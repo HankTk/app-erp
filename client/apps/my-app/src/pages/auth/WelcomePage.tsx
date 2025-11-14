@@ -115,13 +115,14 @@ const MenuCardSubtitle = styled(AxParagraph)`
 
 const menuItems = [
   { id: 'orders', labelKey: 'sidebar.customerOrder', subtitleKey: null, disabled: false },
-  { id: 'purchase-requisition', labelKey: 'module.purchaseRequisition', subtitleKey: 'module.comingSoon', disabled: true },
   { id: 'inventory-control', labelKey: 'module.inventoryControl', subtitleKey: 'module.comingSoon', disabled: true },
-  { id: 'shop', labelKey: 'module.shop', subtitleKey: 'module.comingSoon', disabled: true },
-  { id: 'rma', labelKey: 'module.rma', subtitleKey: 'module.comingSoon', disabled: true },
+  { id: 'purchase-requisition', labelKey: 'module.purchaseRequisition', subtitleKey: 'module.comingSoon', disabled: true },
   { id: 'accounts-receivable', labelKey: 'module.accountsReceivable', subtitleKey: 'module.comingSoon', disabled: true },
-  { id: 'accounts-payable', labelKey: 'module.accountsPayable', subtitleKey: 'module.comingSoon', disabled: true },
   { id: 'general-ledger', labelKey: 'module.generalLedger', subtitleKey: 'module.comingSoon', disabled: true },
+  { id: 'accounts-payable', labelKey: 'module.accountsPayable', subtitleKey: 'module.comingSoon', disabled: true },
+  { id: 'rma', labelKey: 'module.rma', subtitleKey: 'module.comingSoon', disabled: true },
+  { id: 'shop', labelKey: 'module.shop', subtitleKey: 'module.comingSoon', disabled: true },
+  { id: 'master', labelKey: 'sidebar.master', subtitleKey: null, disabled: false },
 ];
 
 interface WelcomePageProps {
