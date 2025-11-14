@@ -96,6 +96,7 @@ public class ProductRepository extends AbstractJsonRepository<Product> {
         existingProduct.setProductName(productDetails.getProductName());
         existingProduct.setDescription(productDetails.getDescription());
         existingProduct.setUnitPrice(productDetails.getUnitPrice());
+        existingProduct.setCost(productDetails.getCost());
         existingProduct.setUnitOfMeasure(productDetails.getUnitOfMeasure());
         existingProduct.setActive(productDetails.isActive());
         existingProduct.setJsonData(productDetails.getJsonData());

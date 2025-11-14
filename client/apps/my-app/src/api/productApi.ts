@@ -6,6 +6,7 @@ export interface Product {
   productName?: string;
   description?: string;
   unitPrice?: number;
+  cost?: number; // Product cost for General Ledger
   unitOfMeasure?: string;
   active?: boolean;
   jsonData?: Record<string, any>;

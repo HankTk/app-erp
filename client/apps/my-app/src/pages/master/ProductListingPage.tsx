@@ -108,6 +108,7 @@ export function ProductListingPage({ onNavigateBack }: ProductListingPageProps =
     setFormData({
       active: true,
       unitPrice: 0,
+      cost: 0,
     });
     setSelectedProduct(null);
     setDialogMode('add');
@@ -285,6 +286,7 @@ export function ProductListingPage({ onNavigateBack }: ProductListingPageProps =
                   <AxTableHeader>Product Name</AxTableHeader>
                   <AxTableHeader>Description</AxTableHeader>
                   <AxTableHeader align="right">Unit Price</AxTableHeader>
+                  <AxTableHeader align="right">Cost</AxTableHeader>
                   <AxTableHeader>Unit of Measure</AxTableHeader>
                   <AxTableHeader align="center">Active</AxTableHeader>
                   <AxTableHeader align="center">Actions</AxTableHeader>
@@ -297,9 +299,14 @@ export function ProductListingPage({ onNavigateBack }: ProductListingPageProps =
                     <AxTableCell>{product.productName || ''}</AxTableCell>
                     <AxTableCell>{product.description || ''}</AxTableCell>
                     <AxTableCell align="right">
-                      {product.unitPrice !== undefined 
+                      {product.unitPrice !== undefined && product.unitPrice !== null 
                         ? `$${product.unitPrice.toFixed(2)}` 
                         : ''}
+                    </AxTableCell>
+                    <AxTableCell align="right">
+                      {product.cost !== undefined && product.cost !== null 
+                        ? `$${product.cost.toFixed(2)}` 
+                        : '-'}
                     </AxTableCell>
                     <AxTableCell>{product.unitOfMeasure || ''}</AxTableCell>
                     <AxTableCell align="center">
@@ -443,10 +450,27 @@ export function ProductListingPage({ onNavigateBack }: ProductListingPageProps =
               type="number"
               step="0.01"
               min="0"
-              value={formData.unitPrice !== undefined ? formData.unitPrice : ''}
+              value={formData.unitPrice !== undefined && formData.unitPrice !== null ? formData.unitPrice : ''}
               onChange={(e) => {
                 const value = parseFloat(e.target.value) || 0;
                 setFormData({ ...formData, unitPrice: value });
+              }}
+              style={{ marginTop: 'var(--spacing-xs)' }}
+              disabled={submitting}
+              fullWidth
+              placeholder="0.00"
+            />
+          </AxFormGroup>
+          <AxFormGroup>
+            <AxLabel>Cost (for General Ledger)</AxLabel>
+            <AxInput
+              type="number"
+              step="0.01"
+              min="0"
+              value={formData.cost !== undefined && formData.cost !== null ? formData.cost : ''}
+              onChange={(e) => {
+                const value = parseFloat(e.target.value) || 0;
+                setFormData({ ...formData, cost: value });
               }}
               style={{ marginTop: 'var(--spacing-xs)' }}
               disabled={submitting}

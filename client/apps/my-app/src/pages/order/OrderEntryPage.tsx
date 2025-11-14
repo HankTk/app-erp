@@ -165,10 +165,12 @@ interface OrderEntryPageProps {
   orderIdToEdit?: string | null;
   onNavigateBack?: () => void;
   readOnly?: boolean; // If true, all fields are read-only except history notes
+  title?: string; // Custom title for the page
+  subtitle?: string; // Custom subtitle for the page
 }
 
 export function OrderEntryPage(props: OrderEntryPageProps = {}) {
-  const { onNavigateToOrders, orderIdToEdit, onNavigateBack, readOnly = false } = props;
+  const { onNavigateToOrders, orderIdToEdit, onNavigateBack, readOnly = false, title, subtitle } = props;
   const { t } = useI18n();
   const [currentStep, setCurrentStep] = useState<OrderStep>('entry');
   const [currentEntrySubStep, setCurrentEntrySubStep] = useState<EntrySubStep>('customer');
@@ -1919,10 +1921,10 @@ export function OrderEntryPage(props: OrderEntryPageProps = {}) {
             )}
             <div style={{ flex: 1 }}>
               <AxHeading3 style={{ marginBottom: 'var(--spacing-xs)' }}>
-                {t('orderEntry.title')}
+                {title || t('orderEntry.title')}
               </AxHeading3>
               <AxParagraph style={{ color: 'var(--color-text-secondary)' }}>
-                {t('orderEntry.subtitle')}
+                {subtitle || t('orderEntry.subtitle')}
               </AxParagraph>
             </div>
           </HeaderLeft>

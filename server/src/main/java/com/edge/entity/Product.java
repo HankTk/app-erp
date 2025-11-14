@@ -11,6 +11,7 @@ public class Product {
     private String productName;
     private String description;
     private BigDecimal unitPrice;
+    private BigDecimal cost; // Product cost for General Ledger
     private String unitOfMeasure;
     private boolean active;
     private Map<String, Object> jsonData;

@@ -14,6 +14,10 @@ import { ProductListingPage } from './pages/master/ProductListingPage';
 import { AddressListingPage } from './pages/master/AddressListingPage';
 import { OrderListingPage } from './pages/order/OrderListingPage';
 import { MasterPage } from './pages/master/MasterPage';
+import { AccountReceivableListingPage } from './pages/accountReceivable/AccountReceivableListingPage';
+import { AccountReceivablePage } from './pages/accountReceivable/AccountReceivablePage';
+import { GeneralLedgerListingPage } from './pages/generalLedger/GeneralLedgerListingPage';
+import { GeneralLedgerPage } from './pages/generalLedger/GeneralLedgerPage';
 import { fetchUsers } from './api/userApi';
 import styled from 'styled-components';
 
@@ -70,13 +74,15 @@ const FullWidthContainer = styled.div`
   transition: background-color var(--transition-base);
 `;
 
-type AppPage = 'welcome' | 'master' | 'users' | 'customers' | 'products' | 'addresses' | 'orders' | 'order-entry';
+type AppPage = 'welcome' | 'master' | 'users' | 'customers' | 'products' | 'addresses' | 'orders' | 'order-entry' | 'accounts-receivable' | 'accounts-receivable-detail' | 'general-ledger' | 'general-ledger-detail';
 
 function AppContent() {
   const [user, setUser] = useState<any>(null);
   const [currentPage, setCurrentPage] = useState<AppPage>('welcome');
   const [orderIdToEdit, setOrderIdToEdit] = useState<string | null>(null);
   const [orderIdToView, setOrderIdToView] = useState<string | null>(null);
+  const [invoiceIdToView, setInvoiceIdToView] = useState<string | null>(null);
+  const [glOrderIdToView, setGlOrderIdToView] = useState<string | null>(null);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [checkingUsers, setCheckingUsers] = useState(true);
@@ -168,6 +174,14 @@ function AppContent() {
         return translate('sidebar.orders');
       case 'order-entry':
         return translate('sidebar.orderEntry');
+      case 'accounts-receivable':
+        return translate('module.accountsReceivable');
+      case 'accounts-receivable-detail':
+        return translate('module.accountsReceivable');
+      case 'general-ledger':
+        return translate('module.generalLedger');
+      case 'general-ledger-detail':
+        return translate('module.generalLedger');
       case 'master':
         return translate('master.title');
       case 'welcome':
@@ -210,7 +224,7 @@ function AppContent() {
         onToggle={() => setSidebarOpen(!sidebarOpen)}
         currentPage={currentPage}
         onPageChange={(page) => {
-          if (page === 'welcome' || page === 'master' || page === 'users' || page === 'customers' || page === 'products' || page === 'addresses' || page === 'orders' || page === 'order-entry') {
+          if (page === 'welcome' || page === 'master' || page === 'users' || page === 'customers' || page === 'products' || page === 'addresses' || page === 'orders' || page === 'order-entry' || page === 'accounts-receivable' || page === 'accounts-receivable-detail' || page === 'general-ledger' || page === 'general-ledger-detail') {
             setCurrentPage(page);
           }
         }}
@@ -227,7 +241,7 @@ function AppContent() {
         onSettingsClick={() => setDrawerOpen(!drawerOpen)}
         title={getPageTitle(currentPage, t)}
       />
-      {currentPage === 'orders' || currentPage === 'order-entry' || currentPage === 'customers' || currentPage === 'products' || currentPage === 'addresses' || currentPage === 'users' || currentPage === 'master' ? (
+      {currentPage === 'orders' || currentPage === 'order-entry' || currentPage === 'accounts-receivable' || currentPage === 'accounts-receivable-detail' || currentPage === 'general-ledger' || currentPage === 'general-ledger-detail' || currentPage === 'customers' || currentPage === 'products' || currentPage === 'addresses' || currentPage === 'users' || currentPage === 'master' ? (
         <FullWidthContainer>
           <AppContainer>
             {currentPage === 'orders' ? (
@@ -293,6 +307,46 @@ function AppContent() {
                   onNavigateBack={() => setCurrentPage('master')}
                 />
               </div>
+            ) : currentPage === 'accounts-receivable' ? (
+              <div style={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column', overflow: 'hidden', width: '100%' }}>
+                <AccountReceivableListingPage 
+                  onViewInvoice={(orderId: string) => {
+                    setInvoiceIdToView(orderId);
+                    setCurrentPage('accounts-receivable-detail');
+                  }}
+                  onNavigateBack={() => setCurrentPage('welcome')}
+                />
+              </div>
+            ) : currentPage === 'accounts-receivable-detail' ? (
+              <div style={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column', overflow: 'hidden', width: '100%' }}>
+                <AccountReceivablePage 
+                  invoiceId={invoiceIdToView}
+                  onNavigateBack={() => {
+                    setInvoiceIdToView(null);
+                    setCurrentPage('accounts-receivable');
+                  }}
+                />
+              </div>
+            ) : currentPage === 'general-ledger' ? (
+              <div style={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column', overflow: 'hidden', width: '100%' }}>
+                <GeneralLedgerListingPage 
+                  onViewEntry={(orderId: string) => {
+                    setGlOrderIdToView(orderId);
+                    setCurrentPage('general-ledger-detail');
+                  }}
+                  onNavigateBack={() => setCurrentPage('welcome')}
+                />
+              </div>
+            ) : currentPage === 'general-ledger-detail' ? (
+              <div style={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column', overflow: 'hidden', width: '100%' }}>
+                <GeneralLedgerPage 
+                  orderId={glOrderIdToView}
+                  onNavigateBack={() => {
+                    setGlOrderIdToView(null);
+                    setCurrentPage('general-ledger');
+                  }}
+                />
+              </div>
             ) : currentPage === 'master' ? (
               <div style={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column', overflow: 'hidden', width: '100%' }}>
                 <MasterPage
@@ -314,7 +368,7 @@ function AppContent() {
               <WelcomePage
                 user={user}
                 onPageChange={(page) => {
-                  if (page === 'master' || page === 'users' || page === 'customers' || page === 'products' || page === 'addresses' || page === 'orders' || page === 'order-entry') {
+                  if (page === 'master' || page === 'users' || page === 'customers' || page === 'products' || page === 'addresses' || page === 'orders' || page === 'order-entry' || page === 'accounts-receivable' || page === 'accounts-receivable-detail' || page === 'general-ledger' || page === 'general-ledger-detail') {
                     setCurrentPage(page);
                   }
                 }}
