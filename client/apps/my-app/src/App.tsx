@@ -1,0 +1,330 @@
+import { useState, useEffect } from 'react';
+import { ThemeProvider, useTheme, AxSection, AxSectionTitle, AxContainer } from '@ui/components';
+import { I18nProvider, useI18n } from './i18n/I18nProvider';
+import { Sidebar } from './components/Sidebar';
+import { Drawer } from './components/Drawer';
+import { AppHeader } from './components/AppHeader';
+import { UserListingPage } from './pages/master/UserListingPage';
+import { LoginPage } from './pages/auth/LoginPage';
+import { WelcomePage } from './pages/auth/WelcomePage';
+import { InitialSetupPage } from './pages/auth/InitialSetupPage';
+import { CustomerListingPage } from './pages/master/CustomerListingPage';
+import { OrderEntryPage } from './pages/order/OrderEntryPage';
+import { ProductListingPage } from './pages/master/ProductListingPage';
+import { AddressListingPage } from './pages/master/AddressListingPage';
+import { OrderListingPage } from './pages/order/OrderListingPage';
+import { MasterPage } from './pages/master/MasterPage';
+import { fetchUsers } from './api/userApi';
+import styled from 'styled-components';
+
+const AppWrapper = styled.div`
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  width: 100%;
+  overflow: hidden;
+`;
+
+const AppContainer = styled.div`
+  width: 100%;
+  flex: 1;
+  min-height: 0;
+  background-color: var(--color-background-page);
+  transition: background-color var(--transition-base);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+`;
+
+const AxMainContent = styled.div`
+  padding: var(--spacing-lg) var(--spacing-lg);
+  flex: 1;
+  min-height: 0;
+  width: 100%;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+`;
+
+const ContentSection = styled(AxSection)`
+  flex: 1;
+  overflow: hidden;
+  margin-bottom: 0;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+`;
+
+const CompactSectionTitle = styled(AxSectionTitle)`
+  margin-bottom: var(--spacing-xs);
+`;
+
+const FullWidthContainer = styled.div`
+  width: 100%;
+  max-width: 100%;
+  margin: 0;
+  padding: 0;
+  background-color: var(--color-background-page);
+  min-height: 100vh;
+  transition: background-color var(--transition-base);
+`;
+
+type AppPage = 'welcome' | 'master' | 'users' | 'customers' | 'products' | 'addresses' | 'orders' | 'order-entry';
+
+function AppContent() {
+  const [user, setUser] = useState<any>(null);
+  const [currentPage, setCurrentPage] = useState<AppPage>('welcome');
+  const [orderIdToEdit, setOrderIdToEdit] = useState<string | null>(null);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [drawerOpen, setDrawerOpen] = useState(false);
+  const [checkingUsers, setCheckingUsers] = useState(true);
+  const [hasUsers, setHasUsers] = useState<boolean | null>(null);
+  const { theme, toggleTheme } = useTheme();
+  const { t } = useI18n();
+
+  // Check if there are any users in the system
+  useEffect(() => {
+    const checkUsers = async () => {
+      try {
+        const users = await fetchUsers();
+        setHasUsers(users.length > 0);
+      } catch (err) {
+        console.error('Error checking users:', err);
+        // If we can't check, assume there are users (fallback to login)
+        setHasUsers(true);
+      } finally {
+        setCheckingUsers(false);
+      }
+    };
+
+    // Load user from localStorage on mount
+    const savedUser = localStorage.getItem('user');
+    if (savedUser) {
+      try {
+        setUser(JSON.parse(savedUser));
+        setHasUsers(true); // If user is logged in, assume users exist
+        setCheckingUsers(false);
+      } catch (e) {
+        localStorage.removeItem('user');
+        checkUsers();
+      }
+    } else {
+      checkUsers();
+    }
+  }, []);
+
+  const handleLoginSuccess = (loggedInUser: any) => {
+    setUser(loggedInUser);
+    localStorage.setItem('user', JSON.stringify(loggedInUser));
+    setCurrentPage('welcome');
+    setHasUsers(true); // After login, we know users exist
+  };
+
+  const handleSetupComplete = (createdUser: any) => {
+    setUser(createdUser);
+    localStorage.setItem('user', JSON.stringify(createdUser));
+    setCurrentPage('welcome');
+    setHasUsers(true); // After setup, we know users exist
+  };
+
+  const handleLogout = () => {
+    setUser(null);
+    localStorage.removeItem('user');
+    setCurrentPage('welcome');
+    // Re-check if users exist after logout
+    checkUsersAfterAction();
+  };
+
+  const checkUsersAfterAction = async () => {
+    try {
+      const users = await fetchUsers();
+      setHasUsers(users.length > 0);
+    } catch (err) {
+      console.error('Error checking users:', err);
+    }
+  };
+
+  const handleNoUsersRemaining = () => {
+    // Log out the current user
+    setUser(null);
+    localStorage.removeItem('user');
+    // Set hasUsers to false to trigger initial setup page
+    setHasUsers(false);
+  };
+
+  const getPageTitle = (page: AppPage, translate: (key: string) => string): string | undefined => {
+    switch (page) {
+      case 'users':
+        return translate('user.title');
+      case 'customers':
+        return translate('sidebar.customers');
+      case 'products':
+        return translate('sidebar.products');
+      case 'addresses':
+        return translate('sidebar.addresses');
+      case 'orders':
+        return translate('sidebar.orders');
+      case 'order-entry':
+        return translate('sidebar.orderEntry');
+      case 'master':
+        return translate('master.title');
+      case 'welcome':
+        return undefined; // Welcome page doesn't show title
+      default:
+        return undefined;
+    }
+  };
+
+  // Show loading state while checking users
+  if (checkingUsers) {
+    return (
+      <div style={{ 
+        display: 'flex', 
+        justifyContent: 'center', 
+        alignItems: 'center', 
+        minHeight: '100vh',
+        backgroundColor: 'var(--color-background-page)'
+      }}>
+        <div>Loading...</div>
+      </div>
+    );
+  }
+
+  // Show initial setup page if no users exist
+  if (!user && hasUsers === false) {
+    return <InitialSetupPage onSetupComplete={handleSetupComplete} />;
+  }
+
+  // Show login page if not authenticated and users exist
+  if (!user) {
+    return <LoginPage onLoginSuccess={handleLoginSuccess} />;
+  }
+
+  // Show main app with welcome or users page
+  return (
+    <AppWrapper>
+      <Sidebar
+        isOpen={sidebarOpen}
+        onToggle={() => setSidebarOpen(!sidebarOpen)}
+        currentPage={currentPage}
+        onPageChange={(page) => {
+          if (page === 'welcome' || page === 'master' || page === 'users' || page === 'customers' || page === 'products' || page === 'addresses' || page === 'orders' || page === 'order-entry') {
+            setCurrentPage(page);
+          }
+        }}
+        onLogout={handleLogout}
+      />
+      <Drawer
+        isOpen={drawerOpen}
+        onToggle={() => setDrawerOpen(!drawerOpen)}
+        theme={theme}
+        onThemeChange={toggleTheme}
+      />
+      <AppHeader
+        onMenuClick={() => setSidebarOpen(!sidebarOpen)}
+        onSettingsClick={() => setDrawerOpen(!drawerOpen)}
+        title={getPageTitle(currentPage, t)}
+      />
+      {currentPage === 'orders' || currentPage === 'order-entry' || currentPage === 'customers' || currentPage === 'products' || currentPage === 'addresses' || currentPage === 'users' || currentPage === 'master' ? (
+        <FullWidthContainer>
+          <AppContainer>
+            {currentPage === 'orders' ? (
+              <div style={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column', overflow: 'hidden', width: '100%' }}>
+                <OrderListingPage 
+                  onNavigateToOrderEntry={() => {
+                    setOrderIdToEdit(null);
+                    setCurrentPage('order-entry');
+                  }}
+                  onEditOrder={(orderId: string) => {
+                    setOrderIdToEdit(orderId);
+                    setCurrentPage('order-entry');
+                  }}
+                  onNavigateBack={() => setCurrentPage('welcome')}
+                />
+              </div>
+            ) : currentPage === 'order-entry' ? (
+              <div style={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column', overflow: 'hidden', width: '100%' }}>
+                <OrderEntryPage 
+                  orderIdToEdit={orderIdToEdit}
+                  onNavigateToOrders={() => {
+                    setOrderIdToEdit(null);
+                    setCurrentPage('orders');
+                  }}
+                  onNavigateBack={() => {
+                    setOrderIdToEdit(null);
+                    setCurrentPage('orders');
+                  }}
+                />
+              </div>
+            ) : currentPage === 'customers' ? (
+              <div style={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column', overflow: 'hidden', width: '100%' }}>
+                <CustomerListingPage 
+                  onNavigateBack={() => setCurrentPage('master')}
+                />
+              </div>
+            ) : currentPage === 'products' ? (
+              <div style={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column', overflow: 'hidden', width: '100%' }}>
+                <ProductListingPage 
+                  onNavigateBack={() => setCurrentPage('master')}
+                />
+              </div>
+            ) : currentPage === 'addresses' ? (
+              <div style={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column', overflow: 'hidden', width: '100%' }}>
+                <AddressListingPage 
+                  onNavigateBack={() => setCurrentPage('master')}
+                />
+              </div>
+            ) : currentPage === 'users' ? (
+              <div style={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column', overflow: 'hidden', width: '100%' }}>
+                <UserListingPage 
+                  onNoUsersRemaining={handleNoUsersRemaining}
+                  onNavigateBack={() => setCurrentPage('master')}
+                />
+              </div>
+            ) : currentPage === 'master' ? (
+              <div style={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column', overflow: 'hidden', width: '100%' }}>
+                <MasterPage
+                  onPageChange={(page) => {
+                    if (page === 'users' || page === 'customers' || page === 'products' || page === 'addresses') {
+                      setCurrentPage(page);
+                    }
+                  }}
+                  onNavigateBack={() => setCurrentPage('welcome')}
+                />
+              </div>
+            ) : null}
+          </AppContainer>
+        </FullWidthContainer>
+      ) : (
+        <AxContainer>
+          <AppContainer>
+            {currentPage === 'welcome' ? (
+              <WelcomePage
+                user={user}
+                onPageChange={(page) => {
+                  if (page === 'master' || page === 'users' || page === 'customers' || page === 'products' || page === 'addresses' || page === 'orders' || page === 'order-entry') {
+                    setCurrentPage(page);
+                  }
+                }}
+              />
+            ) : null}
+          </AppContainer>
+        </AxContainer>
+      )}
+    </AppWrapper>
+  );
+}
+
+function App() {
+  return (
+    <ThemeProvider>
+      <I18nProvider>
+        <AppContent />
+      </I18nProvider>
+    </ThemeProvider>
+  );
+}
+
+export default App;
+

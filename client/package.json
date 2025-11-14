@@ -1,0 +1,49 @@
+{
+  "name": "styled-components-library",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Monorepo for styled-components UI library with CSS variables, design tokens, and dark mode support",
+  "scripts": {
+    "build": "pnpm --filter @ui/components build && pnpm --filter my-dev build && pnpm --filter my-app build && pnpm --filter my-electron build",
+    "build:electron": "pnpm --filter my-electron build",
+    "build:library": "pnpm --filter @ui/components build",
+    "build:my-dev": "pnpm --filter my-dev build",
+    "build:my-app": "pnpm --filter my-app build",
+    "clean": "pnpm --recursive exec rm -rf dist node_modules",
+    "clean:electron": "pnpm --filter my-electron exec rm -rf dist",
+    "clean:library": "pnpm --filter @ui/components exec rm -rf dist",
+    "clean:my-dev": "pnpm --filter my-dev exec rm -rf dist",
+    "clean:my-app": "pnpm --filter my-app exec rm -rf dist",
+    "dev:electron": "pnpm --filter my-electron dev",
+    "dev:library": "pnpm --filter @ui/components dev",
+    "dev:my-dev": "pnpm --filter my-dev dev",
+    "dev:my-app": "pnpm --filter my-app dev",
+    "clean:port": "lsof -ti:3001 | xargs kill -9 2>/dev/null || true",
+    "app": "pnpm clean:port && pnpm --filter my-app dev & pnpm --filter my-electron dev",
+    "lint": "pnpm --recursive lint",
+    "lint:fix": "pnpm --recursive lint --fix",
+    "preview:my-dev": "pnpm --filter my-dev preview",
+    "preview:my-app": "pnpm --filter my-app preview",
+    "test": "pnpm --recursive test",
+    "type-check": "pnpm --recursive type-check",
+    "type-check:my-dev": "pnpm --filter my-dev tsc --noEmit",
+    "type-check:electron": "pnpm --filter my-electron tsc --noEmit",
+    "type-check:library": "pnpm --filter @ui/components type-check",
+    "type-check:my-app": "pnpm --filter my-app tsc --noEmit"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "@types/react": "^18.2.0",
+    "@types/react-dom": "^18.2.0",
+    "electron-to-chromium": "^1.5.249",
+    "nx": "22.0.3",
+    "patch-package": "^8.0.0",
+    "rollup": "^4.18.0",
+    "typescript": "^5.0.0"
+  },
+  "pnpm": {
+    "overrides": {
+      "rollup": "^4.18.0"
+    }
+  }
+}

@@ -1,0 +1,185 @@
+import styled from 'styled-components';
+import { AxButton } from '@ui/components';
+import { useI18n } from '../i18n/I18nProvider';
+
+const AxOverlay = styled.div<{ $isOpen: boolean }>`
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.3);
+  z-index: 99;
+  opacity: ${({ $isOpen }) => ($isOpen ? 1 : 0)};
+  visibility: ${({ $isOpen }) => ($isOpen ? 'visible' : 'hidden')};
+  transition: opacity var(--transition-base), visibility var(--transition-base);
+`;
+
+const AxSidebar = styled.div<{ $isOpen: boolean }>`
+  position: fixed;
+  left: 0;
+  top: 0;
+  height: 100vh;
+  width: 280px;
+  background-color: var(--color-background-default);
+  border-right: 1px solid var(--color-border-default);
+  padding: var(--spacing-xl);
+  z-index: 100;
+  overflow-y: auto;
+  transform: ${({ $isOpen }) => ($isOpen ? 'translateX(0)' : 'translateX(-100%)')};
+  transition: transform var(--transition-base);
+  box-shadow: ${({ $isOpen }) => ($isOpen ? 'var(--shadow-lg)' : 'none')};
+`;
+
+const AxSidebarHeader = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: var(--spacing-2xl);
+  padding-top: calc(44px + var(--spacing-lg));
+`;
+
+const AxSidebarTitleWrapper = styled.div`
+  flex: 1;
+`;
+
+const AxSidebarTitle = styled.h2`
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text-primary);
+  margin-bottom: var(--spacing-sm);
+`;
+
+const AxSidebarSubtitle = styled.p`
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+`;
+
+const AxMenuList = styled.ul`
+  list-style: none;
+  padding: 0;
+  margin: 0;
+`;
+
+const AxMenuItem = styled.li`
+  margin-bottom: var(--spacing-xs);
+`;
+
+const AxMenuButton = styled(AxButton)<{ $isActive: boolean; $disabled?: boolean }>`
+  width: 100%;
+  justify-content: flex-start;
+  text-align: left;
+  background-color: ${({ $isActive }) =>
+  {
+    return $isActive ? 'var(--color-primary)' : 'transparent';
+  }};
+  color: ${({ $isActive, $disabled }) =>
+  {
+    if ($disabled) return 'var(--color-text-secondary)';
+    return $isActive ? 'var(--color-text-inverse)' : 'var(--color-text-primary)';
+  }};
+  opacity: ${({ $disabled }) => ($disabled ? 0.6 : 1)};
+  cursor: ${({ $disabled }) => ($disabled ? 'not-allowed' : 'pointer')};
+  &:hover
+  {
+    background-color: ${({ $isActive, $disabled }) =>
+    {
+      if ($disabled) return 'transparent';
+      return $isActive ? 'var(--color-primary-hover)' : 'var(--color-background-disabled)';
+    }};
+  }
+`;
+
+const AxMenuDivider = styled.div`
+  height: 1px;
+  background-color: var(--color-border-default);
+  margin: var(--spacing-lg) 0;
+`;
+
+const AxLogoutButton = styled(AxButton)`
+  width: 100%;
+  justify-content: flex-start;
+  text-align: left;
+  background-color: transparent;
+  color: var(--color-danger);
+  margin-top: var(--spacing-md);
+  &:hover
+  {
+    background-color: var(--color-danger);
+    color: var(--color-text-inverse);
+  }
+`;
+
+
+interface SidebarProps
+{
+  isOpen: boolean;
+  onToggle: () => void;
+  currentPage: string;
+  onPageChange: (page: string) => void;
+  onLogout: () => void;
+}
+
+const menuItems = [
+  { id: 'welcome', labelKey: 'sidebar.welcome' },
+  { id: 'orders', labelKey: 'sidebar.customerOrder' },
+  { id: 'purchase-requisition', labelKey: 'module.purchaseRequisition', disabled: true },
+  { id: 'shop', labelKey: 'module.shop', disabled: true },
+  { id: 'rma', labelKey: 'module.rma', disabled: true },
+  { id: 'inventory-control', labelKey: 'module.inventoryControl', disabled: true },
+  { id: 'accounts-receivable', labelKey: 'module.accountsReceivable', disabled: true },
+  { id: 'accounts-payable', labelKey: 'module.accountsPayable', disabled: true },
+  { id: 'general-ledger', labelKey: 'module.generalLedger', disabled: true },
+  { id: 'master', labelKey: 'sidebar.master' },
+];
+
+export function Sidebar({ isOpen, onToggle, currentPage, onPageChange, onLogout }: SidebarProps)
+{
+  const { t } = useI18n();
+
+  return (
+    <>
+      <AxOverlay $isOpen={isOpen} onClick={onToggle} />
+      <AxSidebar $isOpen={isOpen}>
+        <AxSidebarHeader>
+          <AxSidebarTitleWrapper>
+            <AxSidebarTitle>{t('sidebar.title')}</AxSidebarTitle>
+            <AxSidebarSubtitle>{t('sidebar.subtitle')}</AxSidebarSubtitle>
+          </AxSidebarTitleWrapper>
+        </AxSidebarHeader>
+        <AxMenuList>
+          {menuItems.map((item) => (
+            <AxMenuItem key={item.id}>
+              <AxMenuButton
+                $isActive={currentPage === item.id}
+                $disabled={item.disabled}
+                onClick={() => {
+                  if (!item.disabled) {
+                    onPageChange(item.id);
+                    onToggle(); // Close sidebar after selection
+                  }
+                }}
+                variant={currentPage === item.id ? 'primary' : 'secondary'}
+                disabled={item.disabled}
+              >
+                {t(item.labelKey)}
+                {item.disabled && ` (${t('module.comingSoon')})`}
+              </AxMenuButton>
+            </AxMenuItem>
+          ))}
+        </AxMenuList>
+        <AxMenuDivider />
+        <AxLogoutButton
+          onClick={() => {
+            onLogout();
+            onToggle(); // Close sidebar after logout
+          }}
+          variant="secondary"
+        >
+          {t('sidebar.logout')}
+        </AxLogoutButton>
+      </AxSidebar>
+    </>
+  );
+}
+
