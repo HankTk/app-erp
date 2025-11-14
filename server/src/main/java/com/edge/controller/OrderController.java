@@ -107,6 +107,32 @@ public class OrderController {
         }
     }
 
+    @GetMapping(value = "/invoice/next-number", produces = MediaType.APPLICATION_JSON_VALUE + ";charset=UTF-8")
+    public ResponseEntity<InvoiceNumberResponse> getNextInvoiceNumber() {
+        try {
+            String invoiceNumber = orderService.generateNextInvoiceNumber();
+            return ResponseEntity.ok(new InvoiceNumberResponse(invoiceNumber));
+        } catch (RuntimeException e) {
+            return ResponseEntity.internalServerError().build();
+        }
+    }
+    
+    public static class InvoiceNumberResponse {
+        private String invoiceNumber;
+        
+        public InvoiceNumberResponse(String invoiceNumber) {
+            this.invoiceNumber = invoiceNumber;
+        }
+        
+        public String getInvoiceNumber() {
+            return invoiceNumber;
+        }
+        
+        public void setInvoiceNumber(String invoiceNumber) {
+            this.invoiceNumber = invoiceNumber;
+        }
+    }
+
     // Request DTOs
     public static class AddOrderItemRequest {
         private String productId;

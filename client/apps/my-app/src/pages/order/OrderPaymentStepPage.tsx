@@ -1,5 +1,6 @@
 import { AxHeading3, AxParagraph, AxInput, AxLabel, AxFormGroup, AxListbox } from '@ui/components';
 import { OrderPaymentStepProps } from './types';
+import { useI18n } from '../../i18n/I18nProvider';
 
 export function OrderPaymentStepPage(props: OrderPaymentStepProps) {
   const {
@@ -10,50 +11,55 @@ export function OrderPaymentStepPage(props: OrderPaymentStepProps) {
     onPaymentAmountChange,
     onPaymentDateChange,
     onPaymentMethodChange,
+    readOnly = false,
   } = props;
+  const { t } = useI18n();
 
   return (
     <div>
-      <AxHeading3 style={{ marginBottom: 'var(--spacing-md)' }}>入金処理 (Payment / Settlement)</AxHeading3>
+      <AxHeading3 style={{ marginBottom: 'var(--spacing-md)' }}>{t('orderEntry.payment.title')}</AxHeading3>
       <AxParagraph style={{ marginBottom: 'var(--spacing-lg)', color: 'var(--color-text-secondary)' }}>
-        顧客からの入金を確認・照合して完了します。
+        {t('orderEntry.payment.description')}
       </AxParagraph>
 
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-md)' }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-xsm)' }}>
         <AxFormGroup>
-          <AxLabel>入金額 (Payment Amount)</AxLabel>
+          <AxLabel>{t('orderEntry.payment.paymentAmount')}</AxLabel>
           <AxInput
             type="number"
             value={paymentAmount || ''}
             onChange={e => onPaymentAmountChange(parseFloat(e.target.value) || 0)}
+            disabled={readOnly}
             placeholder="0.00"
             fullWidth
           />
         </AxFormGroup>
 
         <AxFormGroup>
-          <AxLabel>入金日 (Payment Date)</AxLabel>
+          <AxLabel>{t('orderEntry.payment.paymentDate')}</AxLabel>
           <AxInput
             type="date"
             value={paymentDate}
             onChange={e => onPaymentDateChange(e.target.value)}
+            disabled={readOnly}
             fullWidth
           />
         </AxFormGroup>
 
         <AxFormGroup>
-          <AxLabel>支払方法 (Payment Method)</AxLabel>
+          <AxLabel>{t('orderEntry.payment.paymentMethod')}</AxLabel>
           <AxListbox
             options={[
-              { value: 'BANK_TRANSFER', label: '銀行振込 (Bank Transfer)' },
-              { value: 'CREDIT_CARD', label: 'クレジットカード (Credit Card)' },
-              { value: 'CASH', label: '現金 (Cash)' },
-              { value: 'CHECK', label: '小切手 (Check)' },
-              { value: 'OTHER', label: 'その他 (Other)' },
+              { value: 'BANK_TRANSFER', label: t('orderEntry.payment.method.bankTransfer') },
+              { value: 'CREDIT_CARD', label: t('orderEntry.payment.method.creditCard') },
+              { value: 'CASH', label: t('orderEntry.payment.method.cash') },
+              { value: 'CHECK', label: t('orderEntry.payment.method.check') },
+              { value: 'OTHER', label: t('orderEntry.payment.method.other') },
             ]}
             value={paymentMethod}
             onChange={onPaymentMethodChange}
-            placeholder="支払方法を選択してください"
+            disabled={readOnly}
+            placeholder={t('orderEntry.payment.paymentMethodPlaceholder')}
             fullWidth
           />
         </AxFormGroup>
@@ -66,7 +72,7 @@ export function OrderPaymentStepPage(props: OrderPaymentStepProps) {
           }}
         >
           <AxParagraph style={{ fontWeight: 'var(--font-weight-bold)', marginBottom: 'var(--spacing-sm)' }}>
-            請求金額
+            {t('orderEntry.payment.invoiceAmount')}
           </AxParagraph>
           <AxParagraph style={{ fontSize: 'var(--font-size-lg)', marginBottom: 'var(--spacing-md)' }}>
             ${order?.total?.toFixed(2) || '0.00'}
@@ -77,7 +83,7 @@ export function OrderPaymentStepPage(props: OrderPaymentStepProps) {
                 color: paymentAmount >= (order?.total || 0) ? 'var(--color-success)' : 'var(--color-warning)',
               }}
             >
-              入金額: ${paymentAmount.toFixed(2)} {paymentAmount < (order?.total || 0) && '(不足額あり)'}
+              {t('orderEntry.payment.paymentAmountLabel')} ${paymentAmount.toFixed(2)} {paymentAmount < (order?.total || 0) && t('orderEntry.payment.shortage')}
             </AxParagraph>
           )}
         </div>

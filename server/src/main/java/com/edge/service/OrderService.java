@@ -140,6 +140,10 @@ public class OrderService {
         }
     }
     
+    public String generateNextInvoiceNumber() {
+        return orderRepository.generateNextInvoiceNumber();
+    }
+    
     private void enrichOrderItems(Order order) {
         if (order.getItems() != null) {
             for (OrderItem item : order.getItems()) {

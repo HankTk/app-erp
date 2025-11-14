@@ -20,8 +20,11 @@ public class OrderRepository extends AbstractJsonRepository<Order> {
     private static final String DATA_FILE_NAME = "orders.json";
     private static final String DATA_DIR_NAME = "data";
     private static final String COUNTER_FILE_NAME = "order_counter.json";
+    private static final String INVOICE_COUNTER_FILE_NAME = "invoice_counter.json";
     private static final long INITIAL_ORDER_NUMBER = 100000L;
+    private static final long INITIAL_INVOICE_NUMBER = 200000L;
     private java.nio.file.Path counterFilePath;
+    private java.nio.file.Path invoiceCounterFilePath;
 
     public OrderRepository() {
         super(DATA_DIR_NAME, DATA_FILE_NAME, "orders");
@@ -31,6 +34,7 @@ public class OrderRepository extends AbstractJsonRepository<Order> {
                 java.nio.file.Files.createDirectories(dataDir);
             }
             counterFilePath = dataDir.resolve(COUNTER_FILE_NAME);
+            invoiceCounterFilePath = dataDir.resolve(INVOICE_COUNTER_FILE_NAME);
         } catch (IOException e) {
             logger.error("Error initializing counter file path", e);
             throw new RuntimeException("Failed to initialize order counter", e);
@@ -122,12 +126,16 @@ public class OrderRepository extends AbstractJsonRepository<Order> {
     
     private synchronized String generateNextOrderNumber() {
         try {
-            // First, try to find a gap (reuse deleted order numbers)
-            long nextOrderNumber = findNextAvailableOrderNumber();
+            // Read current counter value from file
+            long currentCounter = readCounter();
             
-            // Update counter file to reflect the new value
+            // Increment the counter
+            long nextOrderNumber = currentCounter + 1;
+            
+            // Update counter file with the new value
             writeCounter(nextOrderNumber);
-            logger.info("Generated order number: {}", nextOrderNumber);
+            logger.info("Generated order number: {} (counter updated from {} to {})", 
+                nextOrderNumber, currentCounter, nextOrderNumber);
             return String.valueOf(nextOrderNumber);
         } catch (IOException e) {
             logger.error("Error generating order number", e);
@@ -135,53 +143,105 @@ public class OrderRepository extends AbstractJsonRepository<Order> {
         }
     }
     
-    private long findNextAvailableOrderNumber() {
-        // Get all existing order numbers as a sorted set
-        java.util.Set<Long> existingNumbers = items.stream()
-            .filter(order -> order.getOrderNumber() != null && !order.getOrderNumber().trim().isEmpty())
-            .mapToLong(order -> {
-                try {
-                    return Long.parseLong(order.getOrderNumber());
-                } catch (NumberFormatException e) {
-                    return 0L;
-                }
-            })
-            .filter(num -> num >= INITIAL_ORDER_NUMBER)
-            .boxed()
-            .collect(java.util.stream.Collectors.toSet());
-        
-        // If no existing orders, start from initial value
-        if (existingNumbers.isEmpty()) {
-            return INITIAL_ORDER_NUMBER;
+    private long readCounter() throws IOException {
+        // If counter file doesn't exist, initialize it with the initial value
+        if (!java.nio.file.Files.exists(counterFilePath)) {
+            long initialValue = INITIAL_ORDER_NUMBER;
+            writeCounter(initialValue);
+            logger.info("Initialized order counter file with value: {}", initialValue);
+            return initialValue;
         }
         
-        // Find the first gap starting from INITIAL_ORDER_NUMBER
-        for (long num = INITIAL_ORDER_NUMBER; num <= findMaxOrderNumber() + 1; num++) {
-            if (!existingNumbers.contains(num)) {
-                return num;
+        // Read the counter value from file
+        try {
+            String content = new String(java.nio.file.Files.readAllBytes(counterFilePath)).trim();
+            if (content.isEmpty()) {
+                // File exists but is empty, initialize with initial value
+                long initialValue = INITIAL_ORDER_NUMBER;
+                writeCounter(initialValue);
+                logger.info("Counter file was empty, initialized with value: {}", initialValue);
+                return initialValue;
             }
+            
+            long counterValue = Long.parseLong(content);
+            // Ensure counter is at least INITIAL_ORDER_NUMBER
+            if (counterValue < INITIAL_ORDER_NUMBER) {
+                counterValue = INITIAL_ORDER_NUMBER;
+                writeCounter(counterValue);
+                logger.info("Counter value was below initial value, reset to: {}", counterValue);
+            }
+            return counterValue;
+        } catch (NumberFormatException e) {
+            // File contains invalid data, reset to initial value
+            logger.warn("Counter file contains invalid data, resetting to initial value: {}", INITIAL_ORDER_NUMBER);
+            long initialValue = INITIAL_ORDER_NUMBER;
+            writeCounter(initialValue);
+            return initialValue;
         }
-        
-        // If no gap found, use max + 1
-        return findMaxOrderNumber() + 1;
-    }
-    
-    private long findMaxOrderNumber() {
-        return items.stream()
-            .filter(order -> order.getOrderNumber() != null && !order.getOrderNumber().trim().isEmpty())
-            .mapToLong(order -> {
-                try {
-                    return Long.parseLong(order.getOrderNumber());
-                } catch (NumberFormatException e) {
-                    return 0L;
-                }
-            })
-            .max()
-            .orElse(INITIAL_ORDER_NUMBER - 1);
     }
     
     private void writeCounter(long value) throws IOException {
         java.nio.file.Files.write(counterFilePath, String.valueOf(value).getBytes());
+    }
+    
+    public synchronized String generateNextInvoiceNumber() {
+        try {
+            // Read current invoice counter value from file
+            long currentCounter = readInvoiceCounter();
+            
+            // Increment the counter
+            long nextInvoiceNumber = currentCounter + 1;
+            
+            // Update counter file with the new value
+            writeInvoiceCounter(nextInvoiceNumber);
+            logger.info("Generated invoice number: {} (counter updated from {} to {})", 
+                nextInvoiceNumber, currentCounter, nextInvoiceNumber);
+            return String.valueOf(nextInvoiceNumber);
+        } catch (IOException e) {
+            logger.error("Error generating invoice number", e);
+            throw new RuntimeException("Failed to generate invoice number", e);
+        }
+    }
+    
+    private long readInvoiceCounter() throws IOException {
+        // If counter file doesn't exist, initialize it with the initial value
+        if (!java.nio.file.Files.exists(invoiceCounterFilePath)) {
+            long initialValue = INITIAL_INVOICE_NUMBER;
+            writeInvoiceCounter(initialValue);
+            logger.info("Initialized invoice counter file with value: {}", initialValue);
+            return initialValue;
+        }
+        
+        // Read the counter value from file
+        try {
+            String content = new String(java.nio.file.Files.readAllBytes(invoiceCounterFilePath)).trim();
+            if (content.isEmpty()) {
+                // File exists but is empty, initialize with initial value
+                long initialValue = INITIAL_INVOICE_NUMBER;
+                writeInvoiceCounter(initialValue);
+                logger.info("Invoice counter file was empty, initialized with value: {}", initialValue);
+                return initialValue;
+            }
+            
+            long counterValue = Long.parseLong(content);
+            // Ensure counter is at least INITIAL_INVOICE_NUMBER
+            if (counterValue < INITIAL_INVOICE_NUMBER) {
+                counterValue = INITIAL_INVOICE_NUMBER;
+                writeInvoiceCounter(counterValue);
+                logger.info("Invoice counter value was below initial value, reset to: {}", counterValue);
+            }
+            return counterValue;
+        } catch (NumberFormatException e) {
+            // File contains invalid data, reset to initial value
+            logger.warn("Invoice counter file contains invalid data, resetting to initial value: {}", INITIAL_INVOICE_NUMBER);
+            long initialValue = INITIAL_INVOICE_NUMBER;
+            writeInvoiceCounter(initialValue);
+            return initialValue;
+        }
+    }
+    
+    private void writeInvoiceCounter(long value) throws IOException {
+        java.nio.file.Files.write(invoiceCounterFilePath, String.valueOf(value).getBytes());
     }
 
     public Order updateOrder(String id, Order orderDetails) {
@@ -244,6 +304,12 @@ public class OrderRepository extends AbstractJsonRepository<Order> {
         }
         if (orderDetails.getNotes() != null) {
             existingOrder.setNotes(orderDetails.getNotes());
+        }
+        if (orderDetails.getInvoiceNumber() != null) {
+            existingOrder.setInvoiceNumber(orderDetails.getInvoiceNumber());
+        }
+        if (orderDetails.getInvoiceDate() != null) {
+            existingOrder.setInvoiceDate(orderDetails.getInvoiceDate());
         }
         if (orderDetails.getJsonData() != null) {
             existingOrder.setJsonData(orderDetails.getJsonData());

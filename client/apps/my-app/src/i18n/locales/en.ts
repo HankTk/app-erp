@@ -191,6 +191,10 @@ export const en = {
   'orderEntry.payment.method.check': 'Check',
   'orderEntry.payment.method.other': 'Other',
   
+  // Address Labels
+  'orderEntry.shippingAddress': 'Shipping Address',
+  'orderEntry.billingAddress': 'Billing Address',
+  
   // Order History Step
   'orderEntry.history.title': 'History',
   'orderEntry.history.description': 'Displays the execution history and remarks for each step of the order.',

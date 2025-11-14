@@ -11,12 +11,10 @@ import {
   AxParagraph,
   AxButton,
   AxDialog,
-  AxInput,
-  AxLabel,
   AxFormGroup,
   AxListbox,
 } from '@ui/components';
-import { fetchOrders, updateOrder, deleteOrder, Order } from '../../api/orderApi';
+import { fetchOrders, deleteOrder, Order } from '../../api/orderApi';
 import { fetchCustomers, Customer } from '../../api/customerApi';
 import { fetchAddresses, Address } from '../../api/addressApi';
 import styled from 'styled-components';
@@ -68,24 +66,22 @@ const TableCard = styled(AxCard)`
   overflow: hidden;
 `;
 
-type DialogMode = 'view' | 'edit' | null;
 
 interface OrderListingPageProps {
   onNavigateToOrderEntry?: () => void;
   onEditOrder?: (orderId: string) => void;
+  onViewOrder?: (orderId: string) => void;
   onNavigateBack?: () => void;
 }
 
-export function OrderListingPage({ onNavigateToOrderEntry, onEditOrder, onNavigateBack }: OrderListingPageProps = {} as OrderListingPageProps) {
+export function OrderListingPage({ onNavigateToOrderEntry, onEditOrder, onViewOrder, onNavigateBack }: OrderListingPageProps = {} as OrderListingPageProps) {
   const [orders, setOrders] = useState<Order[]>([]);
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [addresses, setAddresses] = useState<Address[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [dialogMode, setDialogMode] = useState<DialogMode>(null);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
-  const [formData, setFormData] = useState<Partial<Order>>({});
   const [submitting, setSubmitting] = useState(false);
   const [statusFilter, setStatusFilter] = useState<string | null>(null);
 
@@ -161,20 +157,16 @@ export function OrderListingPage({ onNavigateToOrderEntry, onEditOrder, onNaviga
   };
 
   const handleView = (order: Order) => {
-    setFormData(order);
-    setSelectedOrder(order);
-    setDialogMode('view');
+    if (onViewOrder && order.id) {
+      // Navigate to order entry page in read-only mode
+      onViewOrder(order.id);
+    }
   };
 
   const handleEdit = (order: Order) => {
     if (onEditOrder && order.id) {
       // Navigate to order entry page for editing
       onEditOrder(order.id);
-    } else {
-      // Fallback to dialog edit if no navigation handler
-      setFormData(order);
-      setSelectedOrder(order);
-      setDialogMode('edit');
     }
   };
 
@@ -200,23 +192,6 @@ export function OrderListingPage({ onNavigateToOrderEntry, onEditOrder, onNaviga
     }
   };
 
-  const handleSave = async () => {
-    if (!selectedOrder?.id) return;
-
-    try {
-      setSubmitting(true);
-      await updateOrder(selectedOrder.id, formData);
-      await loadOrders();
-      setDialogMode(null);
-      setFormData({});
-      setSelectedOrder(null);
-    } catch (err) {
-      console.error('Error saving order:', err);
-      alert(err instanceof Error ? err.message : 'Failed to update order');
-    } finally {
-      setSubmitting(false);
-    }
-  };
 
 
   const getStatusColor = (status?: string) => {
@@ -507,234 +482,6 @@ export function OrderListingPage({ onNavigateToOrderEntry, onEditOrder, onNaviga
         </div>
       </TableCard>
 
-      {/* View/Edit Order Dialog */}
-      <AxDialog
-        open={dialogMode !== null}
-        onClose={() => {
-          setDialogMode(null);
-          setFormData({});
-          setSelectedOrder(null);
-        }}
-        title={dialogMode === 'view' ? 'View Order' : 'Edit Order'}
-        size="large"
-        footer={
-          <div style={{ display: 'flex', gap: 'var(--spacing-sm)', justifyContent: 'flex-end' }}>
-            <AxButton 
-              variant="secondary" 
-              onClick={() => {
-                setDialogMode(null);
-                setFormData({});
-                setSelectedOrder(null);
-              }}
-              disabled={submitting}
-            >
-              {dialogMode === 'view' ? 'Close' : 'Cancel'}
-            </AxButton>
-            {dialogMode === 'edit' && (
-              <AxButton 
-                variant="primary" 
-                onClick={handleSave}
-                disabled={submitting}
-              >
-                {submitting ? 'Saving...' : 'Save'}
-              </AxButton>
-            )}
-          </div>
-        }
-      >
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-lg)', maxHeight: '70vh', overflowY: 'auto' }}>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--spacing-md)' }}>
-            <AxFormGroup>
-              <AxLabel>Order Number</AxLabel>
-              <AxInput
-                type="text"
-                value={formData.orderNumber || ''}
-                onChange={(e) => {
-                  setFormData({ ...formData, orderNumber: e.target.value });
-                }}
-                style={{ marginTop: 'var(--spacing-xs)' }}
-                disabled={submitting || dialogMode === 'view'}
-                fullWidth
-              />
-            </AxFormGroup>
-            <AxFormGroup>
-              <AxLabel>Status</AxLabel>
-              <AxListbox
-                options={[
-                  { value: 'DRAFT', label: 'Draft' },
-                  { value: 'PENDING_APPROVAL', label: 'Pending Approval' },
-                  { value: 'APPROVED', label: 'Approved' },
-                  { value: 'SHIPPING_INSTRUCTED', label: 'Shipping Instructed' },
-                  { value: 'SHIPPED', label: 'Shipped' },
-                  { value: 'INVOICED', label: 'Invoiced' },
-                  { value: 'PAID', label: 'Paid' },
-                  { value: 'CANCELLED', label: 'Cancelled' },
-                ]}
-                value={formData.status || null}
-                onChange={(value) => {
-                  setFormData({ ...formData, status: value as Order['status'] });
-                }}
-                placeholder="Select status"
-                fullWidth
-                disabled={submitting || dialogMode === 'view'}
-              />
-            </AxFormGroup>
-          </div>
-
-          <AxFormGroup>
-            <AxLabel>Customer</AxLabel>
-            <AxInput
-              type="text"
-              value={getCustomerName(formData.customerId)}
-              disabled
-              style={{ marginTop: 'var(--spacing-xs)' }}
-              fullWidth
-            />
-          </AxFormGroup>
-
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--spacing-md)' }}>
-            <AxFormGroup>
-              <AxLabel>Shipping Address</AxLabel>
-              <AxInput
-                type="text"
-                value={formatAddress(formData.shippingAddressId)}
-                disabled
-                style={{ marginTop: 'var(--spacing-xs)' }}
-                fullWidth
-              />
-            </AxFormGroup>
-            <AxFormGroup>
-              <AxLabel>Billing Address</AxLabel>
-              <AxInput
-                type="text"
-                value={formatAddress(formData.billingAddressId)}
-                disabled
-                style={{ marginTop: 'var(--spacing-xs)' }}
-                fullWidth
-              />
-            </AxFormGroup>
-          </div>
-
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--spacing-md)' }}>
-            <AxFormGroup>
-              <AxLabel>Order Date</AxLabel>
-              <AxInput
-                type="text"
-                value={formatDate(formData.orderDate)}
-                disabled
-                style={{ marginTop: 'var(--spacing-xs)' }}
-                fullWidth
-              />
-            </AxFormGroup>
-            <AxFormGroup>
-              <AxLabel>Ship Date</AxLabel>
-              <AxInput
-                type="date"
-                value={formData.shipDate ? new Date(formData.shipDate).toISOString().split('T')[0] : ''}
-                onChange={(e) => {
-                  setFormData({ ...formData, shipDate: e.target.value ? new Date(e.target.value).toISOString() : undefined });
-                }}
-                style={{ marginTop: 'var(--spacing-xs)' }}
-                disabled={submitting || dialogMode === 'view'}
-                fullWidth
-              />
-            </AxFormGroup>
-          </div>
-
-          <div>
-            <AxLabel style={{ marginBottom: 'var(--spacing-sm)' }}>Order Items</AxLabel>
-            <div style={{ overflowX: 'auto' }}>
-              <AxTable fullWidth>
-                <AxTableHead>
-                  <AxTableRow>
-                    <AxTableHeader>Product</AxTableHeader>
-                    <AxTableHeader align="right">Quantity</AxTableHeader>
-                    <AxTableHeader align="right">Unit Price</AxTableHeader>
-                    <AxTableHeader align="right">Line Total</AxTableHeader>
-                  </AxTableRow>
-                </AxTableHead>
-                <AxTableBody>
-                  {formData.items && formData.items.length > 0 ? (
-                    formData.items.map((item) => (
-                      <AxTableRow key={item.id}>
-                        <AxTableCell>{item.productName || item.productCode || 'N/A'}</AxTableCell>
-                        <AxTableCell align="right">{item.quantity || 0}</AxTableCell>
-                        <AxTableCell align="right">${item.unitPrice?.toFixed(2) || '0.00'}</AxTableCell>
-                        <AxTableCell align="right">${item.lineTotal?.toFixed(2) || '0.00'}</AxTableCell>
-                      </AxTableRow>
-                    ))
-                  ) : (
-                    <AxTableRow>
-                      <AxTableCell colSpan={4} align="center">
-                        <AxParagraph style={{ color: 'var(--color-text-secondary)' }}>
-                          No items
-                        </AxParagraph>
-                      </AxTableCell>
-                    </AxTableRow>
-                  )}
-                </AxTableBody>
-              </AxTable>
-            </div>
-          </div>
-
-          <div style={{ padding: 'var(--spacing-md)', backgroundColor: 'var(--color-background-secondary)', borderRadius: 'var(--radius-md)' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 'var(--spacing-sm)' }}>
-              <AxParagraph>Subtotal:</AxParagraph>
-              <AxParagraph>${formData.subtotal?.toFixed(2) || '0.00'}</AxParagraph>
-            </div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 'var(--spacing-sm)' }}>
-              <AxParagraph>Tax:</AxParagraph>
-              <AxParagraph>${formData.tax?.toFixed(2) || '0.00'}</AxParagraph>
-            </div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 'var(--spacing-sm)' }}>
-              <AxParagraph>Shipping:</AxParagraph>
-              <AxParagraph>${formData.shippingCost?.toFixed(2) || '0.00'}</AxParagraph>
-            </div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', paddingTop: 'var(--spacing-sm)', borderTop: '2px solid var(--color-border-default)' }}>
-              <AxParagraph style={{ fontWeight: 'var(--font-weight-bold)' }}>Total:</AxParagraph>
-              <AxParagraph style={{ fontWeight: 'var(--font-weight-bold)' }}>${formData.total?.toFixed(2) || '0.00'}</AxParagraph>
-            </div>
-          </div>
-
-          <AxFormGroup>
-            <AxLabel>Notes</AxLabel>
-            <textarea
-              value={formData.notes || ''}
-              onChange={(e) => {
-                setFormData({ ...formData, notes: e.target.value });
-              }}
-              disabled={submitting || dialogMode === 'view'}
-              placeholder="Order notes"
-              style={{
-                fontFamily: 'var(--font-family-base)',
-                fontSize: 'var(--font-size-base)',
-                fontWeight: 'var(--font-weight-normal)',
-                lineHeight: 'var(--line-height-normal)',
-                padding: 'var(--spacing-sm) calc(var(--spacing-sm) + 6px)',
-                border: '2px solid var(--color-border-default)',
-                borderRadius: 'var(--radius-md)',
-                outline: 'none',
-                transition: 'border-color var(--transition-base), box-shadow var(--transition-base)',
-                width: '100%',
-                minHeight: '100px',
-                resize: 'vertical',
-                color: 'var(--color-text-primary)',
-                backgroundColor: 'var(--color-background-default)',
-                marginTop: 'var(--spacing-xs)',
-                boxSizing: 'border-box',
-              }}
-              onFocus={(e) => {
-                e.target.style.borderColor = 'var(--color-border-focus)';
-                e.target.style.boxShadow = 'var(--shadow-focus-sm)';
-              }}
-              onBlur={(e) => {
-                e.target.style.borderColor = 'var(--color-border-default)';
-                e.target.style.boxShadow = 'none';
-              }}
-            />
-          </AxFormGroup>
-        </div>
-      </AxDialog>
 
       {/* Delete Confirmation Dialog */}
       <AxDialog

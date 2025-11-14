@@ -14,6 +14,7 @@ export interface OrderStepProps {
   onNavigateBack?: () => void;
   loading?: boolean;
   submitting?: boolean;
+  readOnly?: boolean; // If true, all fields are read-only
 }
 
 export interface OrderEntryStepProps extends OrderStepProps {

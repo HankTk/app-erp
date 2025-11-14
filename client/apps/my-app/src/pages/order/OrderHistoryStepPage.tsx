@@ -6,6 +6,12 @@ import {
   AxDialog,
   AxLabel,
   AxFormGroup,
+  AxTable,
+  AxTableHead,
+  AxTableBody,
+  AxTableRow,
+  AxTableHeader,
+  AxTableCell,
 } from '@ui/components';
 import { OrderHistoryStepProps } from './types';
 import { useI18n } from '../../i18n/I18nProvider';
@@ -65,7 +71,7 @@ interface HistoryRecord {
 }
 
 export function OrderHistoryStepPage(props: OrderHistoryStepProps) {
-  const { order, onAddNote, submitting = false, customers } = props;
+  const { order, onAddNote, submitting = false, customers, readOnly = false } = props;
   const { t } = useI18n();
   const [noteDialogOpen, setNoteDialogOpen] = useState(false);
   const [noteText, setNoteText] = useState('');
@@ -200,37 +206,58 @@ export function OrderHistoryStepPage(props: OrderHistoryStepProps) {
           </AxParagraph>
         </EmptyState>
       ) : (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-md)' }}>
-          {historyRecords
-            .slice()
-            .reverse()
-            .map((record, index) => (
-              <HistoryItem key={index}>
-                <HistoryItemHeader>
-                  <HistoryItemTitle>
-                    {stepLabels[record.step] || record.stepLabel || record.step}
-                  </HistoryItemTitle>
-                  <HistoryItemDate>{formatDate(record.timestamp)}</HistoryItemDate>
-                </HistoryItemHeader>
-                {record.status && (
-                  <AxParagraph style={{ fontSize: 'var(--font-size-sm)', color: 'var(--color-text-secondary)', marginBottom: 'var(--spacing-xs)' }}>
-                    {t('orderEntry.history.status')} {getStatusLabel(record.status)}
-                  </AxParagraph>
-                )}
-                {record.notes && (
-                  <HistoryItemContent>{record.notes}</HistoryItemContent>
-                )}
-                {record.data && Object.keys(record.data).length > 0 && (
-                  <div style={{ marginTop: 'var(--spacing-sm)', fontSize: 'var(--font-size-sm)', color: 'var(--color-text-secondary)' }}>
-                    {Object.entries(record.data).map(([key, value]) => (
-                      <div key={key} style={{ marginTop: 'var(--spacing-xs)' }}>
-                        <strong>{getDataKeyLabel(key)}:</strong> {formatDataValue(key, value)}
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </HistoryItem>
-            ))}
+        <div 
+          style={{ 
+            maxHeight: 'calc(100vh - 590px)',
+            overflowY: 'auto',
+            overflowX: 'auto',
+          }}
+        >
+          <AxTable fullWidth>
+            <AxTableHead>
+              <AxTableRow>
+                <AxTableHeader>Date / Time</AxTableHeader>
+                <AxTableHeader>Step</AxTableHeader>
+                <AxTableHeader>Status</AxTableHeader>
+                <AxTableHeader>Notes</AxTableHeader>
+                <AxTableHeader>Data</AxTableHeader>
+              </AxTableRow>
+            </AxTableHead>
+            <AxTableBody>
+              {historyRecords
+                .slice()
+                .reverse()
+                .map((record, index) => (
+                  <AxTableRow key={index}>
+                    <AxTableCell style={{ whiteSpace: 'nowrap' }}>
+                      {formatDate(record.timestamp)}
+                    </AxTableCell>
+                    <AxTableCell>
+                      {stepLabels[record.step] || record.stepLabel || record.step}
+                    </AxTableCell>
+                    <AxTableCell>
+                      {record.status ? getStatusLabel(record.status) : '-'}
+                    </AxTableCell>
+                    <AxTableCell style={{ whiteSpace: 'pre-wrap', maxWidth: '300px' }}>
+                      {record.notes || '-'}
+                    </AxTableCell>
+                    <AxTableCell style={{ fontSize: 'var(--font-size-sm)', color: 'var(--color-text-secondary)' }}>
+                      {record.data && Object.keys(record.data).length > 0 ? (
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-xs)' }}>
+                          {Object.entries(record.data).map(([key, value]) => (
+                            <div key={key}>
+                              <strong>{getDataKeyLabel(key)}:</strong> {formatDataValue(key, value)}
+                            </div>
+                          ))}
+                        </div>
+                      ) : (
+                        '-'
+                      )}
+                    </AxTableCell>
+                  </AxTableRow>
+                ))}
+            </AxTableBody>
+          </AxTable>
         </div>
       )}
 

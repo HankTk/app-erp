@@ -76,6 +76,7 @@ function AppContent() {
   const [user, setUser] = useState<any>(null);
   const [currentPage, setCurrentPage] = useState<AppPage>('welcome');
   const [orderIdToEdit, setOrderIdToEdit] = useState<string | null>(null);
+  const [orderIdToView, setOrderIdToView] = useState<string | null>(null);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [checkingUsers, setCheckingUsers] = useState(true);
@@ -234,10 +235,17 @@ function AppContent() {
                 <OrderListingPage 
                   onNavigateToOrderEntry={() => {
                     setOrderIdToEdit(null);
+                    setOrderIdToView(null);
                     setCurrentPage('order-entry');
                   }}
                   onEditOrder={(orderId: string) => {
                     setOrderIdToEdit(orderId);
+                    setOrderIdToView(null);
+                    setCurrentPage('order-entry');
+                  }}
+                  onViewOrder={(orderId: string) => {
+                    setOrderIdToView(orderId);
+                    setOrderIdToEdit(null);
                     setCurrentPage('order-entry');
                   }}
                   onNavigateBack={() => setCurrentPage('welcome')}
@@ -246,13 +254,16 @@ function AppContent() {
             ) : currentPage === 'order-entry' ? (
               <div style={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column', overflow: 'hidden', width: '100%' }}>
                 <OrderEntryPage 
-                  orderIdToEdit={orderIdToEdit}
+                  orderIdToEdit={orderIdToEdit || orderIdToView}
+                  readOnly={!!orderIdToView}
                   onNavigateToOrders={() => {
                     setOrderIdToEdit(null);
+                    setOrderIdToView(null);
                     setCurrentPage('orders');
                   }}
                   onNavigateBack={() => {
                     setOrderIdToEdit(null);
+                    setOrderIdToView(null);
                     setCurrentPage('orders');
                   }}
                 />

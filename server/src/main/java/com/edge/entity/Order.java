@@ -17,6 +17,8 @@ public class Order {
     private LocalDateTime orderDate;
     private LocalDateTime shipDate;
     private String status; // "DRAFT", "PENDING_APPROVAL", "APPROVED", "SHIPPING_INSTRUCTED", "SHIPPED", "INVOICED", "PAID", "CANCELLED"
+    private String invoiceNumber; // Invoice number linked to customer for A/R processing
+    private LocalDateTime invoiceDate; // Invoice date
     private List<OrderItem> items;
     private BigDecimal subtotal;
     private BigDecimal tax;

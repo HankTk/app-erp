@@ -23,6 +23,7 @@ import {
   fetchOrdersByStatus,
   fetchOrderById,
   deleteOrder,
+  getNextInvoiceNumber,
   Order,
 } from '../../api/orderApi';
 import styled from 'styled-components';
@@ -90,13 +91,40 @@ const StepIndicator = styled.div`
   padding-bottom: var(--spacing-md);
   border-bottom: 2px solid var(--color-border-default);
   flex-shrink: 0;
+  align-items: center;
+  position: relative;
+  width: 100%;
+`;
+
+const StepScrollContainer = styled.div`
+  display: flex;
+  gap: var(--spacing-sm);
+  flex: 1 1 auto;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-width: thin;
+  align-items: center;
+  &::-webkit-scrollbar {
+    height: 6px;
+  }
+  &::-webkit-scrollbar-thumb {
+    background-color: var(--color-border-default);
+    border-radius: 3px;
+  }
+`;
+
+const HistoryStepContainer = styled.div`
+  flex-shrink: 0;
+  margin-left: var(--spacing-sm);
 `;
 
 const Step = styled.div<{ $active: boolean; $completed: boolean }>`
-  flex: 1;
+  flex: none;
   padding: var(--spacing-sm) var(--spacing-md);
   text-align: center;
   border-radius: var(--radius-md);
+  white-space: nowrap;
+  font-size: var(--font-size-sm);
   background-color: ${props => 
     props.$active ? 'var(--color-primary)' : 
     props.$completed ? 'var(--color-success)' : 
@@ -105,7 +133,8 @@ const Step = styled.div<{ $active: boolean; $completed: boolean }>`
     props.$active || props.$completed ? 'var(--color-text-inverse)' : 
     'var(--color-text-secondary)'};
   font-weight: ${props => props.$active ? 'var(--font-weight-bold)' : 'var(--font-weight-normal)'};
-  cursor: ${props => props.$completed ? 'pointer' : 'default'};
+  cursor: ${props => props.$completed ? 'pointer' : 'not-allowed'};
+  opacity: ${props => !props.$completed && !props.$active ? 0.5 : 1};
   transition: all var(--transition-base);
 `;
 
@@ -135,10 +164,11 @@ interface OrderEntryPageProps {
   onNavigateToOrders?: () => void;
   orderIdToEdit?: string | null;
   onNavigateBack?: () => void;
+  readOnly?: boolean; // If true, all fields are read-only except history notes
 }
 
 export function OrderEntryPage(props: OrderEntryPageProps = {}) {
-  const { onNavigateToOrders, orderIdToEdit, onNavigateBack } = props;
+  const { onNavigateToOrders, orderIdToEdit, onNavigateBack, readOnly = false } = props;
   const { t } = useI18n();
   const [currentStep, setCurrentStep] = useState<OrderStep>('entry');
   const [currentEntrySubStep, setCurrentEntrySubStep] = useState<EntrySubStep>('customer');
@@ -223,6 +253,56 @@ export function OrderEntryPage(props: OrderEntryPageProps = {}) {
   useEffect(() => {
     orderRef.current = order;
   }, [order]);
+
+  // In read-only mode, start from entry step with customer sub-step
+  useEffect(() => {
+    if (readOnly && order) {
+      if (currentStep !== 'entry') {
+        setCurrentStep('entry');
+      }
+      if (currentEntrySubStep !== 'customer') {
+        setCurrentEntrySubStep('customer');
+      }
+    }
+  }, [readOnly, order]);
+
+  // Auto-generate invoice number when entering invoicing step
+  useEffect(() => {
+    if (currentStep === 'invoicing' && order) {
+      // Check if invoice number is already set (from Order entity or jsonData)
+      const existingInvoiceNumber = order.invoiceNumber || order.jsonData?.invoiceNumber;
+      if (!invoiceNumber && !existingInvoiceNumber) {
+        const loadInvoiceNumber = async () => {
+          try {
+            const nextInvoiceNumber = await getNextInvoiceNumber();
+            setInvoiceNumber(nextInvoiceNumber);
+            // Set invoice date to today if not set
+            if (!invoiceDate) {
+              const today = new Date().toISOString().split('T')[0];
+              setInvoiceDate(today);
+            }
+          } catch (err) {
+            console.error('Error loading invoice number:', err);
+          }
+        };
+        loadInvoiceNumber();
+      } else if (existingInvoiceNumber && !invoiceNumber) {
+        // Load existing invoice number if not already loaded in state
+        setInvoiceNumber(existingInvoiceNumber);
+        // Load existing invoice date if available
+        if (order.invoiceDate && !invoiceDate) {
+          const invoiceDateValue = new Date(order.invoiceDate).toISOString().split('T')[0];
+          setInvoiceDate(invoiceDateValue);
+        } else if (order.jsonData?.invoiceDate && !invoiceDate) {
+          setInvoiceDate(order.jsonData.invoiceDate);
+        } else if (!invoiceDate) {
+          // Set invoice date to today if not set
+          const today = new Date().toISOString().split('T')[0];
+          setInvoiceDate(today);
+        }
+      }
+    }
+  }, [currentStep, order, invoiceNumber, invoiceDate]);
 
   const loadCustomers = async () => {
     try {
@@ -324,8 +404,13 @@ export function OrderEntryPage(props: OrderEntryPageProps = {}) {
               setShippingInstructions(existingOrder.jsonData.shippingInstructions || '');
               setRequestedShipDate(existingOrder.jsonData.requestedShipDate || '');
               setTrackingNumber(existingOrder.jsonData.trackingNumber || '');
-              setInvoiceNumber(existingOrder.jsonData.invoiceNumber || '');
-              setInvoiceDate(existingOrder.jsonData.invoiceDate || '');
+              // Load invoice number from Order entity or jsonData (for backward compatibility)
+              setInvoiceNumber(existingOrder.invoiceNumber || existingOrder.jsonData?.invoiceNumber || '');
+              // Load invoice date from Order entity or jsonData (for backward compatibility)
+              const invoiceDateValue = existingOrder.invoiceDate 
+                ? new Date(existingOrder.invoiceDate).toISOString().split('T')[0]
+                : existingOrder.jsonData?.invoiceDate || '';
+              setInvoiceDate(invoiceDateValue);
               setPaymentAmount(existingOrder.jsonData.paymentAmount || 0);
               setPaymentDate(existingOrder.jsonData.paymentDate || '');
               setPaymentMethod(existingOrder.jsonData.paymentMethod || '');
@@ -563,7 +648,7 @@ export function OrderEntryPage(props: OrderEntryPageProps = {}) {
       });
       setOrder(updated);
       // 履歴に記録（更新されたorderを使用）
-      await addHistoryRecord('approval', '承認・確認', approvalNotes, 'APPROVED', {
+      await addHistoryRecord('approval', t('orderEntry.history.step.approval'), approvalNotes, 'APPROVED', {
         creditCheckPassed,
         inventoryConfirmed,
         priceApproved,
@@ -590,7 +675,7 @@ export function OrderEntryPage(props: OrderEntryPageProps = {}) {
       });
       setOrder(updated);
       // 履歴に記録（更新されたorderを使用）
-      await addHistoryRecord('confirmation', '受注明細確定', undefined, 'APPROVED', {
+      await addHistoryRecord('confirmation', t('orderEntry.history.step.confirmation'), undefined, 'APPROVED', {
         orderNumber: updated.orderNumber,
       }, updated);
       setCurrentStep('shipping_instruction');
@@ -616,7 +701,7 @@ export function OrderEntryPage(props: OrderEntryPageProps = {}) {
       });
       setOrder(updated);
       // 履歴に記録（更新されたorderを使用）
-      await addHistoryRecord('shipping_instruction', '出荷指示', shippingInstructions, 'SHIPPING_INSTRUCTED', {
+      await addHistoryRecord('shipping_instruction', t('orderEntry.history.step.shippingInstruction'), shippingInstructions, 'SHIPPING_INSTRUCTED', {
         requestedShipDate,
       }, updated);
       setCurrentStep('shipping');
@@ -643,7 +728,7 @@ export function OrderEntryPage(props: OrderEntryPageProps = {}) {
       });
       setOrder(updated);
       // 履歴に記録（更新されたorderを使用）
-      await addHistoryRecord('shipping', '出荷処理', undefined, 'SHIPPED', {
+      await addHistoryRecord('shipping', t('orderEntry.history.step.shipping'), undefined, 'SHIPPED', {
         shipDate,
         trackingNumber,
       }, updated);
@@ -663,14 +748,18 @@ export function OrderEntryPage(props: OrderEntryPageProps = {}) {
       const jsonData = order.jsonData || {};
       jsonData.invoiceNumber = invoiceNumber;
       jsonData.invoiceDate = invoiceDate;
+      // Set invoice date as LocalDateTime string format
+      const invoiceDateObj = invoiceDate ? new Date(invoiceDate + 'T00:00:00').toISOString() : null;
       const updated = await updateOrder(order.id!, {
         ...order,
         status: 'INVOICED',
+        invoiceNumber: invoiceNumber, // Store in Order entity for A/R processing
+        invoiceDate: invoiceDateObj, // Store in Order entity
         jsonData,
       });
       setOrder(updated);
       // 履歴に記録（更新されたorderを使用）
-      await addHistoryRecord('invoicing', '請求処理', undefined, 'INVOICED', {
+      await addHistoryRecord('invoicing', t('orderEntry.history.step.invoicing'), undefined, 'INVOICED', {
         invoiceNumber,
         invoiceDate,
         total: updated.total,
@@ -699,7 +788,7 @@ export function OrderEntryPage(props: OrderEntryPageProps = {}) {
       });
       setOrder(updated);
       // 履歴に記録（更新されたorderを使用）
-      await addHistoryRecord('payment', '入金処理', undefined, 'PAID', {
+      await addHistoryRecord('payment', t('orderEntry.history.step.payment'), undefined, 'PAID', {
         paymentAmount,
         paymentDate,
         paymentMethod,
@@ -1581,6 +1670,7 @@ export function OrderEntryPage(props: OrderEntryPageProps = {}) {
             onNavigateBack={onNavigateBack}
             loading={loading}
             submitting={submitting}
+            readOnly={readOnly}
             customers={customers}
             products={products}
             addresses={addresses}
@@ -1611,6 +1701,7 @@ export function OrderEntryPage(props: OrderEntryPageProps = {}) {
             onNavigateBack={onNavigateBack}
             loading={loading}
             submitting={submitting}
+            readOnly={readOnly}
             approvalNotes={approvalNotes}
             creditCheckPassed={creditCheckPassed}
             inventoryConfirmed={inventoryConfirmed}
@@ -1631,6 +1722,7 @@ export function OrderEntryPage(props: OrderEntryPageProps = {}) {
             onNavigateBack={onNavigateBack}
             loading={loading}
             submitting={submitting}
+            readOnly={readOnly}
             customer={selectedCustomer}
           />
         );
@@ -1644,6 +1736,7 @@ export function OrderEntryPage(props: OrderEntryPageProps = {}) {
             onNavigateBack={onNavigateBack}
             loading={loading}
             submitting={submitting}
+            readOnly={readOnly}
             shippingInstructions={shippingInstructions}
             requestedShipDate={requestedShipDate}
             onShippingInstructionsChange={setShippingInstructions}
@@ -1660,6 +1753,7 @@ export function OrderEntryPage(props: OrderEntryPageProps = {}) {
             onNavigateBack={onNavigateBack}
             loading={loading}
             submitting={submitting}
+            readOnly={readOnly}
             actualShipDate={actualShipDate}
             trackingNumber={trackingNumber}
             onActualShipDateChange={setActualShipDate}
@@ -1676,6 +1770,7 @@ export function OrderEntryPage(props: OrderEntryPageProps = {}) {
             onNavigateBack={onNavigateBack}
             loading={loading}
             submitting={submitting}
+            readOnly={readOnly}
             invoiceNumber={invoiceNumber}
             invoiceDate={invoiceDate}
             onInvoiceNumberChange={setInvoiceNumber}
@@ -1692,6 +1787,7 @@ export function OrderEntryPage(props: OrderEntryPageProps = {}) {
             onNavigateBack={onNavigateBack}
             loading={loading}
             submitting={submitting}
+            readOnly={readOnly}
             paymentAmount={paymentAmount}
             paymentDate={paymentDate}
             paymentMethod={paymentMethod}
@@ -1710,6 +1806,7 @@ export function OrderEntryPage(props: OrderEntryPageProps = {}) {
             onNavigateBack={onNavigateBack}
             loading={loading}
             submitting={submitting}
+            readOnly={readOnly}
             onAddNote={handleAddNote}
             customers={customers}
           />
@@ -1831,6 +1928,21 @@ export function OrderEntryPage(props: OrderEntryPageProps = {}) {
           </HeaderLeft>
           <HeaderRight>
             <div style={{ display: 'flex', gap: 'var(--spacing-md)', flexWrap: 'wrap', alignItems: 'flex-start' }}>
+              {order?.orderNumber && (
+                <div style={{ 
+                  padding: 'var(--spacing-md)', 
+                  backgroundColor: 'var(--color-background-secondary)', 
+                  borderRadius: 'var(--radius-md)',
+                  minWidth: '150px'
+                }}>
+                  <AxParagraph style={{ fontWeight: 'var(--font-weight-bold)', marginBottom: 'var(--spacing-xs)', fontSize: 'var(--font-size-sm)' }}>
+                    {t('orderEntry.confirmation.orderNumber')}
+                  </AxParagraph>
+                  <AxParagraph style={{ fontSize: 'var(--font-size-sm)' }}>
+                    {order.orderNumber}
+                  </AxParagraph>
+                </div>
+              )}
               {selectedCustomer && (
                 <div style={{ 
                   padding: 'var(--spacing-md)', 
@@ -1851,6 +1963,67 @@ export function OrderEntryPage(props: OrderEntryPageProps = {}) {
                   )}
                 </div>
               )}
+              {(() => {
+                const shippingAddress = addresses.find(a => a.id === order?.shippingAddressId);
+                const billingAddress = addresses.find(a => a.id === order?.billingAddressId);
+                if (shippingAddress || billingAddress) {
+                  return (
+                    <>
+                      {shippingAddress && (
+                        <div style={{ 
+                          padding: 'var(--spacing-md)', 
+                          backgroundColor: 'var(--color-background-secondary)', 
+                          borderRadius: 'var(--radius-md)',
+                          minWidth: '200px',
+                          maxWidth: '250px'
+                        }}>
+                          <AxParagraph style={{ fontWeight: 'var(--font-weight-bold)', marginBottom: 'var(--spacing-xs)', fontSize: 'var(--font-size-sm)' }}>
+                            {t('orderEntry.shippingAddress')}
+                          </AxParagraph>
+                          <AxParagraph style={{ fontSize: 'var(--font-size-sm)', lineHeight: 'var(--line-height-tight)' }}>
+                            {shippingAddress.streetAddress1}
+                            {shippingAddress.streetAddress2 && `, ${shippingAddress.streetAddress2}`}
+                            <br />
+                            {shippingAddress.city}, {shippingAddress.state} {shippingAddress.postalCode}
+                            {shippingAddress.country && (
+                              <>
+                                <br />
+                                {shippingAddress.country}
+                              </>
+                            )}
+                          </AxParagraph>
+                        </div>
+                      )}
+                      {billingAddress && (
+                        <div style={{ 
+                          padding: 'var(--spacing-md)', 
+                          backgroundColor: 'var(--color-background-secondary)', 
+                          borderRadius: 'var(--radius-md)',
+                          minWidth: '200px',
+                          maxWidth: '250px'
+                        }}>
+                          <AxParagraph style={{ fontWeight: 'var(--font-weight-bold)', marginBottom: 'var(--spacing-xs)', fontSize: 'var(--font-size-sm)' }}>
+                            {t('orderEntry.billingAddress')}
+                          </AxParagraph>
+                          <AxParagraph style={{ fontSize: 'var(--font-size-sm)', lineHeight: 'var(--line-height-tight)' }}>
+                            {billingAddress.streetAddress1}
+                            {billingAddress.streetAddress2 && `, ${billingAddress.streetAddress2}`}
+                            <br />
+                            {billingAddress.city}, {billingAddress.state} {billingAddress.postalCode}
+                            {billingAddress.country && (
+                              <>
+                                <br />
+                                {billingAddress.country}
+                              </>
+                            )}
+                          </AxParagraph>
+                        </div>
+                      )}
+                    </>
+                  );
+                }
+                return null;
+              })()}
               {order?.id && (
                 <>
                   <div style={{ 
@@ -1873,7 +2046,7 @@ export function OrderEntryPage(props: OrderEntryPageProps = {}) {
                       }}
                       placeholder={t('orderEntry.selectStatus')}
                       fullWidth
-                      disabled={loading || !order?.id}
+                      disabled={loading || !order?.id || readOnly}
                     />
                   </div>
                 </>
@@ -1885,122 +2058,234 @@ export function OrderEntryPage(props: OrderEntryPageProps = {}) {
 
       <ContentCard padding="large">
         <StepIndicator>
-          {steps.map((step, index) => {
-            const isActive = currentStep === step.key;
-            const isCompleted = isStepCompleted(step.key);
-            return (
-              <Step
-                key={step.key}
-                $active={isActive}
-                $completed={isCompleted}
-                onClick={() => {
-                  if (isCompleted || isActive) {
-                    setCurrentStep(step.key);
-                    if (step.key === 'entry') {
-                      setCurrentEntrySubStep('review');
-                    }
-                  }
-                }}
-                title={step.description}
-              >
-                {index + 1}. {step.label}
-              </Step>
-            );
-          })}
+          <StepScrollContainer>
+            {steps
+              .filter(step => {
+                // In read-only mode, only show completed steps (except history)
+                if (readOnly) {
+                  return step.key !== 'history' && isStepCompleted(step.key);
+                }
+                // In edit mode, show all steps except history
+                return step.key !== 'history';
+              })
+              .map((step, index) => {
+                const isActive = currentStep === step.key;
+                const isCompleted = isStepCompleted(step.key);
+                // Calculate the original step number for display
+                const originalIndex = steps.findIndex(s => s.key === step.key);
+                return (
+                  <Step
+                    key={step.key}
+                    $active={isActive}
+                    $completed={isCompleted}
+                    onClick={() => {
+                      if (readOnly) {
+                        // In read-only mode, only allow access to completed steps
+                        if (isCompleted) {
+                          setCurrentStep(step.key);
+                          if (step.key === 'entry') {
+                            setCurrentEntrySubStep('review');
+                          }
+                        }
+                      } else {
+                        // In edit mode, allow access to completed or active steps
+                        if (isCompleted || isActive) {
+                          setCurrentStep(step.key);
+                          if (step.key === 'entry') {
+                            setCurrentEntrySubStep('review');
+                          }
+                        }
+                      }
+                    }}
+                    title={step.description}
+                  >
+                    {originalIndex + 1}. {step.label}
+                  </Step>
+                );
+              })}
+          </StepScrollContainer>
+          <HistoryStepContainer>
+            {(() => {
+              const historyStep = steps.find(s => s.key === 'history');
+              if (!historyStep) return null;
+              const isActive = currentStep === 'history';
+              const isCompleted = isStepCompleted('history');
+              return (
+                <Step
+                  key="history"
+                  $active={isActive}
+                  $completed={isCompleted}
+                  onClick={() => {
+                    setCurrentStep('history');
+                  }}
+                  title={historyStep.description}
+                >
+                  {historyStep.label}
+                </Step>
+              );
+            })()}
+          </HistoryStepContainer>
         </StepIndicator>
 
         <StepContent>
           {renderStepContent()}
         </StepContent>
 
-        <ButtonGroup>
-          <AxButton
-            variant="secondary"
-            onClick={handlePrevious}
-            disabled={(currentStep === 'entry' && currentEntrySubStep === 'customer') || submitting}
-          >
-            {t('orderEntry.previous')}
-          </AxButton>
-          {currentStep === 'entry' && currentEntrySubStep === 'review' ? (
+        {!readOnly && (
+          <ButtonGroup>
             <AxButton
-              variant="primary"
-              onClick={handleCompleteEntry}
-              disabled={!canProceedToNext() || submitting}
+              variant="secondary"
+              onClick={handlePrevious}
+              disabled={(currentStep === 'entry' && currentEntrySubStep === 'customer') || submitting}
             >
-              {submitting ? t('orderEntry.saving') : (orderIdToEdit ? t('orderEntry.saveOrder') : t('orderEntry.completeOrder'))}
+              {t('orderEntry.previous')}
             </AxButton>
-          ) : currentStep === 'approval' ? (
-            <AxButton
-              variant="primary"
-              onClick={handleApproveOrder}
-              disabled={!canProceedToNext() || submitting}
-            >
-              {submitting ? t('orderEntry.approving') : t('orderEntry.approveOrder')}
-            </AxButton>
-          ) : currentStep === 'confirmation' ? (
-            <AxButton
-              variant="primary"
-              onClick={handleConfirmOrder}
-              disabled={!canProceedToNext() || submitting}
-            >
-              {submitting ? t('orderEntry.confirming') : t('orderEntry.confirmOrder')}
-            </AxButton>
-          ) : currentStep === 'shipping_instruction' ? (
-            <AxButton
-              variant="primary"
-              onClick={handleShippingInstruction}
-              disabled={!canProceedToNext() || submitting}
-            >
-              {submitting ? t('orderEntry.submitting') : t('orderEntry.submitShippingInstruction')}
-            </AxButton>
-          ) : currentStep === 'shipping' ? (
-            <AxButton
-              variant="primary"
-              onClick={handleShipOrder}
-              disabled={!canProceedToNext() || submitting}
-            >
-              {submitting ? t('orderEntry.shipping') : t('orderEntry.shipOrder')}
-            </AxButton>
-          ) : currentStep === 'invoicing' ? (
-            <AxButton
-              variant="primary"
-              onClick={handleInvoiceOrder}
-              disabled={!canProceedToNext() || submitting}
-            >
-              {submitting ? t('orderEntry.invoicing') : t('orderEntry.createInvoice')}
-            </AxButton>
-          ) : currentStep === 'payment' ? (
-            <AxButton
-              variant="primary"
-              onClick={handlePayment}
-              disabled={!canProceedToNext() || submitting}
-            >
-              {submitting ? t('orderEntry.processing') : t('orderEntry.completePayment')}
-            </AxButton>
-          ) : currentStep === 'history' ? (
+            {currentStep === 'entry' && currentEntrySubStep === 'review' ? (
+              <AxButton
+                variant="primary"
+                onClick={handleCompleteEntry}
+                disabled={!canProceedToNext() || submitting}
+              >
+                {submitting ? t('orderEntry.saving') : (orderIdToEdit ? t('orderEntry.saveOrder') : t('orderEntry.completeOrder'))}
+              </AxButton>
+            ) : currentStep === 'approval' ? (
+              <AxButton
+                variant="primary"
+                onClick={handleApproveOrder}
+                disabled={!canProceedToNext() || submitting}
+              >
+                {submitting ? t('orderEntry.approving') : t('orderEntry.approveOrder')}
+              </AxButton>
+            ) : currentStep === 'confirmation' ? (
+              <AxButton
+                variant="primary"
+                onClick={handleConfirmOrder}
+                disabled={!canProceedToNext() || submitting}
+              >
+                {submitting ? t('orderEntry.confirming') : t('orderEntry.confirmOrder')}
+              </AxButton>
+            ) : currentStep === 'shipping_instruction' ? (
+              <AxButton
+                variant="primary"
+                onClick={handleShippingInstruction}
+                disabled={!canProceedToNext() || submitting}
+              >
+                {submitting ? t('orderEntry.submitting') : t('orderEntry.submitShippingInstruction')}
+              </AxButton>
+            ) : currentStep === 'shipping' ? (
+              <AxButton
+                variant="primary"
+                onClick={handleShipOrder}
+                disabled={!canProceedToNext() || submitting}
+              >
+                {submitting ? t('orderEntry.shipping') : t('orderEntry.shipOrder')}
+              </AxButton>
+            ) : currentStep === 'invoicing' ? (
+              <AxButton
+                variant="primary"
+                onClick={handleInvoiceOrder}
+                disabled={!canProceedToNext() || submitting}
+              >
+                {submitting ? t('orderEntry.invoicing') : t('orderEntry.createInvoice')}
+              </AxButton>
+            ) : currentStep === 'payment' ? (
+              <AxButton
+                variant="primary"
+                onClick={handlePayment}
+                disabled={!canProceedToNext() || submitting}
+              >
+                {submitting ? t('orderEntry.processing') : t('orderEntry.completePayment')}
+              </AxButton>
+            ) : currentStep === 'history' ? (
+              <AxButton
+                variant="secondary"
+                onClick={() => {
+                  if (onNavigateToOrders) {
+                    onNavigateToOrders();
+                  } else {
+                    handlePrevious();
+                  }
+                }}
+                disabled={submitting}
+              >
+                {onNavigateToOrders ? t('orderEntry.backToOrders') : t('orderEntry.previous')}
+              </AxButton>
+            ) : (
+              <AxButton
+                variant="primary"
+                onClick={handleNext}
+                disabled={!canProceedToNext() || submitting}
+              >
+                {t('orderEntry.next')}
+              </AxButton>
+            )}
+          </ButtonGroup>
+        )}
+        {readOnly && currentStep === 'history' && (
+          <ButtonGroup>
             <AxButton
               variant="secondary"
               onClick={() => {
                 if (onNavigateToOrders) {
                   onNavigateToOrders();
-                } else {
-                  handlePrevious();
+                } else if (onNavigateBack) {
+                  onNavigateBack();
                 }
               }}
-              disabled={submitting}
             >
               {onNavigateToOrders ? t('orderEntry.backToOrders') : t('orderEntry.previous')}
             </AxButton>
-          ) : (
+          </ButtonGroup>
+        )}
+        {readOnly && currentStep !== 'history' && (
+          <ButtonGroup>
+            <AxButton
+              variant="secondary"
+              onClick={() => {
+                // Find previous completed step
+                const currentIndex = steps.findIndex(s => s.key === currentStep);
+                for (let i = currentIndex - 1; i >= 0; i--) {
+                  if (isStepCompleted(steps[i].key)) {
+                    setCurrentStep(steps[i].key);
+                    if (steps[i].key === 'entry') {
+                      setCurrentEntrySubStep('review');
+                    }
+                    return;
+                  }
+                }
+              }}
+              disabled={(() => {
+                const currentIndex = steps.findIndex(s => s.key === currentStep);
+                return currentIndex === 0 || !steps.slice(0, currentIndex).some(s => isStepCompleted(s.key));
+              })()}
+            >
+              {t('orderEntry.previous')}
+            </AxButton>
             <AxButton
               variant="primary"
-              onClick={handleNext}
-              disabled={!canProceedToNext() || submitting}
+              onClick={() => {
+                // Find next completed step (excluding history)
+                const currentIndex = steps.findIndex(s => s.key === currentStep);
+                for (let i = currentIndex + 1; i < steps.length; i++) {
+                  if (steps[i].key !== 'history' && isStepCompleted(steps[i].key)) {
+                    setCurrentStep(steps[i].key);
+                    if (steps[i].key === 'entry') {
+                      setCurrentEntrySubStep('review');
+                    }
+                    return;
+                  }
+                }
+              }}
+              disabled={(() => {
+                const currentIndex = steps.findIndex(s => s.key === currentStep);
+                const remainingSteps = steps.slice(currentIndex + 1).filter(s => s.key !== 'history');
+                return remainingSteps.length === 0 || !remainingSteps.some(s => isStepCompleted(s.key));
+              })()}
             >
               {t('orderEntry.next')}
             </AxButton>
-          )}
-        </ButtonGroup>
+          </ButtonGroup>
+        )}
       </ContentCard>
     </PageContainer>
   );

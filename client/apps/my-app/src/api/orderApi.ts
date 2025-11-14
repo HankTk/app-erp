@@ -19,6 +19,8 @@ export interface Order {
   orderDate?: string;
   shipDate?: string;
   status?: 'DRAFT' | 'PENDING_APPROVAL' | 'APPROVED' | 'SHIPPING_INSTRUCTED' | 'SHIPPED' | 'INVOICED' | 'PAID' | 'CANCELLED';
+  invoiceNumber?: string; // Invoice number linked to customer for A/R processing
+  invoiceDate?: string; // Invoice date
   items?: OrderItem[];
   subtotal?: number;
   tax?: number;
@@ -83,5 +85,14 @@ export const removeOrderItem = async (
   return httpRequest<Order>(`${API_BASE_URL}/${orderId}/items/${itemId}`, {
     method: 'DELETE',
   });
+};
+
+export const getNextInvoiceNumber = async (): Promise<string> => {
+  const response = await fetch(`${API_BASE_URL}/invoice/next-number`);
+  if (!response.ok) {
+    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+  }
+  const data = await response.json();
+  return data.invoiceNumber;
 };
 

@@ -191,6 +191,10 @@ export const ja = {
   'orderEntry.payment.method.check': '小切手',
   'orderEntry.payment.method.other': 'その他',
   
+  // Address Labels
+  'orderEntry.shippingAddress': '配送先住所',
+  'orderEntry.billingAddress': '請求先住所',
+  
   // Order History Step
   'orderEntry.history.title': '履歴',
   'orderEntry.history.description': 'オーダーの各ステップの実行履歴と備考を表示します。',

@@ -15,6 +15,7 @@ import {
 } from '@ui/components';
 import styled from 'styled-components';
 import { OrderEntryStepProps, EntrySubStep } from './types';
+import { useI18n } from '../../i18n/I18nProvider';
 
 const StepContent = styled.div`
   display: flex;
@@ -84,7 +85,9 @@ export function OrderEntryStepPage(props: OrderEntryStepProps) {
     onSetShippingId,
     onSetBillingId,
     loading = false,
+    readOnly = false,
   } = props;
+  const { t } = useI18n();
 
   const isSubStepCompleted = (subStep: EntrySubStep) => {
     if (!order) return false;
@@ -96,7 +99,11 @@ export function OrderEntryStepPage(props: OrderEntryStepProps) {
       case 'shipping':
         return !!order.shippingAddressId && !!order.billingAddressId;
       case 'review':
-        return false;
+        // Review is completed if customer, products, and shipping are all completed
+        return !!order.customerId && 
+               order.items && order.items.length > 0 && 
+               !!order.shippingAddressId && 
+               !!order.billingAddressId;
       default:
         return false;
     }
@@ -130,7 +137,7 @@ export function OrderEntryStepPage(props: OrderEntryStepProps) {
             }}
             placeholder="Select a customer"
             fullWidth
-            disabled={loading || !order?.id}
+            disabled={loading || !order?.id || readOnly}
           />
         </AxFormGroup>
         {order?.customerId && (
@@ -169,7 +176,7 @@ export function OrderEntryStepPage(props: OrderEntryStepProps) {
                 onChange={onSetSelectedProduct}
                 placeholder="Select a product"
                 fullWidth
-                disabled={loading}
+                disabled={loading || readOnly}
               />
             </AxFormGroup>
           </div>
@@ -181,7 +188,7 @@ export function OrderEntryStepPage(props: OrderEntryStepProps) {
                 min="1"
                 value={quantity}
                 onChange={e => onSetQuantity(parseInt(e.target.value) || 1)}
-                disabled={loading}
+                disabled={loading || readOnly}
                 fullWidth
               />
             </AxFormGroup>
@@ -195,7 +202,7 @@ export function OrderEntryStepPage(props: OrderEntryStepProps) {
                 onSetQuantity(1);
               }
             }}
-            disabled={!selectedProduct || loading}
+            disabled={!selectedProduct || loading || readOnly}
           >
             Add
           </AxButton>
@@ -223,7 +230,7 @@ export function OrderEntryStepPage(props: OrderEntryStepProps) {
                           variant="secondary"
                           size="small"
                           onClick={() => onUpdateQuantity(item.id!, (item.quantity || 1) - 1)}
-                          disabled={loading || (item.quantity || 1) <= 1}
+                          disabled={loading || (item.quantity || 1) <= 1 || readOnly}
                         >
                           -
                         </AxButton>
@@ -232,7 +239,7 @@ export function OrderEntryStepPage(props: OrderEntryStepProps) {
                           variant="secondary"
                           size="small"
                           onClick={() => onUpdateQuantity(item.id!, (item.quantity || 1) + 1)}
-                          disabled={loading}
+                          disabled={loading || readOnly}
                         >
                           +
                         </AxButton>
@@ -300,7 +307,7 @@ export function OrderEntryStepPage(props: OrderEntryStepProps) {
 
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--spacing-md)' }}>
           <AxFormGroup>
-            <AxLabel>Shipping Address</AxLabel>
+            <AxLabel>{t('orderEntry.shippingAddress')}</AxLabel>
             <AxListbox
               options={addressOptions}
               value={shippingId}
@@ -312,7 +319,7 @@ export function OrderEntryStepPage(props: OrderEntryStepProps) {
               }}
               placeholder="Select shipping address"
               fullWidth
-              disabled={loading || addressOptions.length === 0}
+              disabled={loading || addressOptions.length === 0 || readOnly}
             />
             {addressOptions.length === 0 && (
               <AxParagraph
@@ -328,7 +335,7 @@ export function OrderEntryStepPage(props: OrderEntryStepProps) {
           </AxFormGroup>
 
           <AxFormGroup>
-            <AxLabel>Billing Address</AxLabel>
+            <AxLabel>{t('orderEntry.billingAddress')}</AxLabel>
             <AxListbox
               options={addressOptions}
               value={billingId}
@@ -340,7 +347,7 @@ export function OrderEntryStepPage(props: OrderEntryStepProps) {
               }}
               placeholder="Select billing address (can be same as shipping)"
               fullWidth
-              disabled={loading || addressOptions.length === 0}
+              disabled={loading || addressOptions.length === 0 || readOnly}
             />
             {addressOptions.length === 0 && (
               <AxParagraph
@@ -369,61 +376,11 @@ export function OrderEntryStepPage(props: OrderEntryStepProps) {
   };
 
   const renderReviewStep = () => {
-    const shippingAddress = addresses.find(a => a.id === order?.shippingAddressId);
-    const billingAddress = addresses.find(a => a.id === order?.billingAddressId);
-
     return (
       <div>
         <AxHeading3 style={{ marginBottom: 'var(--spacing-md)' }}>Review Order</AxHeading3>
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-lg)' }}>
-          <div style={{ display: 'flex', gap: 'var(--spacing-xl)', flexWrap: 'wrap' }}>
-            <div style={{ flex: 1, minWidth: '250px' }}>
-              <AxParagraph style={{ fontWeight: 'var(--font-weight-bold)', marginBottom: 'var(--spacing-sm)' }}>
-                Shipping Address
-              </AxParagraph>
-              {shippingAddress ? (
-                <AxParagraph>
-                  {shippingAddress.streetAddress1}
-                  <br />
-                  {shippingAddress.streetAddress2 && (
-                    <>
-                      {shippingAddress.streetAddress2}
-                      <br />
-                    </>
-                  )}
-                  {shippingAddress.city}, {shippingAddress.state} {shippingAddress.postalCode}
-                  <br />
-                  {shippingAddress.country}
-                </AxParagraph>
-              ) : (
-                <AxParagraph style={{ color: 'var(--color-text-secondary)' }}>Not selected</AxParagraph>
-              )}
-            </div>
-
-            <div style={{ flex: 1, minWidth: '250px' }}>
-              <AxParagraph style={{ fontWeight: 'var(--font-weight-bold)', marginBottom: 'var(--spacing-sm)' }}>
-                Billing Address
-              </AxParagraph>
-              {billingAddress ? (
-                <AxParagraph>
-                  {billingAddress.streetAddress1}
-                  <br />
-                  {billingAddress.streetAddress2 && (
-                    <>
-                      {billingAddress.streetAddress2}
-                      <br />
-                    </>
-                  )}
-                  {billingAddress.city}, {billingAddress.state} {billingAddress.postalCode}
-                  <br />
-                  {billingAddress.country}
-                </AxParagraph>
-              ) : (
-                <AxParagraph style={{ color: 'var(--color-text-secondary)' }}>Not selected</AxParagraph>
-              )}
-            </div>
-          </div>
 
           <div>
             <AxParagraph style={{ fontWeight: 'var(--font-weight-bold)', marginBottom: 'var(--spacing-sm)' }}>
@@ -518,8 +475,16 @@ export function OrderEntryStepPage(props: OrderEntryStepProps) {
               $active={isActive}
               $completed={isCompleted}
               onClick={() => {
-                if (isCompleted || isActive) {
-                  onSubStepChange(subStep.key);
+                if (readOnly) {
+                  // In read-only mode, only allow access to completed sub-steps
+                  if (isCompleted) {
+                    onSubStepChange(subStep.key);
+                  }
+                } else {
+                  // In edit mode, allow access to completed or active sub-steps
+                  if (isCompleted || isActive) {
+                    onSubStepChange(subStep.key);
+                  }
                 }
               }}
             >

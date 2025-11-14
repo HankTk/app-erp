@@ -12,6 +12,7 @@ export function OrderApprovalStepPage(props: OrderApprovalStepProps) {
     onCreditCheckChange,
     onInventoryConfirmChange,
     onPriceApproveChange,
+    readOnly = false,
   } = props;
   const { t } = useI18n();
 
@@ -29,6 +30,7 @@ export function OrderApprovalStepPage(props: OrderApprovalStepProps) {
               type="checkbox"
               checked={creditCheckPassed}
               onChange={e => onCreditCheckChange(e.target.checked)}
+              disabled={readOnly}
               style={{ marginRight: 'var(--spacing-xs)' }}
             />
             {t('orderEntry.approval.creditCheck')}
@@ -41,6 +43,7 @@ export function OrderApprovalStepPage(props: OrderApprovalStepProps) {
               type="checkbox"
               checked={inventoryConfirmed}
               onChange={e => onInventoryConfirmChange(e.target.checked)}
+              disabled={readOnly}
               style={{ marginRight: 'var(--spacing-xs)' }}
             />
             {t('orderEntry.approval.inventoryConfirmed')}
@@ -53,6 +56,7 @@ export function OrderApprovalStepPage(props: OrderApprovalStepProps) {
               type="checkbox"
               checked={priceApproved}
               onChange={e => onPriceApproveChange(e.target.checked)}
+              disabled={readOnly}
               style={{ marginRight: 'var(--spacing-xs)' }}
             />
             {t('orderEntry.approval.priceApproved')}
@@ -64,6 +68,7 @@ export function OrderApprovalStepPage(props: OrderApprovalStepProps) {
           <textarea
             value={approvalNotes}
             onChange={e => onApprovalNotesChange(e.target.value)}
+            disabled={readOnly}
             style={{
               width: '100%',
               minHeight: '100px',
