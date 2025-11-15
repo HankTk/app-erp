@@ -15,7 +15,7 @@ import {
 } from '@ui/components';
 import { fetchPurchaseOrders, PurchaseOrder } from '../../api/purchaseOrderApi';
 import { fetchVendors, Vendor } from '../../api/vendorApi';
-import styled from 'styled-components';
+import styled from '@emotion/styled';
 import { useI18n } from '../../i18n/I18nProvider';
 
 const PageContainer = styled.div`

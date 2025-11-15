@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import styled from 'styled-components';
+import styled from '@emotion/styled';
 import { ThemeProvider, useTheme, AxContainer, AxHeader, AxTitle, AxSubtitle, AxSection, AxSectionTitle } from '@ui/components';
 import { I18nProvider, useI18n } from './i18n/I18nProvider';
 import { Sidebar } from './components/Sidebar';

@@ -1,5 +1,5 @@
 import React from 'react';
-import styled from 'styled-components';
+import styled from '@emotion/styled';
 
 export interface AxCheckboxProps extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'type'> {
   label?: string;
@@ -20,7 +20,7 @@ const StyledCheckboxWrapper = styled.label<StyledCheckboxWrapperProps>`
   opacity: ${({ $disabled }) => ($disabled ? 'var(--opacity-disabled)' : '1')};
 `;
 
-const StyledCheckboxInput = styled.input.attrs({ type: 'checkbox' })<{ $error?: boolean }>`
+const StyledCheckboxInput = styled.input<{ $error?: boolean }>`
   appearance: none;
   width: 20px;
   height: 20px;
@@ -100,6 +100,7 @@ export const AxCheckbox: React.FC<AxCheckboxProps> = ({
   return (
     <StyledCheckboxWrapper $error={error} $disabled={disabled} htmlFor={checkboxId}>
       <StyledCheckboxInput
+        type="checkbox"
         id={checkboxId}
         $error={error}
         disabled={disabled}

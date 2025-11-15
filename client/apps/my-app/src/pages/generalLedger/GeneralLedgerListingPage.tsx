@@ -19,7 +19,7 @@ import { fetchPurchaseOrders, PurchaseOrder } from '../../api/purchaseOrderApi';
 import { fetchCustomers, Customer } from '../../api/customerApi';
 import { fetchVendors, Vendor } from '../../api/vendorApi';
 import { fetchProducts, Product } from '../../api/productApi';
-import styled from 'styled-components';
+import styled from '@emotion/styled';
 
 const PageContainer = styled.div`
   display: flex;

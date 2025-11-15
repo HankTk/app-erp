@@ -6,7 +6,7 @@ import {
   AxParagraph,
 } from '@ui/components';
 import { I18N } from '../i18n/I18nProvider';
-import styled from 'styled-components';
+import styled from '@emotion/styled';
 
 const ProgressGroup = styled.div`
   display: flex;

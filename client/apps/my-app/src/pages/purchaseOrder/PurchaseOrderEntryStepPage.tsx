@@ -13,7 +13,7 @@ import {
   AxTableHeader,
   AxTableCell,
 } from '@ui/components';
-import styled from 'styled-components';
+import styled from '@emotion/styled';
 import { PurchaseOrderEntryStepProps, EntrySubStep } from './types';
 import { useI18n } from '../../i18n/I18nProvider';
 

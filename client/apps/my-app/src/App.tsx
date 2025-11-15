@@ -24,7 +24,7 @@ import { PurchaseOrderEntryPage } from './pages/purchaseOrder/PurchaseOrderEntry
 import { GeneralLedgerListingPage } from './pages/generalLedger/GeneralLedgerListingPage';
 import { GeneralLedgerPage } from './pages/generalLedger/GeneralLedgerPage';
 import { fetchUsers } from './api/userApi';
-import styled from 'styled-components';
+import styled from '@emotion/styled';
 
 const AppWrapper = styled.div`
   display: flex;

@@ -18,7 +18,7 @@ import {
 } from '@ui/components';
 import { useI18n } from '../../i18n/I18nProvider';
 import { fetchAddresses, createAddress, updateAddress, deleteAddress, Address } from '../../api/addressApi';
-import styled from 'styled-components';
+import styled from '@emotion/styled';
 
 const PageContainer = styled.div`
   display: flex;

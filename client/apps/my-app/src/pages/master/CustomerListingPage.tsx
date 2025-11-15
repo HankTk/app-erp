@@ -20,7 +20,7 @@ import { fetchCustomers, createCustomer, updateCustomer, deleteCustomer, Custome
 import { fetchAddresses, Address } from '../../api/addressApi';
 import { CustomerAddressAssociation } from '../../components/CustomerAddressAssociation';
 import { useWebSocket } from '../../hooks/useWebSocket';
-import styled from 'styled-components';
+import styled from '@emotion/styled';
 
 const PageContainer = styled.div`
   display: flex;

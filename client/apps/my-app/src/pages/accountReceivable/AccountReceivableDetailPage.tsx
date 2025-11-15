@@ -19,7 +19,7 @@ import { useI18n } from '../../i18n/I18nProvider';
 import { fetchCustomers, Customer } from '../../api/customerApi';
 import { fetchAddressesByCustomerId, Address } from '../../api/addressApi';
 import { fetchOrderById, updateOrder, Order } from '../../api/orderApi';
-import styled from 'styled-components';
+import styled from '@emotion/styled';
 
 const PageContainer = styled.div`
   display: flex;

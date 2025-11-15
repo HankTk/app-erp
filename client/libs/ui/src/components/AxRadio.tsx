@@ -1,5 +1,5 @@
 import React from 'react';
-import styled from 'styled-components';
+import styled from '@emotion/styled';
 
 export interface AxRadioProps extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'type'> {
   label?: string;
@@ -20,7 +20,7 @@ const StyledRadioWrapper = styled.label<StyledRadioWrapperProps>`
   opacity: ${({ $disabled }) => ($disabled ? 'var(--opacity-disabled)' : '1')};
 `;
 
-const StyledRadioInput = styled.input.attrs({ type: 'radio' })<{ $error?: boolean }>`
+const StyledRadioInput = styled.input<{ $error?: boolean }>`
   appearance: none;
   width: 20px;
   height: 20px;
@@ -99,6 +99,7 @@ export const AxRadio: React.FC<AxRadioProps> = ({
   return (
     <StyledRadioWrapper $error={error} $disabled={disabled} htmlFor={radioId}>
       <StyledRadioInput
+        type="radio"
         id={radioId}
         $error={error}
         disabled={disabled}

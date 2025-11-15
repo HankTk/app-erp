@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { AxCard, AxDateRangePicker, AxHeading3, AxParagraph } from '@ui/components';
-import styled from 'styled-components';
+import styled from '@emotion/styled';
 
 const ExampleContainer = styled.div`
   margin-bottom: var(--spacing-4xl);

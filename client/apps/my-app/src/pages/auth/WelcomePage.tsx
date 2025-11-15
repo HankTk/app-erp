@@ -4,7 +4,7 @@ import {
   AxCard,
 } from '@ui/components';
 import { useI18n } from '../../i18n/I18nProvider';
-import styled from 'styled-components';
+import styled from '@emotion/styled';
 
 const HeroContainer = styled.div`
   display: flex;

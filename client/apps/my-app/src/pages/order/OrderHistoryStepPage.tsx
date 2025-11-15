@@ -16,7 +16,7 @@ import {
 import { OrderHistoryStepProps } from './types';
 import { useI18n } from '../../i18n/I18nProvider';
 import { Customer } from '../../api/customerApi';
-import styled from 'styled-components';
+import styled from '@emotion/styled';
 
 const HistoryContainer = styled.div`
   display: flex;

@@ -1,5 +1,5 @@
 import React from 'react';
-import styled from 'styled-components';
+import styled from '@emotion/styled';
 
 export interface AxCardProps extends React.HTMLAttributes<HTMLDivElement> {
   elevation?: 0 | 1 | 2 | 3 | 4;

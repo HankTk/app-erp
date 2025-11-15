@@ -10,7 +10,7 @@ import {
 } from '@ui/components';
 import { useI18n } from '../../i18n/I18nProvider';
 import { login } from '../../api/userApi';
-import styled from 'styled-components';
+import styled from '@emotion/styled';
 
 const LoginContainer = styled.div`
   display: flex;

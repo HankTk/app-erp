@@ -1,5 +1,5 @@
 import React from 'react';
-import styled from 'styled-components';
+import styled from '@emotion/styled';
 
 export interface AxTableProps extends React.TableHTMLAttributes<HTMLTableElement> {
   variant?: 'default' | 'bordered' | 'striped';

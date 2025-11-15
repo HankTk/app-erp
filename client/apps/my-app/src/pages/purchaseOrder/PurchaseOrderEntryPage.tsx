@@ -22,7 +22,7 @@ import {
   getNextInvoiceNumber,
   PurchaseOrder,
 } from '../../api/purchaseOrderApi';
-import styled from 'styled-components';
+import styled from '@emotion/styled';
 import { PurchaseOrderStep, EntrySubStep } from './types';
 import { PurchaseOrderEntryStepPage } from './PurchaseOrderEntryStepPage';
 import { PurchaseOrderApprovalStepPage } from './PurchaseOrderApprovalStepPage';

@@ -17,7 +17,7 @@ import {
 } from '@ui/components';
 import { fetchAddresses, deleteAddress, Address } from '../api/addressApi';
 import { fetchCustomerById, updateCustomer, Customer } from '../api/customerApi';
-import styled from 'styled-components';
+import styled from '@emotion/styled';
 
 const Container = styled.div`
   display: flex;

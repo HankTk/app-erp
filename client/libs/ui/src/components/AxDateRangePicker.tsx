@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useEffect, useRef } from 'react';
-import styled from 'styled-components';
+import styled from '@emotion/styled';
 
 export interface AxDateRangePickerProps
 {

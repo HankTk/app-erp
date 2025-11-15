@@ -26,7 +26,7 @@ import {
   getNextInvoiceNumber,
   Order,
 } from '../../api/orderApi';
-import styled from 'styled-components';
+import styled from '@emotion/styled';
 import { OrderStep, EntrySubStep } from './types';
 import { OrderEntryStepPage } from './OrderEntryStepPage';
 import { OrderApprovalStepPage } from './OrderApprovalStepPage';

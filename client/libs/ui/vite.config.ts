@@ -15,14 +15,15 @@ export default defineConfig({
     },
     rollupOptions:
     {
-      external: ['react', 'react-dom', 'react/jsx-runtime', 'styled-components'],
+      external: ['react', 'react-dom', 'react/jsx-runtime', '@emotion/react', '@emotion/styled'],
       output:
       {
         globals:
         {
           react: 'React',
           'react-dom': 'ReactDOM',
-          'styled-components': 'styled',
+          '@emotion/react': 'emotionReact',
+          '@emotion/styled': 'emotionStyled',
         },
       },
     },
