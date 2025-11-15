@@ -24,6 +24,8 @@ import { PurchaseOrderEntryPage } from './pages/purchaseOrder/PurchaseOrderEntry
 import { GeneralLedgerListingPage } from './pages/generalLedger/GeneralLedgerListingPage';
 import { GeneralLedgerPage } from './pages/generalLedger/GeneralLedgerPage';
 import { InventoryControlPage } from './pages/inventory/InventoryControlPage';
+import { RMAListingPage } from './pages/rma/RMAListingPage';
+import { RMAEntryPage } from './pages/rma/RMAEntryPage';
 import { fetchUsers } from './api/userApi';
 import styled from '@emotion/styled';
 import { debugProps } from './utils/emotionCache';
@@ -83,7 +85,7 @@ const FullWidthContainer = styled.div`
   transition: background-color var(--transition-base);
 `;
 
-type AppPage = 'welcome' | 'master' | 'users' | 'customers' | 'vendors' | 'products' | 'addresses' | 'orders' | 'order-entry' | 'accounts-receivable' | 'accounts-receivable-detail' | 'purchase-order' | 'purchase-order-entry' | 'accounts-payable' | 'accounts-payable-detail' | 'general-ledger' | 'general-ledger-detail' | 'inventory-control';
+type AppPage = 'welcome' | 'master' | 'users' | 'customers' | 'vendors' | 'products' | 'addresses' | 'orders' | 'order-entry' | 'accounts-receivable' | 'accounts-receivable-detail' | 'purchase-order' | 'purchase-order-entry' | 'accounts-payable' | 'accounts-payable-detail' | 'general-ledger' | 'general-ledger-detail' | 'inventory-control' | 'rma' | 'rma-entry';
 
 function AppContent() {
   const [user, setUser] = useState<any>(null);
@@ -95,6 +97,8 @@ function AppContent() {
   const [poIdToView, setPoIdToView] = useState<string | null>(null);
   const [apInvoiceIdToView, setApInvoiceIdToView] = useState<string | null>(null);
   const [glOrderIdToView, setGlOrderIdToView] = useState<string | null>(null);
+  const [rmaIdToEdit, setRmaIdToEdit] = useState<string | null>(null);
+  const [rmaIdToView, setRmaIdToView] = useState<string | null>(null);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [checkingUsers, setCheckingUsers] = useState(true);
@@ -206,6 +210,10 @@ function AppContent() {
         return translate('module.generalLedger');
       case 'inventory-control':
         return translate('module.inventoryControl');
+      case 'rma':
+        return translate('module.rma');
+      case 'rma-entry':
+        return translate('module.rma');
       case 'master':
         return translate('master.title');
       case 'welcome':
@@ -248,7 +256,7 @@ function AppContent() {
         onToggle={() => setSidebarOpen(!sidebarOpen)}
         currentPage={currentPage}
         onPageChange={(page) => {
-          if (page === 'welcome' || page === 'master' || page === 'users' || page === 'customers' || page === 'vendors' || page === 'products' || page === 'addresses' || page === 'orders' || page === 'order-entry' || page === 'accounts-receivable' || page === 'accounts-receivable-detail' || page === 'purchase-order' || page === 'purchase-order-entry' || page === 'accounts-payable' || page === 'accounts-payable-detail' || page === 'general-ledger' || page === 'general-ledger-detail' || page === 'inventory-control') {
+          if (page === 'welcome' || page === 'master' || page === 'users' || page === 'customers' || page === 'vendors' || page === 'products' || page === 'addresses' || page === 'orders' || page === 'order-entry' || page === 'accounts-receivable' || page === 'accounts-receivable-detail' || page === 'purchase-order' || page === 'purchase-order-entry' || page === 'accounts-payable' || page === 'accounts-payable-detail' || page === 'general-ledger' || page === 'general-ledger-detail' || page === 'inventory-control' || page === 'rma' || page === 'rma-entry') {
             setCurrentPage(page);
           }
         }}
@@ -265,7 +273,7 @@ function AppContent() {
         onSettingsClick={() => setDrawerOpen(!drawerOpen)}
         title={getPageTitle(currentPage, t)}
       />
-      {currentPage === 'orders' || currentPage === 'order-entry' || currentPage === 'accounts-receivable' || currentPage === 'accounts-receivable-detail' || currentPage === 'purchase-order' || currentPage === 'purchase-order-entry' || currentPage === 'accounts-payable' || currentPage === 'accounts-payable-detail' || currentPage === 'general-ledger' || currentPage === 'general-ledger-detail' || currentPage === 'inventory-control' || currentPage === 'customers' || currentPage === 'vendors' || currentPage === 'products' || currentPage === 'addresses' || currentPage === 'users' || currentPage === 'master' ? (
+      {currentPage === 'orders' || currentPage === 'order-entry' || currentPage === 'accounts-receivable' || currentPage === 'accounts-receivable-detail' || currentPage === 'purchase-order' || currentPage === 'purchase-order-entry' || currentPage === 'accounts-payable' || currentPage === 'accounts-payable-detail' || currentPage === 'general-ledger' || currentPage === 'general-ledger-detail' || currentPage === 'inventory-control' || currentPage === 'customers' || currentPage === 'vendors' || currentPage === 'products' || currentPage === 'addresses' || currentPage === 'users' || currentPage === 'master' || currentPage === 'rma' || currentPage === 'rma-entry' ? (
         <FullWidthContainer {...debugProps(COMPONENT_NAME, 'FullWidthContainer')}>
           <AppContainer {...debugProps(COMPONENT_NAME, 'AppContainer')}>
             {currentPage === 'orders' ? (
@@ -441,6 +449,44 @@ function AppContent() {
                   onNavigateBack={() => setCurrentPage('welcome')}
                 />
               </div>
+            ) : currentPage === 'rma' ? (
+              <div style={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column', overflow: 'hidden', width: '100%' }}>
+                <RMAListingPage 
+                  onNavigateToRMAEntry={() => {
+                    setRmaIdToEdit(null);
+                    setRmaIdToView(null);
+                    setCurrentPage('rma-entry');
+                  }}
+                  onEditRMA={(rmaId: string) => {
+                    setRmaIdToEdit(rmaId);
+                    setRmaIdToView(null);
+                    setCurrentPage('rma-entry');
+                  }}
+                  onViewRMA={(rmaId: string) => {
+                    setRmaIdToView(rmaId);
+                    setRmaIdToEdit(null);
+                    setCurrentPage('rma-entry');
+                  }}
+                  onNavigateBack={() => setCurrentPage('welcome')}
+                />
+              </div>
+            ) : currentPage === 'rma-entry' ? (
+              <div style={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column', overflow: 'hidden', width: '100%' }}>
+                <RMAEntryPage 
+                  rmaIdToEdit={rmaIdToEdit || rmaIdToView}
+                  readOnly={!!rmaIdToView}
+                  onNavigateToRMAs={() => {
+                    setRmaIdToEdit(null);
+                    setRmaIdToView(null);
+                    setCurrentPage('rma');
+                  }}
+                  onNavigateBack={() => {
+                    setRmaIdToEdit(null);
+                    setRmaIdToView(null);
+                    setCurrentPage('rma');
+                  }}
+                />
+              </div>
             ) : currentPage === 'master' ? (
               <div style={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column', overflow: 'hidden', width: '100%' }}>
                 <MasterPage
@@ -462,7 +508,7 @@ function AppContent() {
               <WelcomePage
                 user={user}
                 onPageChange={(page) => {
-                  if (page === 'master' || page === 'users' || page === 'customers' || page === 'vendors' || page === 'products' || page === 'addresses' || page === 'orders' || page === 'order-entry' || page === 'accounts-receivable' || page === 'accounts-receivable-detail' || page === 'purchase-order' || page === 'purchase-order-entry' || page === 'accounts-payable' || page === 'accounts-payable-detail' || page === 'general-ledger' || page === 'general-ledger-detail' || page === 'inventory-control') {
+                  if (page === 'master' || page === 'users' || page === 'customers' || page === 'vendors' || page === 'products' || page === 'addresses' || page === 'orders' || page === 'order-entry' || page === 'accounts-receivable' || page === 'accounts-receivable-detail' || page === 'purchase-order' || page === 'purchase-order-entry' || page === 'accounts-payable' || page === 'accounts-payable-detail' || page === 'general-ledger' || page === 'general-ledger-detail' || page === 'inventory-control' || page === 'rma' || page === 'rma-entry') {
                     setCurrentPage(page);
                   }
                 }}

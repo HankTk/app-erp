@@ -6,6 +6,7 @@ import com.edge.entity.Inventory;
 import com.edge.entity.Order;
 import com.edge.entity.Product;
 import com.edge.entity.PurchaseOrder;
+import com.edge.entity.RMA;
 import com.edge.entity.User;
 import com.edge.entity.Vendor;
 import com.edge.entity.Warehouse;
@@ -121,6 +122,14 @@ public class WebSocketService {
         broadcastEntityDelete("inventory", inventoryId);
     }
     
+    public void broadcastRMAUpdate(RMA rma) {
+        broadcastEntityUpdate("rma", rma);
+    }
+    
+    public void broadcastRMADelete(String rmaId) {
+        broadcastEntityDelete("rma", rmaId);
+    }
+    
     private String getEntityId(Object entity) {
         if (entity instanceof Order) {
             return ((Order) entity).getId();
@@ -140,6 +149,8 @@ public class WebSocketService {
             return ((Warehouse) entity).getId();
         } else if (entity instanceof Inventory) {
             return ((Inventory) entity).getId();
+        } else if (entity instanceof RMA) {
+            return ((RMA) entity).getId();
         }
         return "unknown";
     }
