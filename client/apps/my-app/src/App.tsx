@@ -9,6 +9,7 @@ import { LoginPage } from './pages/auth/LoginPage';
 import { WelcomePage } from './pages/auth/WelcomePage';
 import { InitialSetupPage } from './pages/auth/InitialSetupPage';
 import { CustomerListingPage } from './pages/master/CustomerListingPage';
+import { VendorListingPage } from './pages/master/VendorListingPage';
 import { OrderEntryPage } from './pages/order/OrderEntryPage';
 import { ProductListingPage } from './pages/master/ProductListingPage';
 import { AddressListingPage } from './pages/master/AddressListingPage';
@@ -16,6 +17,10 @@ import { OrderListingPage } from './pages/order/OrderListingPage';
 import { MasterPage } from './pages/master/MasterPage';
 import { AccountReceivableListingPage } from './pages/accountReceivable/AccountReceivableListingPage';
 import { AccountReceivablePage } from './pages/accountReceivable/AccountReceivablePage';
+import { AccountPayableListingPage } from './pages/accountPayable/AccountPayableListingPage';
+import { AccountPayablePage } from './pages/accountPayable/AccountPayablePage';
+import { PurchaseOrderListingPage } from './pages/purchaseOrder/PurchaseOrderListingPage';
+import { PurchaseOrderEntryPage } from './pages/purchaseOrder/PurchaseOrderEntryPage';
 import { GeneralLedgerListingPage } from './pages/generalLedger/GeneralLedgerListingPage';
 import { GeneralLedgerPage } from './pages/generalLedger/GeneralLedgerPage';
 import { fetchUsers } from './api/userApi';
@@ -74,7 +79,7 @@ const FullWidthContainer = styled.div`
   transition: background-color var(--transition-base);
 `;
 
-type AppPage = 'welcome' | 'master' | 'users' | 'customers' | 'products' | 'addresses' | 'orders' | 'order-entry' | 'accounts-receivable' | 'accounts-receivable-detail' | 'general-ledger' | 'general-ledger-detail';
+type AppPage = 'welcome' | 'master' | 'users' | 'customers' | 'vendors' | 'products' | 'addresses' | 'orders' | 'order-entry' | 'accounts-receivable' | 'accounts-receivable-detail' | 'purchase-order' | 'purchase-order-entry' | 'accounts-payable' | 'accounts-payable-detail' | 'general-ledger' | 'general-ledger-detail';
 
 function AppContent() {
   const [user, setUser] = useState<any>(null);
@@ -82,6 +87,9 @@ function AppContent() {
   const [orderIdToEdit, setOrderIdToEdit] = useState<string | null>(null);
   const [orderIdToView, setOrderIdToView] = useState<string | null>(null);
   const [invoiceIdToView, setInvoiceIdToView] = useState<string | null>(null);
+  const [poIdToEdit, setPoIdToEdit] = useState<string | null>(null);
+  const [poIdToView, setPoIdToView] = useState<string | null>(null);
+  const [apInvoiceIdToView, setApInvoiceIdToView] = useState<string | null>(null);
   const [glOrderIdToView, setGlOrderIdToView] = useState<string | null>(null);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [drawerOpen, setDrawerOpen] = useState(false);
@@ -166,6 +174,8 @@ function AppContent() {
         return translate('user.title');
       case 'customers':
         return translate('sidebar.customers');
+      case 'vendors':
+        return translate('sidebar.vendors');
       case 'products':
         return translate('sidebar.products');
       case 'addresses':
@@ -178,6 +188,14 @@ function AppContent() {
         return translate('module.accountsReceivable');
       case 'accounts-receivable-detail':
         return translate('module.accountsReceivable');
+      case 'purchase-order':
+        return translate('module.purchaseOrder');
+      case 'purchase-order-entry':
+        return translate('module.purchaseOrder');
+      case 'accounts-payable':
+        return translate('module.accountsPayable');
+      case 'accounts-payable-detail':
+        return translate('module.accountsPayable');
       case 'general-ledger':
         return translate('module.generalLedger');
       case 'general-ledger-detail':
@@ -224,7 +242,7 @@ function AppContent() {
         onToggle={() => setSidebarOpen(!sidebarOpen)}
         currentPage={currentPage}
         onPageChange={(page) => {
-          if (page === 'welcome' || page === 'master' || page === 'users' || page === 'customers' || page === 'products' || page === 'addresses' || page === 'orders' || page === 'order-entry' || page === 'accounts-receivable' || page === 'accounts-receivable-detail' || page === 'general-ledger' || page === 'general-ledger-detail') {
+          if (page === 'welcome' || page === 'master' || page === 'users' || page === 'customers' || page === 'vendors' || page === 'products' || page === 'addresses' || page === 'orders' || page === 'order-entry' || page === 'accounts-receivable' || page === 'accounts-receivable-detail' || page === 'purchase-order' || page === 'purchase-order-entry' || page === 'accounts-payable' || page === 'accounts-payable-detail' || page === 'general-ledger' || page === 'general-ledger-detail') {
             setCurrentPage(page);
           }
         }}
@@ -241,7 +259,7 @@ function AppContent() {
         onSettingsClick={() => setDrawerOpen(!drawerOpen)}
         title={getPageTitle(currentPage, t)}
       />
-      {currentPage === 'orders' || currentPage === 'order-entry' || currentPage === 'accounts-receivable' || currentPage === 'accounts-receivable-detail' || currentPage === 'general-ledger' || currentPage === 'general-ledger-detail' || currentPage === 'customers' || currentPage === 'products' || currentPage === 'addresses' || currentPage === 'users' || currentPage === 'master' ? (
+      {currentPage === 'orders' || currentPage === 'order-entry' || currentPage === 'accounts-receivable' || currentPage === 'accounts-receivable-detail' || currentPage === 'purchase-order' || currentPage === 'purchase-order-entry' || currentPage === 'accounts-payable' || currentPage === 'accounts-payable-detail' || currentPage === 'general-ledger' || currentPage === 'general-ledger-detail' || currentPage === 'customers' || currentPage === 'vendors' || currentPage === 'products' || currentPage === 'addresses' || currentPage === 'users' || currentPage === 'master' ? (
         <FullWidthContainer>
           <AppContainer>
             {currentPage === 'orders' ? (
@@ -288,6 +306,12 @@ function AppContent() {
                   onNavigateBack={() => setCurrentPage('master')}
                 />
               </div>
+            ) : currentPage === 'vendors' ? (
+              <div style={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column', overflow: 'hidden', width: '100%' }}>
+                <VendorListingPage 
+                  onNavigateBack={() => setCurrentPage('master')}
+                />
+              </div>
             ) : currentPage === 'products' ? (
               <div style={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column', overflow: 'hidden', width: '100%' }}>
                 <ProductListingPage 
@@ -327,6 +351,64 @@ function AppContent() {
                   }}
                 />
               </div>
+            ) : currentPage === 'purchase-order' ? (
+              <div style={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column', overflow: 'hidden', width: '100%' }}>
+                <PurchaseOrderListingPage 
+                  onNavigateToPOEntry={() => {
+                    setPoIdToEdit(null);
+                    setPoIdToView(null);
+                    setCurrentPage('purchase-order-entry');
+                  }}
+                  onEditPO={(poId: string) => {
+                    setPoIdToEdit(poId);
+                    setPoIdToView(null);
+                    setCurrentPage('purchase-order-entry');
+                  }}
+                  onViewPO={(poId: string) => {
+                    setPoIdToView(poId);
+                    setPoIdToEdit(null);
+                    setCurrentPage('purchase-order-entry');
+                  }}
+                  onNavigateBack={() => setCurrentPage('welcome')}
+                />
+              </div>
+            ) : currentPage === 'purchase-order-entry' ? (
+              <div style={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column', overflow: 'hidden', width: '100%' }}>
+                <PurchaseOrderEntryPage 
+                  poIdToEdit={poIdToEdit || poIdToView}
+                  readOnly={!!poIdToView}
+                  onNavigateToPOs={() => {
+                    setPoIdToEdit(null);
+                    setPoIdToView(null);
+                    setCurrentPage('purchase-order');
+                  }}
+                  onNavigateBack={() => {
+                    setPoIdToEdit(null);
+                    setPoIdToView(null);
+                    setCurrentPage('purchase-order');
+                  }}
+                />
+              </div>
+            ) : currentPage === 'accounts-payable' ? (
+              <div style={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column', overflow: 'hidden', width: '100%' }}>
+                <AccountPayableListingPage 
+                  onViewInvoice={(prId: string) => {
+                    setApInvoiceIdToView(prId);
+                    setCurrentPage('accounts-payable-detail');
+                  }}
+                  onNavigateBack={() => setCurrentPage('welcome')}
+                />
+              </div>
+            ) : currentPage === 'accounts-payable-detail' ? (
+              <div style={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column', overflow: 'hidden', width: '100%' }}>
+                <AccountPayablePage 
+                  invoiceId={apInvoiceIdToView}
+                  onNavigateBack={() => {
+                    setApInvoiceIdToView(null);
+                    setCurrentPage('accounts-payable');
+                  }}
+                />
+              </div>
             ) : currentPage === 'general-ledger' ? (
               <div style={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column', overflow: 'hidden', width: '100%' }}>
                 <GeneralLedgerListingPage 
@@ -351,7 +433,7 @@ function AppContent() {
               <div style={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column', overflow: 'hidden', width: '100%' }}>
                 <MasterPage
                   onPageChange={(page) => {
-                    if (page === 'users' || page === 'customers' || page === 'products' || page === 'addresses') {
+                    if (page === 'users' || page === 'customers' || page === 'vendors' || page === 'products' || page === 'addresses') {
                       setCurrentPage(page);
                     }
                   }}
@@ -368,7 +450,7 @@ function AppContent() {
               <WelcomePage
                 user={user}
                 onPageChange={(page) => {
-                  if (page === 'master' || page === 'users' || page === 'customers' || page === 'products' || page === 'addresses' || page === 'orders' || page === 'order-entry' || page === 'accounts-receivable' || page === 'accounts-receivable-detail' || page === 'general-ledger' || page === 'general-ledger-detail') {
+                  if (page === 'master' || page === 'users' || page === 'customers' || page === 'vendors' || page === 'products' || page === 'addresses' || page === 'orders' || page === 'order-entry' || page === 'accounts-receivable' || page === 'accounts-receivable-detail' || page === 'purchase-order' || page === 'purchase-order-entry' || page === 'accounts-payable' || page === 'accounts-payable-detail' || page === 'general-ledger' || page === 'general-ledger-detail') {
                     setCurrentPage(page);
                   }
                 }}

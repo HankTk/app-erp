@@ -48,6 +48,27 @@ export const fetchAddressesByCustomerId = async (customerId: string): Promise<Ad
   return allAddresses.filter(addr => addressIds.includes(addr.id || ''));
 };
 
+export const fetchAddressesByVendorId = async (vendorId: string): Promise<Address[]> => {
+  // Import vendorApi to get vendor data
+  const { fetchVendorById } = await import('./vendorApi');
+  const vendor = await fetchVendorById(vendorId);
+  
+  if (!vendor) return [];
+  
+  // Get addressIds from vendor
+  const addressIds: string[] = vendor.addressIds && Array.isArray(vendor.addressIds) 
+    ? vendor.addressIds 
+    : (vendor.jsonData?.addressIds && Array.isArray(vendor.jsonData.addressIds)
+      ? vendor.jsonData.addressIds
+      : []);
+  
+  if (addressIds.length === 0) return [];
+  
+  // Fetch all addresses and filter by IDs
+  const allAddresses = await addressApi.fetchAll();
+  return allAddresses.filter(addr => addressIds.includes(addr.id || ''));
+};
+
 export const fetchAddressesByCustomerIdAndType = async (
   customerId: string,
   addressType: 'SHIPPING' | 'BILLING'

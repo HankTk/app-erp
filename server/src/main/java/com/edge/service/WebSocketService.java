@@ -4,7 +4,9 @@ import com.edge.entity.Address;
 import com.edge.entity.Customer;
 import com.edge.entity.Order;
 import com.edge.entity.Product;
+import com.edge.entity.PurchaseOrder;
 import com.edge.entity.User;
+import com.edge.entity.Vendor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -85,6 +87,22 @@ public class WebSocketService {
         broadcastEntityDelete("user", userId);
     }
     
+    public void broadcastPurchaseOrderUpdate(PurchaseOrder po) {
+        broadcastEntityUpdate("purchaseOrder", po);
+    }
+    
+    public void broadcastPurchaseOrderDelete(String poId) {
+        broadcastEntityDelete("purchaseOrder", poId);
+    }
+    
+    public void broadcastVendorUpdate(Vendor vendor) {
+        broadcastEntityUpdate("vendor", vendor);
+    }
+    
+    public void broadcastVendorDelete(String vendorId) {
+        broadcastEntityDelete("vendor", vendorId);
+    }
+    
     private String getEntityId(Object entity) {
         if (entity instanceof Order) {
             return ((Order) entity).getId();
@@ -96,6 +114,10 @@ public class WebSocketService {
             return ((Address) entity).getId();
         } else if (entity instanceof User) {
             return ((User) entity).getId();
+        } else if (entity instanceof PurchaseOrder) {
+            return ((PurchaseOrder) entity).getId();
+        } else if (entity instanceof Vendor) {
+            return ((Vendor) entity).getId();
         }
         return "unknown";
     }

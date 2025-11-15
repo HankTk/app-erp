@@ -97,6 +97,7 @@ const MenuCardTitle = styled(AxParagraph)`
 const masterItems = [
   { id: 'users', labelKey: 'sidebar.users' },
   { id: 'customers', labelKey: 'sidebar.customers' },
+  { id: 'vendors', labelKey: 'sidebar.vendors' },
   { id: 'products', labelKey: 'sidebar.products' },
   { id: 'addresses', labelKey: 'sidebar.addresses' },
 ];

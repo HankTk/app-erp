@@ -123,12 +123,12 @@ interface SidebarProps
 const menuItems = [
   { id: 'welcome', labelKey: 'sidebar.welcome' },
   { id: 'orders', labelKey: 'sidebar.customerOrder' },
-  { id: 'purchase-requisition', labelKey: 'module.purchaseRequisition', disabled: true },
+  { id: 'purchase-order', labelKey: 'module.purchaseOrder', disabled: false },
   { id: 'shop', labelKey: 'module.shop', disabled: true },
   { id: 'rma', labelKey: 'module.rma', disabled: true },
   { id: 'inventory-control', labelKey: 'module.inventoryControl', disabled: true },
-  { id: 'accounts-receivable', labelKey: 'module.accountsReceivable', disabled: true },
-  { id: 'accounts-payable', labelKey: 'module.accountsPayable', disabled: true },
+  { id: 'accounts-receivable', labelKey: 'module.accountsReceivable', disabled: false },
+  { id: 'accounts-payable', labelKey: 'module.accountsPayable', disabled: false },
   { id: 'general-ledger', labelKey: 'module.generalLedger', disabled: true },
   { id: 'master', labelKey: 'sidebar.master' },
 ];

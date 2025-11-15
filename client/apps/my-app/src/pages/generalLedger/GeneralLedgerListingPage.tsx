@@ -15,7 +15,9 @@ import {
   AxInput,
 } from '@ui/components';
 import { fetchOrders, Order } from '../../api/orderApi';
+import { fetchPurchaseOrders, PurchaseOrder } from '../../api/purchaseOrderApi';
 import { fetchCustomers, Customer } from '../../api/customerApi';
+import { fetchVendors, Vendor } from '../../api/vendorApi';
 import { fetchProducts, Product } from '../../api/productApi';
 import styled from 'styled-components';
 
@@ -70,12 +72,16 @@ const TableCard = styled(AxCard)`
 interface GLEntry {
   id: string;
   date: string;
-  type: 'REVENUE' | 'COST' | 'PAYMENT';
-  orderId: string;
-  orderNumber: string;
+  type: 'REVENUE' | 'COST' | 'PAYMENT' | 'EXPENSE' | 'ACCOUNTS_PAYABLE';
+  orderId?: string;
+  orderNumber?: string;
+  poId?: string;
+  poNumber?: string;
   invoiceNumber?: string;
-  customerId: string;
-  customerName: string;
+  customerId?: string;
+  customerName?: string;
+  supplierId?: string;
+  supplierName?: string;
   description: string;
   quantity: number;
   amount: number;
@@ -102,9 +108,11 @@ export function GeneralLedgerListingPage({ onViewEntry, onNavigateBack }: Genera
     try {
       setLoading(true);
       setError(null);
-      const [ordersData, customersData, productsData] = await Promise.all([
+      const [ordersData, purchaseOrdersData, customersData, vendorsData, productsData] = await Promise.all([
         fetchOrders(),
+        fetchPurchaseOrders(),
         fetchCustomers(),
+        fetchVendors(),
         fetchProducts(),
       ]);
       
@@ -204,6 +212,135 @@ export function GeneralLedgerListingPage({ onViewEntry, onNavigateBack }: Genera
         }
       });
       
+      // Process Purchase Orders that have been received, invoiced, or paid
+      const processedPOs = purchaseOrdersData.filter(po => 
+        po.status === 'RECEIVED' || po.status === 'INVOICED' || po.status === 'PAID'
+      );
+      
+      processedPOs.forEach(po => {
+        const vendor = vendorsData.find(v => v.id === po.supplierId);
+        const supplierName = vendor 
+          ? (vendor.companyName || `${vendor.lastName} ${vendor.firstName}` || vendor.email)
+          : 'Unknown';
+        
+        // Handle receivedDate - it might be stored as a string in jsonData
+        let receivedDate: string | null = null;
+        if (po.jsonData?.receivedDate) {
+          try {
+            const receivedDateValue = po.jsonData.receivedDate;
+            if (typeof receivedDateValue === 'string') {
+              // If it's already a date string (YYYY-MM-DD), use it directly
+              if (receivedDateValue.match(/^\d{4}-\d{2}-\d{2}$/)) {
+                receivedDate = receivedDateValue;
+              } else {
+                // Otherwise, try to parse it
+                receivedDate = new Date(receivedDateValue).toISOString().split('T')[0];
+              }
+            }
+          } catch (e) {
+            console.warn('Error parsing receivedDate:', e);
+          }
+        }
+        
+        // Convert invoiceDate and orderDate to string format if they're LocalDateTime objects
+        const invoiceDateStr = po.invoiceDate 
+          ? (typeof po.invoiceDate === 'string' ? po.invoiceDate : new Date(po.invoiceDate).toISOString().split('T')[0])
+          : null;
+        const orderDateStr = po.orderDate 
+          ? (typeof po.orderDate === 'string' ? po.orderDate : new Date(po.orderDate).toISOString().split('T')[0])
+          : '';
+        
+        const transactionDate = receivedDate || invoiceDateStr || orderDateStr;
+        
+        // Calculate total quantity
+        const totalQuantity = po.items?.reduce((sum, item) => sum + (item.quantity || 0), 0) || 0;
+        
+        // Calculate product cost using actual product cost from products data
+        const productCost = po.items?.reduce((sum, item) => {
+          const product = productsData.find(p => p.id === item.productId);
+          const itemCost = product?.cost || (item.unitPrice || 0) * 0.7; // Use product cost, fallback to 70% of unit price
+          return sum + (itemCost * (item.quantity || 0));
+        }, 0) || 0;
+        
+        // EXPENSE entry - when PO is received/invoiced/paid (inventory increase, accounts payable)
+        if (po.status === 'RECEIVED' || po.status === 'INVOICED' || po.status === 'PAID') {
+          const shippingCost = po.shippingCost || 0;
+          const totalCost = productCost + shippingCost;
+          
+          if (totalCost > 0) {
+            entries.push({
+              id: `${po.id}-expense`,
+              date: transactionDate || '',
+              type: 'EXPENSE',
+              poId: po.id || '',
+              poNumber: po.orderNumber || '',
+              invoiceNumber: po.invoiceNumber,
+              supplierId: po.supplierId || '',
+              supplierName,
+              description: `Purchase Expense for PO ${po.orderNumber}${po.invoiceNumber ? ` / Invoice ${po.invoiceNumber}` : ''} (Product: $${productCost.toFixed(2)}, Shipping: $${shippingCost.toFixed(2)})`,
+              quantity: totalQuantity,
+              amount: totalCost,
+              cost: totalCost,
+              status: po.status,
+            });
+          }
+        }
+        
+        // ACCOUNTS_PAYABLE entry - when invoice is received
+        if (po.status === 'INVOICED' || po.status === 'PAID') {
+          entries.push({
+            id: `${po.id}-ap`,
+            date: invoiceDateStr || orderDateStr || '',
+            type: 'ACCOUNTS_PAYABLE',
+            poId: po.id || '',
+            poNumber: po.orderNumber || '',
+            invoiceNumber: po.invoiceNumber,
+            supplierId: po.supplierId || '',
+            supplierName,
+            description: `Accounts Payable for PO ${po.orderNumber}${po.invoiceNumber ? ` / Invoice ${po.invoiceNumber}` : ''}`,
+            quantity: totalQuantity,
+            amount: po.total || 0,
+            status: po.status,
+          });
+        }
+        
+        // PAYMENT entry - when payment is made
+        if (po.status === 'PAID' && po.jsonData?.paymentAmount) {
+          const paymentAmount = po.jsonData.paymentAmount || 0;
+          let paymentDate: string = '';
+          if (po.jsonData.paymentDate) {
+            const paymentDateValue = po.jsonData.paymentDate;
+            if (typeof paymentDateValue === 'string') {
+              if (paymentDateValue.match(/^\d{4}-\d{2}-\d{2}$/)) {
+                paymentDate = paymentDateValue;
+              } else {
+                paymentDate = new Date(paymentDateValue).toISOString().split('T')[0];
+              }
+            }
+          }
+          if (!paymentDate) {
+            paymentDate = orderDateStr;
+          }
+          
+          if (paymentAmount > 0) {
+            entries.push({
+              id: `${po.id}-payment`,
+              date: paymentDate,
+              type: 'PAYMENT',
+              poId: po.id || '',
+              poNumber: po.orderNumber || '',
+              invoiceNumber: po.invoiceNumber,
+              supplierId: po.supplierId || '',
+              supplierName,
+              description: `Payment made for PO ${po.orderNumber}${po.invoiceNumber ? ` / Invoice ${po.invoiceNumber}` : ''}`,
+              quantity: 0,
+              amount: paymentAmount,
+              status: 'PAID',
+            });
+          }
+        }
+      });
+      
       // Sort by date (newest first)
       entries.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
       
@@ -245,6 +382,10 @@ export function GeneralLedgerListingPage({ onViewEntry, onNavigateBack }: Genera
         return '#DC2626'; // Red
       case 'PAYMENT':
         return '#2563EB'; // Blue
+      case 'EXPENSE':
+        return '#DC2626'; // Red (same as COST)
+      case 'ACCOUNTS_PAYABLE':
+        return '#F59E0B'; // Orange
       default:
         return '#6B7280';
     }
@@ -258,6 +399,10 @@ export function GeneralLedgerListingPage({ onViewEntry, onNavigateBack }: Genera
         return '#FEE2E2';
       case 'PAYMENT':
         return '#DBEAFE';
+      case 'EXPENSE':
+        return '#FEE2E2'; // Same as COST
+      case 'ACCOUNTS_PAYABLE':
+        return '#FEF3C7'; // Light orange
       default:
         return '#F3F4F6';
     }
@@ -271,6 +416,10 @@ export function GeneralLedgerListingPage({ onViewEntry, onNavigateBack }: Genera
         return 'Cost';
       case 'PAYMENT':
         return 'Payment';
+      case 'EXPENSE':
+        return 'Expense';
+      case 'ACCOUNTS_PAYABLE':
+        return 'A/P';
       default:
         return type;
     }
@@ -278,7 +427,7 @@ export function GeneralLedgerListingPage({ onViewEntry, onNavigateBack }: Genera
 
   // Calculate totals
   const totalDebit = filteredEntries
-    .filter(e => e.type === 'COST')
+    .filter(e => e.type === 'COST' || e.type === 'EXPENSE' || e.type === 'ACCOUNTS_PAYABLE')
     .reduce((sum, e) => sum + e.amount, 0);
   const totalCredit = filteredEntries
     .filter(e => e.type === 'REVENUE' || e.type === 'PAYMENT')
@@ -289,10 +438,16 @@ export function GeneralLedgerListingPage({ onViewEntry, onNavigateBack }: Genera
   const totalCost = filteredEntries
     .filter(e => e.type === 'COST')
     .reduce((sum, e) => sum + e.amount, 0);
+  const totalExpense = filteredEntries
+    .filter(e => e.type === 'EXPENSE')
+    .reduce((sum, e) => sum + e.amount, 0);
+  const totalAccountsPayable = filteredEntries
+    .filter(e => e.type === 'ACCOUNTS_PAYABLE')
+    .reduce((sum, e) => sum + e.amount, 0);
   const totalPayment = filteredEntries
     .filter(e => e.type === 'PAYMENT')
     .reduce((sum, e) => sum + e.amount, 0);
-  const netIncome = totalRevenue - totalCost;
+  const netIncome = totalRevenue - totalCost - totalExpense;
 
   if (loading) {
     return (
@@ -413,6 +568,8 @@ export function GeneralLedgerListingPage({ onViewEntry, onNavigateBack }: Genera
                   { value: null, label: 'All Types' },
                   { value: 'REVENUE', label: 'Revenue' },
                   { value: 'COST', label: 'Cost' },
+                  { value: 'EXPENSE', label: 'Expense' },
+                  { value: 'ACCOUNTS_PAYABLE', label: 'Accounts Payable' },
                   { value: 'PAYMENT', label: 'Payment' },
                 ]}
                 value={typeFilter}
@@ -437,8 +594,8 @@ export function GeneralLedgerListingPage({ onViewEntry, onNavigateBack }: Genera
                 <AxTableRow>
                   <AxTableHeader>Date</AxTableHeader>
                   <AxTableHeader>Type</AxTableHeader>
-                  <AxTableHeader>Order/Invoice</AxTableHeader>
-                  <AxTableHeader>Customer</AxTableHeader>
+                  <AxTableHeader>Order/PO/Invoice</AxTableHeader>
+                  <AxTableHeader>Customer/Supplier</AxTableHeader>
                   <AxTableHeader>Description</AxTableHeader>
                   <AxTableHeader align="right">Quantity</AxTableHeader>
                   <AxTableHeader align="right">Debit</AxTableHeader>
@@ -448,9 +605,13 @@ export function GeneralLedgerListingPage({ onViewEntry, onNavigateBack }: Genera
               </AxTableHead>
               <AxTableBody>
                 {filteredEntries.map((entry) => {
-                  // Debit for COST, Credit for REVENUE and PAYMENT
-                  const debitAmount = entry.type === 'COST' ? entry.amount : 0;
+                  // Debit for COST, EXPENSE, ACCOUNTS_PAYABLE; Credit for REVENUE and PAYMENT
+                  const debitAmount = entry.type === 'COST' || entry.type === 'EXPENSE' || entry.type === 'ACCOUNTS_PAYABLE' ? entry.amount : 0;
                   const creditAmount = entry.type === 'REVENUE' || entry.type === 'PAYMENT' ? entry.amount : 0;
+                  
+                  // Determine order/PO number and customer/supplier name
+                  const orderOrPONumber = entry.orderNumber || entry.poNumber || 'N/A';
+                  const customerOrSupplierName = entry.customerName || entry.supplierName || 'N/A';
                   
                   return (
                     <AxTableRow key={entry.id}>
@@ -471,10 +632,10 @@ export function GeneralLedgerListingPage({ onViewEntry, onNavigateBack }: Genera
                         </span>
                       </AxTableCell>
                       <AxTableCell>
-                        {entry.orderNumber}
+                        {entry.poNumber ? `PO: ${entry.poNumber}` : entry.orderNumber ? `Order: ${entry.orderNumber}` : 'N/A'}
                         {entry.invoiceNumber && ` / ${entry.invoiceNumber}`}
                       </AxTableCell>
-                      <AxTableCell>{entry.customerName}</AxTableCell>
+                      <AxTableCell>{customerOrSupplierName}</AxTableCell>
                       <AxTableCell>{entry.description}</AxTableCell>
                       <AxTableCell align="right">{entry.quantity}</AxTableCell>
                       <AxTableCell align="right" style={{ 
@@ -490,11 +651,11 @@ export function GeneralLedgerListingPage({ onViewEntry, onNavigateBack }: Genera
                         {creditAmount > 0 ? `$${creditAmount.toFixed(2)}` : '-'}
                       </AxTableCell>
                       <AxTableCell align="center">
-                        {onViewEntry && entry.orderId && (
+                        {onViewEntry && (entry.orderId || entry.poId) && (
                           <AxButton 
                             variant="secondary" 
                             size="small"
-                            onClick={() => onViewEntry(entry.orderId)}
+                            onClick={() => onViewEntry(entry.orderId || entry.poId || '')}
                             style={{ minWidth: '80px' }}
                           >
                             View
@@ -552,10 +713,18 @@ export function GeneralLedgerListingPage({ onViewEntry, onNavigateBack }: Genera
                 </div>
                 <div>
                   <AxParagraph style={{ fontSize: 'var(--font-size-sm)', color: 'var(--color-text-secondary)', marginBottom: 'var(--spacing-xs)' }}>
-                    Net Income
+                    Total Expense
                   </AxParagraph>
-                  <AxParagraph style={{ fontSize: 'var(--font-size-lg)', fontWeight: 'var(--font-weight-bold)', color: netIncome >= 0 ? 'var(--color-success)' : 'var(--color-error)' }}>
-                    ${netIncome.toFixed(2)}
+                  <AxParagraph style={{ fontSize: 'var(--font-size-lg)', fontWeight: 'var(--font-weight-bold)', color: 'var(--color-error)' }}>
+                    ${totalExpense.toFixed(2)}
+                  </AxParagraph>
+                </div>
+                <div>
+                  <AxParagraph style={{ fontSize: 'var(--font-size-sm)', color: 'var(--color-text-secondary)', marginBottom: 'var(--spacing-xs)' }}>
+                    Total A/P
+                  </AxParagraph>
+                  <AxParagraph style={{ fontSize: 'var(--font-size-lg)', fontWeight: 'var(--font-weight-bold)', color: 'var(--color-error)' }}>
+                    ${totalAccountsPayable.toFixed(2)}
                   </AxParagraph>
                 </div>
                 <div>
@@ -564,6 +733,14 @@ export function GeneralLedgerListingPage({ onViewEntry, onNavigateBack }: Genera
                   </AxParagraph>
                   <AxParagraph style={{ fontSize: 'var(--font-size-lg)', fontWeight: 'var(--font-weight-bold)', color: 'var(--color-primary)' }}>
                     ${totalPayment.toFixed(2)}
+                  </AxParagraph>
+                </div>
+                <div>
+                  <AxParagraph style={{ fontSize: 'var(--font-size-sm)', color: 'var(--color-text-secondary)', marginBottom: 'var(--spacing-xs)' }}>
+                    Net Income
+                  </AxParagraph>
+                  <AxParagraph style={{ fontSize: 'var(--font-size-lg)', fontWeight: 'var(--font-weight-bold)', color: netIncome >= 0 ? 'var(--color-success)' : 'var(--color-error)' }}>
+                    ${netIncome.toFixed(2)}
                   </AxParagraph>
                 </div>
               </div>

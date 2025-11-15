@@ -7,6 +7,7 @@ import { Customer } from '../api/customerApi';
 import { Product } from '../api/productApi';
 import { Address } from '../api/addressApi';
 import type { User } from '../api/userApi';
+import { Vendor } from '../api/vendorApi';
 
 export type EntityType = 'order' | 'customer' | 'product' | 'address' | 'user';
 
@@ -27,6 +28,8 @@ interface UseWebSocketOptions {
   onAddressDelete?: (addressId: string) => void;
   onUserUpdate?: (user: User) => void;
   onUserDelete?: (userId: string) => void;
+  onVendorUpdate?: (vendor: Vendor) => void;
+  onVendorDelete?: (vendorId: string) => void;
   enabled?: boolean;
 }
 
@@ -42,6 +45,8 @@ export function useWebSocket(options: UseWebSocketOptions = {}) {
     onAddressDelete,
     onUserUpdate,
     onUserDelete,
+    onVendorUpdate,
+    onVendorDelete,
     enabled = true,
   } = options;
   const [connected, setConnected] = useState(false);
@@ -183,6 +188,29 @@ export function useWebSocket(options: UseWebSocketOptions = {}) {
             }
           });
         }
+
+        // Subscribe to vendor updates
+        if (onVendorUpdate || onVendorDelete) {
+          client.subscribe('/topic/vendors/update', (message: IMessage) => {
+            try {
+              const vendor: Vendor = JSON.parse(message.body);
+              console.log('Received vendor update:', vendor);
+              onVendorUpdate?.(vendor);
+            } catch (error) {
+              console.error('Error parsing vendor update:', error);
+            }
+          });
+
+          client.subscribe('/topic/vendors/delete', (message: IMessage) => {
+            try {
+              const vendorId: string = message.body;
+              console.log('Received vendor deletion:', vendorId);
+              onVendorDelete?.(vendorId);
+            } catch (error) {
+              console.error('Error parsing vendor deletion:', error);
+            }
+          });
+        }
       },
       onDisconnect: () => {
         console.log('WebSocket disconnected');
@@ -220,6 +248,8 @@ export function useWebSocket(options: UseWebSocketOptions = {}) {
     onAddressDelete,
     onUserUpdate,
     onUserDelete,
+    onVendorUpdate,
+    onVendorDelete,
   ]);
 
   const disconnect = useCallback(() => {
