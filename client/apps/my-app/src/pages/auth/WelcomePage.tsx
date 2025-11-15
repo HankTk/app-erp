@@ -115,7 +115,7 @@ const MenuCardSubtitle = styled(AxParagraph)`
 
 const menuItems = [
   { id: 'orders', labelKey: 'sidebar.customerOrder', subtitleKey: null, disabled: false },
-  { id: 'inventory-control', labelKey: 'module.inventoryControl', subtitleKey: 'module.comingSoon', disabled: true },
+  { id: 'inventory-control', labelKey: 'module.inventoryControl', subtitleKey: null, disabled: false },
   { id: 'purchase-order', labelKey: 'module.purchaseOrder', subtitleKey: null, disabled: false },
   { id: 'accounts-receivable', labelKey: 'module.accountsReceivable', subtitleKey: null, disabled: false },
   { id: 'general-ledger', labelKey: 'module.generalLedger', subtitleKey: null, disabled: false },

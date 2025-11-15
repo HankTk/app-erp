@@ -23,6 +23,7 @@ import { PurchaseOrderListingPage } from './pages/purchaseOrder/PurchaseOrderLis
 import { PurchaseOrderEntryPage } from './pages/purchaseOrder/PurchaseOrderEntryPage';
 import { GeneralLedgerListingPage } from './pages/generalLedger/GeneralLedgerListingPage';
 import { GeneralLedgerPage } from './pages/generalLedger/GeneralLedgerPage';
+import { InventoryControlPage } from './pages/inventory/InventoryControlPage';
 import { fetchUsers } from './api/userApi';
 import styled from '@emotion/styled';
 
@@ -79,7 +80,7 @@ const FullWidthContainer = styled.div`
   transition: background-color var(--transition-base);
 `;
 
-type AppPage = 'welcome' | 'master' | 'users' | 'customers' | 'vendors' | 'products' | 'addresses' | 'orders' | 'order-entry' | 'accounts-receivable' | 'accounts-receivable-detail' | 'purchase-order' | 'purchase-order-entry' | 'accounts-payable' | 'accounts-payable-detail' | 'general-ledger' | 'general-ledger-detail';
+type AppPage = 'welcome' | 'master' | 'users' | 'customers' | 'vendors' | 'products' | 'addresses' | 'orders' | 'order-entry' | 'accounts-receivable' | 'accounts-receivable-detail' | 'purchase-order' | 'purchase-order-entry' | 'accounts-payable' | 'accounts-payable-detail' | 'general-ledger' | 'general-ledger-detail' | 'inventory-control';
 
 function AppContent() {
   const [user, setUser] = useState<any>(null);
@@ -200,6 +201,8 @@ function AppContent() {
         return translate('module.generalLedger');
       case 'general-ledger-detail':
         return translate('module.generalLedger');
+      case 'inventory-control':
+        return translate('module.inventoryControl');
       case 'master':
         return translate('master.title');
       case 'welcome':
@@ -242,7 +245,7 @@ function AppContent() {
         onToggle={() => setSidebarOpen(!sidebarOpen)}
         currentPage={currentPage}
         onPageChange={(page) => {
-          if (page === 'welcome' || page === 'master' || page === 'users' || page === 'customers' || page === 'vendors' || page === 'products' || page === 'addresses' || page === 'orders' || page === 'order-entry' || page === 'accounts-receivable' || page === 'accounts-receivable-detail' || page === 'purchase-order' || page === 'purchase-order-entry' || page === 'accounts-payable' || page === 'accounts-payable-detail' || page === 'general-ledger' || page === 'general-ledger-detail') {
+          if (page === 'welcome' || page === 'master' || page === 'users' || page === 'customers' || page === 'vendors' || page === 'products' || page === 'addresses' || page === 'orders' || page === 'order-entry' || page === 'accounts-receivable' || page === 'accounts-receivable-detail' || page === 'purchase-order' || page === 'purchase-order-entry' || page === 'accounts-payable' || page === 'accounts-payable-detail' || page === 'general-ledger' || page === 'general-ledger-detail' || page === 'inventory-control') {
             setCurrentPage(page);
           }
         }}
@@ -259,7 +262,7 @@ function AppContent() {
         onSettingsClick={() => setDrawerOpen(!drawerOpen)}
         title={getPageTitle(currentPage, t)}
       />
-      {currentPage === 'orders' || currentPage === 'order-entry' || currentPage === 'accounts-receivable' || currentPage === 'accounts-receivable-detail' || currentPage === 'purchase-order' || currentPage === 'purchase-order-entry' || currentPage === 'accounts-payable' || currentPage === 'accounts-payable-detail' || currentPage === 'general-ledger' || currentPage === 'general-ledger-detail' || currentPage === 'customers' || currentPage === 'vendors' || currentPage === 'products' || currentPage === 'addresses' || currentPage === 'users' || currentPage === 'master' ? (
+      {currentPage === 'orders' || currentPage === 'order-entry' || currentPage === 'accounts-receivable' || currentPage === 'accounts-receivable-detail' || currentPage === 'purchase-order' || currentPage === 'purchase-order-entry' || currentPage === 'accounts-payable' || currentPage === 'accounts-payable-detail' || currentPage === 'general-ledger' || currentPage === 'general-ledger-detail' || currentPage === 'inventory-control' || currentPage === 'customers' || currentPage === 'vendors' || currentPage === 'products' || currentPage === 'addresses' || currentPage === 'users' || currentPage === 'master' ? (
         <FullWidthContainer>
           <AppContainer>
             {currentPage === 'orders' ? (
@@ -429,6 +432,12 @@ function AppContent() {
                   }}
                 />
               </div>
+            ) : currentPage === 'inventory-control' ? (
+              <div style={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column', overflow: 'hidden', width: '100%' }}>
+                <InventoryControlPage 
+                  onNavigateBack={() => setCurrentPage('welcome')}
+                />
+              </div>
             ) : currentPage === 'master' ? (
               <div style={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column', overflow: 'hidden', width: '100%' }}>
                 <MasterPage
@@ -450,7 +459,7 @@ function AppContent() {
               <WelcomePage
                 user={user}
                 onPageChange={(page) => {
-                  if (page === 'master' || page === 'users' || page === 'customers' || page === 'vendors' || page === 'products' || page === 'addresses' || page === 'orders' || page === 'order-entry' || page === 'accounts-receivable' || page === 'accounts-receivable-detail' || page === 'purchase-order' || page === 'purchase-order-entry' || page === 'accounts-payable' || page === 'accounts-payable-detail' || page === 'general-ledger' || page === 'general-ledger-detail') {
+                  if (page === 'master' || page === 'users' || page === 'customers' || page === 'vendors' || page === 'products' || page === 'addresses' || page === 'orders' || page === 'order-entry' || page === 'accounts-receivable' || page === 'accounts-receivable-detail' || page === 'purchase-order' || page === 'purchase-order-entry' || page === 'accounts-payable' || page === 'accounts-payable-detail' || page === 'general-ledger' || page === 'general-ledger-detail' || page === 'inventory-control') {
                     setCurrentPage(page);
                   }
                 }}

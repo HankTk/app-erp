@@ -120,17 +120,23 @@ interface SidebarProps
   onLogout: () => void;
 }
 
-const menuItems = [
-  { id: 'welcome', labelKey: 'sidebar.welcome' },
-  { id: 'orders', labelKey: 'sidebar.customerOrder' },
+interface MenuItem {
+  id: string;
+  labelKey: string;
+  disabled?: boolean;
+}
+
+const menuItems: MenuItem[] = [
+  { id: 'welcome', labelKey: 'sidebar.welcome', disabled: false },
+  { id: 'orders', labelKey: 'sidebar.customerOrder', disabled: false },
   { id: 'purchase-order', labelKey: 'module.purchaseOrder', disabled: false },
   { id: 'shop', labelKey: 'module.shop', disabled: true },
   { id: 'rma', labelKey: 'module.rma', disabled: true },
-  { id: 'inventory-control', labelKey: 'module.inventoryControl', disabled: true },
+  { id: 'inventory-control', labelKey: 'module.inventoryControl', disabled: false },
   { id: 'accounts-receivable', labelKey: 'module.accountsReceivable', disabled: false },
   { id: 'accounts-payable', labelKey: 'module.accountsPayable', disabled: false },
-  { id: 'general-ledger', labelKey: 'module.generalLedger', disabled: true },
-  { id: 'master', labelKey: 'sidebar.master' },
+  { id: 'general-ledger', labelKey: 'module.generalLedger', disabled: false },
+  { id: 'master', labelKey: 'sidebar.master', disabled: false },
 ];
 
 export function Sidebar({ isOpen, onToggle, currentPage, onPageChange, onLogout }: SidebarProps)
@@ -152,18 +158,18 @@ export function Sidebar({ isOpen, onToggle, currentPage, onPageChange, onLogout 
             <AxMenuItem key={item.id}>
               <AxMenuButton
                 $isActive={currentPage === item.id}
-                $disabled={item.disabled}
+                $disabled={item.disabled === true}
                 onClick={() => {
-                  if (!item.disabled) {
+                  if (item.disabled !== true) {
                     onPageChange(item.id);
                     onToggle(); // Close sidebar after selection
                   }
                 }}
                 variant={currentPage === item.id ? 'primary' : 'secondary'}
-                disabled={item.disabled}
+                disabled={item.disabled === true}
               >
                 {t(item.labelKey)}
-                {item.disabled && ` (${t('module.comingSoon')})`}
+                {item.disabled === true && ` (${t('module.comingSoon')})`}
               </AxMenuButton>
             </AxMenuItem>
           ))}

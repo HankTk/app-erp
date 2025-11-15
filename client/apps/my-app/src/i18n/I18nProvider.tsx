@@ -6,8 +6,8 @@ export type Language = 'en' | 'ja';
 
 interface I18nContextType {
   language: Language;
-  t: (key: string) => string;
-  l10n: (key: string) => string;
+  t: (key: string, params?: Record<string, string | number | undefined>) => string;
+  l10n: (key: string, params?: Record<string, string | number | undefined>) => string;
   setLanguage: (language: Language) => void;
 }
 
@@ -47,8 +47,17 @@ export const I18nProvider: React.FC<I18nProviderProps> = ({
     localStorage.setItem(storageKey, language);
   }, [language, storageKey]);
 
-  const t = (key: string): string => {
-    return translations[language][key] || key;
+  const t = (key: string, params?: Record<string, string | number | undefined>): string => {
+    let text = translations[language][key] || key;
+    if (params) {
+      Object.keys(params).forEach((paramKey) => {
+        const value = params[paramKey];
+        if (value !== undefined && value !== null) {
+          text = text.replace(new RegExp(`\\{${paramKey}\\}`, 'g'), String(value));
+        }
+      });
+    }
+    return text;
   };
 
   // l10n is an alias for t
@@ -74,13 +83,13 @@ export const useI18n = (): I18nContextType => {
 };
 
 // Short alias for translation function
-export const useT = (): ((key: string) => string) => {
+export const useT = (): ((key: string, params?: Record<string, string | number | undefined>) => string) => {
   const { t } = useI18n();
   return t;
 };
 
 // Short alias for l10n function
-export const useL10n = (): ((key: string) => string) => {
+export const useL10n = (): ((key: string, params?: Record<string, string | number | undefined>) => string) => {
   const { l10n } = useI18n();
   return l10n;
 };

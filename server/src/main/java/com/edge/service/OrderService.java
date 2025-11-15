@@ -3,8 +3,10 @@ package com.edge.service;
 import com.edge.entity.Order;
 import com.edge.entity.OrderItem;
 import com.edge.entity.Product;
+import com.edge.entity.Warehouse;
 import com.edge.repository.OrderRepository;
 import com.edge.repository.ProductRepository;
+import com.edge.repository.WarehouseRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -19,6 +21,12 @@ public class OrderService {
     
     @Autowired
     private ProductRepository productRepository;
+    
+    @Autowired
+    private WarehouseRepository warehouseRepository;
+    
+    @Autowired
+    private InventoryService inventoryService;
     
     @Autowired(required = false)
     private WebSocketService webSocketService;
@@ -55,10 +63,21 @@ public class OrderService {
     
     public Order updateOrder(String id, Order orderDetails) {
         System.out.println("OrderService.updateOrder - ID: " + id + ", Status: " + orderDetails.getStatus());
+        
+        // Get existing order to check status change
+        Order existingOrder = orderRepository.getOrderById(id)
+            .orElseThrow(() -> new RuntimeException("Order not found with id: " + id));
+        String oldStatus = existingOrder.getStatus();
+        
         // Enrich order items with product information
         enrichOrderItems(orderDetails);
         Order updated = orderRepository.updateOrder(id, orderDetails);
         System.out.println("OrderService.updateOrder - Updated status: " + updated.getStatus());
+        
+        // Handle inventory decrease when order is shipped
+        if ("SHIPPED".equals(updated.getStatus()) && !"SHIPPED".equals(oldStatus)) {
+            decreaseInventoryForOrder(updated);
+        }
         
         // Broadcast update via WebSocket
         if (webSocketService != null) {
@@ -156,6 +175,39 @@ public class OrderService {
                         }
                         item.calculateLineTotal();
                     });
+                }
+            }
+        }
+    }
+    
+    private void decreaseInventoryForOrder(Order order) {
+        if (order.getItems() == null || order.getItems().isEmpty()) {
+            return;
+        }
+        
+        // Get default warehouse (first active warehouse, or first warehouse if none active)
+        List<Warehouse> warehouses = warehouseRepository.getActiveWarehouses();
+        if (warehouses.isEmpty()) {
+            warehouses = warehouseRepository.getAllWarehouses();
+        }
+        
+        if (warehouses.isEmpty()) {
+            System.out.println("Warning: No warehouses found. Cannot decrease inventory for order " + order.getId());
+            return;
+        }
+        
+        Warehouse defaultWarehouse = warehouses.get(0);
+        String warehouseId = defaultWarehouse.getId();
+        
+        // Decrease inventory for each order item
+        for (OrderItem item : order.getItems()) {
+            if (item.getProductId() != null && item.getQuantity() != null && item.getQuantity() > 0) {
+                try {
+                    inventoryService.adjustInventory(item.getProductId(), warehouseId, -item.getQuantity());
+                    System.out.println("Decreased inventory for product " + item.getProductId() + 
+                        " by " + item.getQuantity() + " in warehouse " + warehouseId);
+                } catch (Exception e) {
+                    System.err.println("Error decreasing inventory for product " + item.getProductId() + ": " + e.getMessage());
                 }
             }
         }

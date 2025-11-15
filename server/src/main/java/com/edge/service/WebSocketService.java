@@ -2,11 +2,13 @@ package com.edge.service;
 
 import com.edge.entity.Address;
 import com.edge.entity.Customer;
+import com.edge.entity.Inventory;
 import com.edge.entity.Order;
 import com.edge.entity.Product;
 import com.edge.entity.PurchaseOrder;
 import com.edge.entity.User;
 import com.edge.entity.Vendor;
+import com.edge.entity.Warehouse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -103,6 +105,22 @@ public class WebSocketService {
         broadcastEntityDelete("vendor", vendorId);
     }
     
+    public void broadcastWarehouseUpdate(Warehouse warehouse) {
+        broadcastEntityUpdate("warehouse", warehouse);
+    }
+    
+    public void broadcastWarehouseDelete(String warehouseId) {
+        broadcastEntityDelete("warehouse", warehouseId);
+    }
+    
+    public void broadcastInventoryUpdate(Inventory inventory) {
+        broadcastEntityUpdate("inventory", inventory);
+    }
+    
+    public void broadcastInventoryDelete(String inventoryId) {
+        broadcastEntityDelete("inventory", inventoryId);
+    }
+    
     private String getEntityId(Object entity) {
         if (entity instanceof Order) {
             return ((Order) entity).getId();
@@ -118,6 +136,10 @@ public class WebSocketService {
             return ((PurchaseOrder) entity).getId();
         } else if (entity instanceof Vendor) {
             return ((Vendor) entity).getId();
+        } else if (entity instanceof Warehouse) {
+            return ((Warehouse) entity).getId();
+        } else if (entity instanceof Inventory) {
+            return ((Inventory) entity).getId();
         }
         return "unknown";
     }

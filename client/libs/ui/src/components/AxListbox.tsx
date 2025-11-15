@@ -177,12 +177,12 @@ const StyledListboxOption = styled.li<StyledListboxOptionProps>`
       $selected ? 'var(--color-primary-light)' : 'var(--color-background-disabled)'};
   }
 
-  &:first-child {
+  &:first-of-type {
     border-top-left-radius: var(--radius-md);
     border-top-right-radius: var(--radius-md);
   }
 
-  &:last-child {
+  &:last-of-type {
     border-bottom-left-radius: var(--radius-md);
     border-bottom-right-radius: var(--radius-md);
   }

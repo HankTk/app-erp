@@ -3,8 +3,10 @@ package com.edge.service;
 import com.edge.entity.PurchaseOrder;
 import com.edge.entity.PurchaseOrderItem;
 import com.edge.entity.Product;
+import com.edge.entity.Warehouse;
 import com.edge.repository.PurchaseOrderRepository;
 import com.edge.repository.ProductRepository;
+import com.edge.repository.WarehouseRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -19,6 +21,12 @@ public class PurchaseOrderService {
     
     @Autowired
     private ProductRepository productRepository;
+    
+    @Autowired
+    private WarehouseRepository warehouseRepository;
+    
+    @Autowired
+    private InventoryService inventoryService;
     
     @Autowired(required = false)
     private WebSocketService webSocketService;
@@ -55,10 +63,21 @@ public class PurchaseOrderService {
     
     public PurchaseOrder updatePurchaseOrder(String id, PurchaseOrder poDetails) {
         System.out.println("PurchaseOrderService.updatePurchaseOrder - ID: " + id + ", Status: " + poDetails.getStatus());
+        
+        // Get existing PO to check status change
+        PurchaseOrder existingPO = purchaseOrderRepository.getPurchaseOrderById(id)
+            .orElseThrow(() -> new RuntimeException("Purchase Order not found with id: " + id));
+        String oldStatus = existingPO.getStatus();
+        
         // Enrich PO items with product information
         enrichPurchaseOrderItems(poDetails);
         PurchaseOrder updated = purchaseOrderRepository.updatePurchaseOrder(id, poDetails);
         System.out.println("PurchaseOrderService.updatePurchaseOrder - Updated status: " + updated.getStatus());
+        
+        // Handle inventory increase when PO is received
+        if ("RECEIVED".equals(updated.getStatus()) && !"RECEIVED".equals(oldStatus)) {
+            increaseInventoryForPurchaseOrder(updated);
+        }
         
         // Broadcast update via WebSocket
         if (webSocketService != null) {
@@ -156,6 +175,39 @@ public class PurchaseOrderService {
                         }
                         item.calculateLineTotal();
                     });
+                }
+            }
+        }
+    }
+    
+    private void increaseInventoryForPurchaseOrder(PurchaseOrder po) {
+        if (po.getItems() == null || po.getItems().isEmpty()) {
+            return;
+        }
+        
+        // Get default warehouse (first active warehouse, or first warehouse if none active)
+        List<Warehouse> warehouses = warehouseRepository.getActiveWarehouses();
+        if (warehouses.isEmpty()) {
+            warehouses = warehouseRepository.getAllWarehouses();
+        }
+        
+        if (warehouses.isEmpty()) {
+            System.out.println("Warning: No warehouses found. Cannot increase inventory for PO " + po.getId());
+            return;
+        }
+        
+        Warehouse defaultWarehouse = warehouses.get(0);
+        String warehouseId = defaultWarehouse.getId();
+        
+        // Increase inventory for each PO item
+        for (PurchaseOrderItem item : po.getItems()) {
+            if (item.getProductId() != null && item.getQuantity() != null && item.getQuantity() > 0) {
+                try {
+                    inventoryService.adjustInventory(item.getProductId(), warehouseId, item.getQuantity());
+                    System.out.println("Increased inventory for product " + item.getProductId() + 
+                        " by " + item.getQuantity() + " in warehouse " + warehouseId);
+                } catch (Exception e) {
+                    System.err.println("Error increasing inventory for product " + item.getProductId() + ": " + e.getMessage());
                 }
             }
         }

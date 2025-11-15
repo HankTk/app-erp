@@ -90,7 +90,7 @@ export const StyledTableHeader = styled.th<{ $align?: 'left' | 'center' | 'right
     if ($variant === 'bordered') {
       return `
         border-right: 1px solid var(--color-border-default);
-        &:last-child {
+        &:last-of-type {
           border-right: none;
         }
       `;
@@ -109,7 +109,7 @@ export const StyledTableCell = styled.td<{ $align?: 'left' | 'center' | 'right';
     if ($variant === 'bordered') {
       return `
         border-right: 1px solid var(--color-border-default);
-        &:last-child {
+        &:last-of-type {
           border-right: none;
         }
       `;
