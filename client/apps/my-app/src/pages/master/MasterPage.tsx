@@ -6,6 +6,9 @@ import {
 } from '@ui/components';
 import { useI18n } from '../../i18n/I18nProvider';
 import styled from '@emotion/styled';
+import { debugProps } from '../../utils/emotionCache';
+
+const COMPONENT_NAME = 'MasterPage';
 
 const PageContainer = styled.div`
   display: flex;
@@ -111,10 +114,10 @@ export function MasterPage({ onPageChange, onNavigateBack }: MasterPageProps) {
   const { t } = useI18n();
 
   return (
-    <PageContainer>
-      <HeaderCard padding="large">
-        <HeaderSection>
-          <HeaderLeft>
+    <PageContainer {...debugProps(COMPONENT_NAME, 'PageContainer')}>
+      <HeaderCard padding="large" {...debugProps(COMPONENT_NAME, 'HeaderCard')}>
+        <HeaderSection {...debugProps(COMPONENT_NAME, 'HeaderSection')}>
+          <HeaderLeft {...debugProps(COMPONENT_NAME, 'HeaderLeft')}>
             {onNavigateBack && (
               <AxButton 
                 variant="secondary" 
@@ -133,20 +136,21 @@ export function MasterPage({ onPageChange, onNavigateBack }: MasterPageProps) {
               </AxParagraph>
             </div>
           </HeaderLeft>
-          <HeaderRight>
+          <HeaderRight {...debugProps(COMPONENT_NAME, 'HeaderRight')}>
           </HeaderRight>
         </HeaderSection>
       </HeaderCard>
       
-      <CardsContainer>
-        <MenuCardsGrid>
+      <CardsContainer {...debugProps(COMPONENT_NAME, 'CardsContainer')}>
+        <MenuCardsGrid {...debugProps(COMPONENT_NAME, 'MenuCardsGrid')}>
           {masterItems.map((item) => (
             <MenuCard
               key={item.id}
               elevation={1}
               onClick={() => onPageChange(item.id)}
+              {...debugProps(COMPONENT_NAME, 'MenuCard')}
             >
-              <MenuCardTitle>{t(item.labelKey)}</MenuCardTitle>
+              <MenuCardTitle {...debugProps(COMPONENT_NAME, 'MenuCardTitle')}>{t(item.labelKey)}</MenuCardTitle>
             </MenuCard>
           ))}
         </MenuCardsGrid>

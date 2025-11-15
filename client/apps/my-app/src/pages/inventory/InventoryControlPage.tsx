@@ -9,6 +9,9 @@ import {
 } from '@ui/components';
 import { useI18n } from '../../i18n/I18nProvider';
 import styled from '@emotion/styled';
+import { debugProps } from '../../utils/emotionCache';
+
+const COMPONENT_NAME = 'InventoryControlPage';
 
 const PageContainer = styled.div`
   display: flex;
@@ -132,10 +135,10 @@ export function InventoryControlPage({ onNavigateBack }: InventoryControlPagePro
   }
 
   return (
-    <PageContainer>
-      <HeaderCard padding="large">
-        <HeaderSection>
-          <HeaderLeft>
+    <PageContainer {...debugProps(COMPONENT_NAME, 'PageContainer')}>
+      <HeaderCard padding="large" {...debugProps(COMPONENT_NAME, 'HeaderCard')}>
+        <HeaderSection {...debugProps(COMPONENT_NAME, 'HeaderSection')}>
+          <HeaderLeft {...debugProps(COMPONENT_NAME, 'HeaderLeft')}>
             {onNavigateBack && (
               <AxButton 
                 variant="secondary" 
@@ -154,26 +157,28 @@ export function InventoryControlPage({ onNavigateBack }: InventoryControlPagePro
               </AxParagraph>
             </div>
           </HeaderLeft>
-          <HeaderRight>
+          <HeaderRight {...debugProps(COMPONENT_NAME, 'HeaderRight')}>
           </HeaderRight>
         </HeaderSection>
       </HeaderCard>
       
-      <CardsContainer>
-        <MenuCardsGrid>
+      <CardsContainer {...debugProps(COMPONENT_NAME, 'CardsContainer')}>
+        <MenuCardsGrid {...debugProps(COMPONENT_NAME, 'MenuCardsGrid')}>
           <MenuCard
             elevation={1}
             onClick={() => setCurrentView('warehouses')}
+            {...debugProps(COMPONENT_NAME, 'MenuCard')}
           >
-            <MenuCardTitle>{t('inventory.warehouses')}</MenuCardTitle>
-            <MenuCardSubtitle>{t('inventory.warehousesDescription')}</MenuCardSubtitle>
+            <MenuCardTitle {...debugProps(COMPONENT_NAME, 'MenuCardTitle')}>{t('inventory.warehouses')}</MenuCardTitle>
+            <MenuCardSubtitle {...debugProps(COMPONENT_NAME, 'MenuCardSubtitle')}>{t('inventory.warehousesDescription')}</MenuCardSubtitle>
           </MenuCard>
           <MenuCard
             elevation={1}
             onClick={() => setCurrentView('inventory')}
+            {...debugProps(COMPONENT_NAME, 'MenuCard')}
           >
-            <MenuCardTitle>{t('inventory.inventory')}</MenuCardTitle>
-            <MenuCardSubtitle>{t('inventory.inventoryDescription')}</MenuCardSubtitle>
+            <MenuCardTitle {...debugProps(COMPONENT_NAME, 'MenuCardTitle')}>{t('inventory.inventory')}</MenuCardTitle>
+            <MenuCardSubtitle {...debugProps(COMPONENT_NAME, 'MenuCardSubtitle')}>{t('inventory.inventoryDescription')}</MenuCardSubtitle>
           </MenuCard>
         </MenuCardsGrid>
       </CardsContainer>

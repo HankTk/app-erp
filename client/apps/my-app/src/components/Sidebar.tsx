@@ -1,6 +1,9 @@
 import styled from '@emotion/styled';
 import { AxButton } from '@ui/components';
 import { useI18n } from '../i18n/I18nProvider';
+import { debugProps } from '../utils/emotionCache';
+
+const COMPONENT_NAME = 'Sidebar';
 
 const AxOverlay = styled.div<{ $isOpen: boolean }>`
   position: fixed;
@@ -145,17 +148,17 @@ export function Sidebar({ isOpen, onToggle, currentPage, onPageChange, onLogout 
 
   return (
     <>
-      <AxOverlay $isOpen={isOpen} onClick={onToggle} />
-      <AxSidebar $isOpen={isOpen}>
-        <AxSidebarHeader>
+      <AxOverlay $isOpen={isOpen} onClick={onToggle} {...debugProps(COMPONENT_NAME, 'AxOverlay')} />
+      <AxSidebar $isOpen={isOpen} {...debugProps(COMPONENT_NAME, 'AxSidebar')}>
+        <AxSidebarHeader {...debugProps(COMPONENT_NAME, 'AxSidebarHeader')}>
           <AxSidebarTitleWrapper>
             <AxSidebarTitle>{t('sidebar.title')}</AxSidebarTitle>
             <AxSidebarSubtitle>{t('sidebar.subtitle')}</AxSidebarSubtitle>
           </AxSidebarTitleWrapper>
         </AxSidebarHeader>
-        <AxMenuList>
+        <AxMenuList {...debugProps(COMPONENT_NAME, 'AxMenuList')}>
           {menuItems.map((item) => (
-            <AxMenuItem key={item.id}>
+            <AxMenuItem key={item.id} {...debugProps(COMPONENT_NAME, 'AxMenuItem')}>
               <AxMenuButton
                 $isActive={currentPage === item.id}
                 $disabled={item.disabled === true}
@@ -174,7 +177,7 @@ export function Sidebar({ isOpen, onToggle, currentPage, onPageChange, onLogout 
             </AxMenuItem>
           ))}
         </AxMenuList>
-        <AxMenuDivider />
+        <AxMenuDivider {...debugProps(COMPONENT_NAME, 'AxMenuDivider')} />
         <AxLogoutButton
           onClick={() => {
             onLogout();

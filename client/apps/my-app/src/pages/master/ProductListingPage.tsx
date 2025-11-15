@@ -19,6 +19,9 @@ import {
 import { useI18n } from '../../i18n/I18nProvider';
 import { fetchProducts, createProduct, updateProduct, deleteProduct, Product } from '../../api/productApi';
 import styled from '@emotion/styled';
+import { debugProps } from '../../utils/emotionCache';
+
+const COMPONENT_NAME = 'ProductListingPage';
 
 const PageContainer = styled.div`
   display: flex;
@@ -166,10 +169,10 @@ export function ProductListingPage({ onNavigateBack }: ProductListingPageProps =
 
   if (loading) {
     return (
-      <PageContainer>
-        <HeaderCard padding="large">
-          <HeaderSection>
-            <HeaderLeft>
+      <PageContainer {...debugProps(COMPONENT_NAME, 'PageContainer')}>
+        <HeaderCard padding="large" {...debugProps(COMPONENT_NAME, 'HeaderCard')}>
+          <HeaderSection {...debugProps(COMPONENT_NAME, 'HeaderSection')}>
+            <HeaderLeft {...debugProps(COMPONENT_NAME, 'HeaderLeft')}>
               {onNavigateBack && (
                 <AxButton 
                   variant="secondary" 
@@ -188,12 +191,12 @@ export function ProductListingPage({ onNavigateBack }: ProductListingPageProps =
                 </AxParagraph>
               </div>
             </HeaderLeft>
-            <HeaderRight>
+            <HeaderRight {...debugProps(COMPONENT_NAME, 'HeaderRight')}>
               <AxButton variant="primary" onClick={handleAdd}>Add New</AxButton>
             </HeaderRight>
           </HeaderSection>
         </HeaderCard>
-        <TableCard padding="large">
+        <TableCard padding="large" {...debugProps(COMPONENT_NAME, 'TableCard')}>
           <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '200px' }}>
             <AxParagraph>Loading products...</AxParagraph>
           </div>
@@ -204,10 +207,10 @@ export function ProductListingPage({ onNavigateBack }: ProductListingPageProps =
 
   if (error) {
     return (
-      <PageContainer>
-        <HeaderCard padding="large">
-          <HeaderSection>
-            <HeaderLeft>
+      <PageContainer {...debugProps(COMPONENT_NAME, 'PageContainer')}>
+        <HeaderCard padding="large" {...debugProps(COMPONENT_NAME, 'HeaderCard')}>
+          <HeaderSection {...debugProps(COMPONENT_NAME, 'HeaderSection')}>
+            <HeaderLeft {...debugProps(COMPONENT_NAME, 'HeaderLeft')}>
               {onNavigateBack && (
                 <AxButton 
                   variant="secondary" 
@@ -226,12 +229,12 @@ export function ProductListingPage({ onNavigateBack }: ProductListingPageProps =
                 </AxParagraph>
               </div>
             </HeaderLeft>
-            <HeaderRight>
+            <HeaderRight {...debugProps(COMPONENT_NAME, 'HeaderRight')}>
               <AxButton variant="primary" onClick={handleAdd}>Add New</AxButton>
             </HeaderRight>
           </HeaderSection>
         </HeaderCard>
-        <TableCard padding="large">
+        <TableCard padding="large" {...debugProps(COMPONENT_NAME, 'TableCard')}>
           <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '200px', flexDirection: 'column', gap: 'var(--spacing-md)' }}>
             <AxParagraph style={{ color: 'var(--color-error)' }}>Error: {error}</AxParagraph>
             <AxButton variant="secondary" onClick={() => window.location.reload()}>
@@ -244,10 +247,10 @@ export function ProductListingPage({ onNavigateBack }: ProductListingPageProps =
   }
 
   return (
-    <PageContainer>
-      <HeaderCard padding="large">
-        <HeaderSection>
-          <HeaderLeft>
+    <PageContainer {...debugProps(COMPONENT_NAME, 'PageContainer')}>
+      <HeaderCard padding="large" {...debugProps(COMPONENT_NAME, 'HeaderCard')}>
+        <HeaderSection {...debugProps(COMPONENT_NAME, 'HeaderSection')}>
+          <HeaderLeft {...debugProps(COMPONENT_NAME, 'HeaderLeft')}>
             {onNavigateBack && (
               <AxButton 
                 variant="secondary" 
@@ -266,13 +269,13 @@ export function ProductListingPage({ onNavigateBack }: ProductListingPageProps =
               </AxParagraph>
             </div>
           </HeaderLeft>
-          <HeaderRight>
+          <HeaderRight {...debugProps(COMPONENT_NAME, 'HeaderRight')}>
             <AxButton variant="primary" onClick={handleAdd}>Add New</AxButton>
           </HeaderRight>
         </HeaderSection>
       </HeaderCard>
 
-      <TableCard padding="large">
+      <TableCard padding="large" {...debugProps(COMPONENT_NAME, 'TableCard')}>
         <div style={{ flex: 1, overflow: 'auto', minHeight: 0 }}>
           {products.length === 0 ? (
             <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '200px' }}>

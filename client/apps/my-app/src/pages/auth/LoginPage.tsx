@@ -11,6 +11,9 @@ import {
 import { useI18n } from '../../i18n/I18nProvider';
 import { login } from '../../api/userApi';
 import styled from '@emotion/styled';
+import { debugProps } from '../../utils/emotionCache';
+
+const COMPONENT_NAME = 'LoginPage';
 
 const LoginContainer = styled.div`
   display: flex;
@@ -71,13 +74,13 @@ export function LoginPage({ onLoginSuccess }: LoginPageProps) {
   };
 
   return (
-    <LoginContainer>
-      <LoginCard>
-        <TitleSection>
+    <LoginContainer {...debugProps(COMPONENT_NAME, 'LoginContainer')}>
+      <LoginCard {...debugProps(COMPONENT_NAME, 'LoginCard')}>
+        <TitleSection {...debugProps(COMPONENT_NAME, 'TitleSection')}>
           <AxHeading3>{t('login.title')}</AxHeading3>
           <AxParagraph>{t('login.subtitle')}</AxParagraph>
         </TitleSection>
-        <LoginForm onSubmit={handleSubmit}>
+        <LoginForm onSubmit={handleSubmit} {...debugProps(COMPONENT_NAME, 'LoginForm')}>
           <AxFormGroup>
             <AxLabel htmlFor="userid">{t('login.userid')}</AxLabel>
             <AxInput

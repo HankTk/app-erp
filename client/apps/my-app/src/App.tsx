@@ -26,6 +26,9 @@ import { GeneralLedgerPage } from './pages/generalLedger/GeneralLedgerPage';
 import { InventoryControlPage } from './pages/inventory/InventoryControlPage';
 import { fetchUsers } from './api/userApi';
 import styled from '@emotion/styled';
+import { debugProps } from './utils/emotionCache';
+
+const COMPONENT_NAME = 'App';
 
 const AppWrapper = styled.div`
   display: flex;
@@ -239,7 +242,7 @@ function AppContent() {
 
   // Show main app with welcome or users page
   return (
-    <AppWrapper>
+    <AppWrapper {...debugProps(COMPONENT_NAME, 'AppWrapper')}>
       <Sidebar
         isOpen={sidebarOpen}
         onToggle={() => setSidebarOpen(!sidebarOpen)}
@@ -263,8 +266,8 @@ function AppContent() {
         title={getPageTitle(currentPage, t)}
       />
       {currentPage === 'orders' || currentPage === 'order-entry' || currentPage === 'accounts-receivable' || currentPage === 'accounts-receivable-detail' || currentPage === 'purchase-order' || currentPage === 'purchase-order-entry' || currentPage === 'accounts-payable' || currentPage === 'accounts-payable-detail' || currentPage === 'general-ledger' || currentPage === 'general-ledger-detail' || currentPage === 'inventory-control' || currentPage === 'customers' || currentPage === 'vendors' || currentPage === 'products' || currentPage === 'addresses' || currentPage === 'users' || currentPage === 'master' ? (
-        <FullWidthContainer>
-          <AppContainer>
+        <FullWidthContainer {...debugProps(COMPONENT_NAME, 'FullWidthContainer')}>
+          <AppContainer {...debugProps(COMPONENT_NAME, 'AppContainer')}>
             {currentPage === 'orders' ? (
               <div style={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column', overflow: 'hidden', width: '100%' }}>
                 <OrderListingPage 
@@ -454,7 +457,7 @@ function AppContent() {
         </FullWidthContainer>
       ) : (
         <AxContainer>
-          <AppContainer>
+          <AppContainer {...debugProps(COMPONENT_NAME, 'AppContainer')}>
             {currentPage === 'welcome' ? (
               <WelcomePage
                 user={user}

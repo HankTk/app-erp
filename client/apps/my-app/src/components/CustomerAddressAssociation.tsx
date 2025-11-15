@@ -18,6 +18,9 @@ import {
 import { fetchAddresses, deleteAddress, Address } from '../api/addressApi';
 import { fetchCustomerById, updateCustomer, Customer } from '../api/customerApi';
 import styled from '@emotion/styled';
+import { debugProps } from '../utils/emotionCache';
+
+const COMPONENT_NAME = 'CustomerAddressAssociation';
 
 const Container = styled.div`
   display: flex;
@@ -215,8 +218,8 @@ export function CustomerAddressAssociation({ customerId, onAddressesUpdated }: C
   };
 
   return (
-    <Container>
-      <Section>
+    <Container {...debugProps(COMPONENT_NAME, 'Container')}>
+      <Section {...debugProps(COMPONENT_NAME, 'Section')}>
         <AxHeading3 style={{ marginBottom: 'var(--spacing-sm)' }}>Associate Address</AxHeading3>
         <AddressCard padding="medium">
           <AxFormGroup>

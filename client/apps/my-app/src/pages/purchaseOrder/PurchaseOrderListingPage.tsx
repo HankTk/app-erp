@@ -19,6 +19,9 @@ import { fetchVendors, Vendor } from '../../api/vendorApi';
 import { fetchAddresses, Address } from '../../api/addressApi';
 import styled from '@emotion/styled';
 import { useI18n } from '../../i18n/I18nProvider';
+import { debugProps } from '../../utils/emotionCache';
+
+const COMPONENT_NAME = 'PurchaseOrderListingPage';
 
 const PageContainer = styled.div`
   display: flex;
@@ -238,10 +241,10 @@ export function PurchaseOrderListingPage({ onNavigateToPOEntry, onEditPO, onView
 
   if (loading) {
     return (
-      <PageContainer>
-        <HeaderCard padding="large">
-          <HeaderSection>
-            <HeaderLeft>
+      <PageContainer {...debugProps(COMPONENT_NAME, 'PageContainer')}>
+        <HeaderCard padding="large" {...debugProps(COMPONENT_NAME, 'HeaderCard')}>
+          <HeaderSection {...debugProps(COMPONENT_NAME, 'HeaderSection')}>
+            <HeaderLeft {...debugProps(COMPONENT_NAME, 'HeaderLeft')}>
               {onNavigateBack && (
                 <AxButton 
                   variant="secondary" 
@@ -260,11 +263,11 @@ export function PurchaseOrderListingPage({ onNavigateToPOEntry, onEditPO, onView
                 </AxParagraph>
               </div>
             </HeaderLeft>
-            <HeaderRight>
+            <HeaderRight {...debugProps(COMPONENT_NAME, 'HeaderRight')}>
             </HeaderRight>
           </HeaderSection>
         </HeaderCard>
-        <TableCard padding="large">
+        <TableCard padding="large" {...debugProps(COMPONENT_NAME, 'TableCard')}>
           <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '200px' }}>
             <AxParagraph>{t('purchaseOrder.loading')}</AxParagraph>
           </div>
@@ -275,10 +278,10 @@ export function PurchaseOrderListingPage({ onNavigateToPOEntry, onEditPO, onView
 
   if (error) {
     return (
-      <PageContainer>
-        <HeaderCard padding="large">
-          <HeaderSection>
-            <HeaderLeft>
+      <PageContainer {...debugProps(COMPONENT_NAME, 'PageContainer')}>
+        <HeaderCard padding="large" {...debugProps(COMPONENT_NAME, 'HeaderCard')}>
+          <HeaderSection {...debugProps(COMPONENT_NAME, 'HeaderSection')}>
+            <HeaderLeft {...debugProps(COMPONENT_NAME, 'HeaderLeft')}>
               {onNavigateBack && (
                 <AxButton 
                   variant="secondary" 
@@ -297,11 +300,11 @@ export function PurchaseOrderListingPage({ onNavigateToPOEntry, onEditPO, onView
                 </AxParagraph>
               </div>
             </HeaderLeft>
-            <HeaderRight>
+            <HeaderRight {...debugProps(COMPONENT_NAME, 'HeaderRight')}>
             </HeaderRight>
           </HeaderSection>
         </HeaderCard>
-        <TableCard padding="large">
+        <TableCard padding="large" {...debugProps(COMPONENT_NAME, 'TableCard')}>
           <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '200px', flexDirection: 'column', gap: 'var(--spacing-md)' }}>
             <AxParagraph style={{ color: 'var(--color-error)' }}>Error: {error}</AxParagraph>
             {error.includes('404') && (
@@ -319,10 +322,10 @@ export function PurchaseOrderListingPage({ onNavigateToPOEntry, onEditPO, onView
   }
 
   return (
-    <PageContainer>
-      <HeaderCard padding="large">
-        <HeaderSection>
-          <HeaderLeft>
+    <PageContainer {...debugProps(COMPONENT_NAME, 'PageContainer')}>
+      <HeaderCard padding="large" {...debugProps(COMPONENT_NAME, 'HeaderCard')}>
+        <HeaderSection {...debugProps(COMPONENT_NAME, 'HeaderSection')}>
+          <HeaderLeft {...debugProps(COMPONENT_NAME, 'HeaderLeft')}>
             {onNavigateBack && (
               <AxButton 
                 variant="secondary" 
@@ -341,7 +344,7 @@ export function PurchaseOrderListingPage({ onNavigateToPOEntry, onEditPO, onView
               </AxParagraph>
             </div>
           </HeaderLeft>
-          <HeaderRight>
+          <HeaderRight {...debugProps(COMPONENT_NAME, 'HeaderRight')}>
             <AxFormGroup style={{ margin: 0, minWidth: '200px' }}>
               <AxListbox
                 value={statusFilter}
@@ -359,7 +362,7 @@ export function PurchaseOrderListingPage({ onNavigateToPOEntry, onEditPO, onView
         </HeaderSection>
       </HeaderCard>
 
-      <TableCard padding="large">
+      <TableCard padding="large" {...debugProps(COMPONENT_NAME, 'TableCard')}>
         <div style={{ flex: 1, overflow: 'auto', minHeight: 0, height: 0, maxHeight: '100%' }}>
           {filteredPOs.length === 0 ? (
             <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '200px' }}>

@@ -1,5 +1,8 @@
 import styled from '@emotion/styled';
 import { AxButton } from '@ui/components';
+import { debugProps } from '../utils/emotionCache';
+
+const COMPONENT_NAME = 'AppHeader';
 
 const HeaderContainer = styled.header`
   display: flex;
@@ -98,8 +101,8 @@ interface AppHeaderProps {
 
 export function AppHeader({ onMenuClick, onSettingsClick, title }: AppHeaderProps) {
   return (
-    <HeaderContainer>
-      <HeaderLeft>
+    <HeaderContainer {...debugProps(COMPONENT_NAME, 'HeaderContainer')}>
+      <HeaderLeft {...debugProps(COMPONENT_NAME, 'HeaderLeft')}>
         <MenuButton
           onClick={onMenuClick}
           variant="secondary"
@@ -109,11 +112,11 @@ export function AppHeader({ onMenuClick, onSettingsClick, title }: AppHeaderProp
         </MenuButton>
       </HeaderLeft>
       {title && (
-        <HeaderCenter>
-          <HeaderTitle>{title}</HeaderTitle>
+        <HeaderCenter {...debugProps(COMPONENT_NAME, 'HeaderCenter')}>
+          <HeaderTitle {...debugProps(COMPONENT_NAME, 'HeaderTitle')}>{title}</HeaderTitle>
         </HeaderCenter>
       )}
-      <HeaderRight>
+      <HeaderRight {...debugProps(COMPONENT_NAME, 'HeaderRight')}>
         <SettingsButton
           onClick={onSettingsClick}
           variant="secondary"

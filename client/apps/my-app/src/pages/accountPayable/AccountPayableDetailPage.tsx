@@ -20,6 +20,9 @@ import { fetchVendors, Vendor } from '../../api/vendorApi';
 import { fetchAddressesByVendorId, Address } from '../../api/addressApi';
 import { fetchPurchaseOrderById, updatePurchaseOrder, PurchaseOrder } from '../../api/purchaseOrderApi';
 import styled from '@emotion/styled';
+import { debugProps } from '../../utils/emotionCache';
+
+const COMPONENT_NAME = 'AccountPayableDetailPage';
 
 const PageContainer = styled.div`
   display: flex;
@@ -302,10 +305,10 @@ export function AccountPayableDetailPage(props: AccountPayableDetailPageProps = 
 
   if (loading) {
     return (
-      <PageContainer>
-        <HeaderCard padding="large">
-          <HeaderSection>
-            <HeaderLeft>
+      <PageContainer {...debugProps(COMPONENT_NAME, 'PageContainer')}>
+        <HeaderCard padding="large" {...debugProps(COMPONENT_NAME, 'HeaderCard')}>
+          <HeaderSection {...debugProps(COMPONENT_NAME, 'HeaderSection')}>
+            <HeaderLeft {...debugProps(COMPONENT_NAME, 'HeaderLeft')}>
               {onNavigateBack && (
                 <AxButton 
                   variant="secondary" 
@@ -324,11 +327,11 @@ export function AccountPayableDetailPage(props: AccountPayableDetailPageProps = 
                 </AxParagraph>
               </div>
             </HeaderLeft>
-            <HeaderRight>
+            <HeaderRight {...debugProps(COMPONENT_NAME, 'HeaderRight')}>
             </HeaderRight>
           </HeaderSection>
         </HeaderCard>
-        <ContentCard padding="large">
+        <ContentCard padding="large" {...debugProps(COMPONENT_NAME, 'ContentCard')}>
           <AxParagraph>{t('accountsPayable.loading')}</AxParagraph>
         </ContentCard>
       </PageContainer>
@@ -337,10 +340,10 @@ export function AccountPayableDetailPage(props: AccountPayableDetailPageProps = 
 
   if (!po) {
     return (
-      <PageContainer>
-        <HeaderCard padding="large">
-          <HeaderSection>
-            <HeaderLeft>
+      <PageContainer {...debugProps(COMPONENT_NAME, 'PageContainer')}>
+        <HeaderCard padding="large" {...debugProps(COMPONENT_NAME, 'HeaderCard')}>
+          <HeaderSection {...debugProps(COMPONENT_NAME, 'HeaderSection')}>
+            <HeaderLeft {...debugProps(COMPONENT_NAME, 'HeaderLeft')}>
               {onNavigateBack && (
                 <AxButton 
                   variant="secondary" 
@@ -359,11 +362,11 @@ export function AccountPayableDetailPage(props: AccountPayableDetailPageProps = 
                 </AxParagraph>
               </div>
             </HeaderLeft>
-            <HeaderRight>
+            <HeaderRight {...debugProps(COMPONENT_NAME, 'HeaderRight')}>
             </HeaderRight>
           </HeaderSection>
         </HeaderCard>
-        <ContentCard padding="large">
+        <ContentCard padding="large" {...debugProps(COMPONENT_NAME, 'ContentCard')}>
           <AxParagraph>{t('accountsPayable.notFound')}</AxParagraph>
         </ContentCard>
       </PageContainer>
@@ -371,10 +374,10 @@ export function AccountPayableDetailPage(props: AccountPayableDetailPageProps = 
   }
 
   return (
-    <PageContainer>
-      <HeaderCard padding="large">
-        <HeaderSection>
-          <HeaderLeft>
+    <PageContainer {...debugProps(COMPONENT_NAME, 'PageContainer')}>
+      <HeaderCard padding="large" {...debugProps(COMPONENT_NAME, 'HeaderCard')}>
+        <HeaderSection {...debugProps(COMPONENT_NAME, 'HeaderSection')}>
+          <HeaderLeft {...debugProps(COMPONENT_NAME, 'HeaderLeft')}>
             {onNavigateBack && (
               <AxButton 
                 variant="secondary" 
@@ -393,17 +396,18 @@ export function AccountPayableDetailPage(props: AccountPayableDetailPageProps = 
               </AxParagraph>
             </div>
           </HeaderLeft>
-          <HeaderRight>
+          <HeaderRight {...debugProps(COMPONENT_NAME, 'HeaderRight')}>
           </HeaderRight>
         </HeaderSection>
       </HeaderCard>
 
-      <ContentCard padding="large">
-        <StepIndicator>
+      <ContentCard padding="large" {...debugProps(COMPONENT_NAME, 'ContentCard')}>
+        <StepIndicator {...debugProps(COMPONENT_NAME, 'StepIndicator')}>
           <Step
             $active={currentStep === 'invoice'}
             $completed={isStepCompleted('invoice')}
             onClick={() => setCurrentStep('invoice')}
+            {...debugProps(COMPONENT_NAME, 'Step')}
           >
             {t('accountsPayable.step.invoice')}
           </Step>
@@ -411,6 +415,7 @@ export function AccountPayableDetailPage(props: AccountPayableDetailPageProps = 
             $active={currentStep === 'payment'}
             $completed={isStepCompleted('payment')}
             onClick={() => setCurrentStep('payment')}
+            {...debugProps(COMPONENT_NAME, 'Step')}
           >
             {t('accountsPayable.step.payment')}
           </Step>
@@ -418,19 +423,20 @@ export function AccountPayableDetailPage(props: AccountPayableDetailPageProps = 
             $active={currentStep === 'history'}
             $completed={isStepCompleted('history')}
             onClick={() => setCurrentStep('history')}
+            {...debugProps(COMPONENT_NAME, 'Step')}
           >
             {t('accountsPayable.step.history')}
           </Step>
         </StepIndicator>
 
-        <StepContent>
+        <StepContent {...debugProps(COMPONENT_NAME, 'StepContent')}>
           {currentStep === 'invoice' && (
             <>
               <div>
                 <AxHeading3>{t('accountsPayable.invoice.title')}</AxHeading3>
                 <AxParagraph>{t('accountsPayable.invoice.description')}</AxParagraph>
               </div>
-              <InfoSection>
+              <InfoSection {...debugProps(COMPONENT_NAME, 'InfoSection')}>
                 <InfoRow>
                   <AxLabel>{t('accountsPayable.invoice.invoiceNumber')}</AxLabel>
                   <AxParagraph>{po.invoiceNumber || 'N/A'}</AxParagraph>

@@ -20,6 +20,9 @@ import { fetchCustomers, Customer } from '../../api/customerApi';
 import { fetchVendors, Vendor } from '../../api/vendorApi';
 import { fetchProducts, Product } from '../../api/productApi';
 import styled from '@emotion/styled';
+import { debugProps } from '../../utils/emotionCache';
+
+const COMPONENT_NAME = 'GeneralLedgerListingPage';
 
 const PageContainer = styled.div`
   display: flex;
@@ -451,10 +454,10 @@ export function GeneralLedgerListingPage({ onViewEntry, onNavigateBack }: Genera
 
   if (loading) {
     return (
-      <PageContainer>
-        <HeaderCard padding="large">
-          <HeaderSection>
-            <HeaderLeft>
+      <PageContainer {...debugProps(COMPONENT_NAME, 'PageContainer')}>
+        <HeaderCard padding="large" {...debugProps(COMPONENT_NAME, 'HeaderCard')}>
+          <HeaderSection {...debugProps(COMPONENT_NAME, 'HeaderSection')}>
+            <HeaderLeft {...debugProps(COMPONENT_NAME, 'HeaderLeft')}>
               {onNavigateBack && (
                 <AxButton 
                   variant="secondary" 
@@ -475,7 +478,7 @@ export function GeneralLedgerListingPage({ onViewEntry, onNavigateBack }: Genera
             </HeaderLeft>
           </HeaderSection>
         </HeaderCard>
-        <TableCard padding="large">
+        <TableCard padding="large" {...debugProps(COMPONENT_NAME, 'TableCard')}>
           <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '200px' }}>
             <AxParagraph>Loading general ledger entries...</AxParagraph>
           </div>
@@ -486,10 +489,10 @@ export function GeneralLedgerListingPage({ onViewEntry, onNavigateBack }: Genera
 
   if (error) {
     return (
-      <PageContainer>
-        <HeaderCard padding="large">
-          <HeaderSection>
-            <HeaderLeft>
+      <PageContainer {...debugProps(COMPONENT_NAME, 'PageContainer')}>
+        <HeaderCard padding="large" {...debugProps(COMPONENT_NAME, 'HeaderCard')}>
+          <HeaderSection {...debugProps(COMPONENT_NAME, 'HeaderSection')}>
+            <HeaderLeft {...debugProps(COMPONENT_NAME, 'HeaderLeft')}>
               {onNavigateBack && (
                 <AxButton 
                   variant="secondary" 
@@ -510,7 +513,7 @@ export function GeneralLedgerListingPage({ onViewEntry, onNavigateBack }: Genera
             </HeaderLeft>
           </HeaderSection>
         </HeaderCard>
-        <TableCard padding="large">
+        <TableCard padding="large" {...debugProps(COMPONENT_NAME, 'TableCard')}>
           <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '200px', flexDirection: 'column', gap: 'var(--spacing-md)' }}>
             <AxParagraph style={{ color: 'var(--color-error)' }}>Error: {error}</AxParagraph>
             <AxButton variant="secondary" onClick={() => window.location.reload()}>
@@ -523,10 +526,10 @@ export function GeneralLedgerListingPage({ onViewEntry, onNavigateBack }: Genera
   }
 
   return (
-    <PageContainer>
-      <HeaderCard padding="large">
-        <HeaderSection>
-          <HeaderLeft>
+    <PageContainer {...debugProps(COMPONENT_NAME, 'PageContainer')}>
+      <HeaderCard padding="large" {...debugProps(COMPONENT_NAME, 'HeaderCard')}>
+        <HeaderSection {...debugProps(COMPONENT_NAME, 'HeaderSection')}>
+          <HeaderLeft {...debugProps(COMPONENT_NAME, 'HeaderLeft')}>
             {onNavigateBack && (
               <AxButton 
                 variant="secondary" 
@@ -545,7 +548,7 @@ export function GeneralLedgerListingPage({ onViewEntry, onNavigateBack }: Genera
               </AxParagraph>
             </div>
           </HeaderLeft>
-          <HeaderRight>
+          <HeaderRight {...debugProps(COMPONENT_NAME, 'HeaderRight')}>
             <AxFormGroup style={{ margin: 0, minWidth: '150px' }}>
               <AxInput
                 type="date"
@@ -581,7 +584,7 @@ export function GeneralLedgerListingPage({ onViewEntry, onNavigateBack }: Genera
         </HeaderSection>
       </HeaderCard>
 
-      <TableCard padding="large">
+      <TableCard padding="large" {...debugProps(COMPONENT_NAME, 'TableCard')}>
         <div style={{ flex: 1, overflow: 'auto', minHeight: 0, height: 0, maxHeight: '100%' }}>
           {filteredEntries.length === 0 ? (
             <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '200px' }}>

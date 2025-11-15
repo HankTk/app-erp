@@ -17,6 +17,9 @@ import { fetchPurchaseOrders, PurchaseOrder } from '../../api/purchaseOrderApi';
 import { fetchVendors, Vendor } from '../../api/vendorApi';
 import styled from '@emotion/styled';
 import { useI18n } from '../../i18n/I18nProvider';
+import { debugProps } from '../../utils/emotionCache';
+
+const COMPONENT_NAME = 'AccountPayableListingPage';
 
 const PageContainer = styled.div`
   display: flex;
@@ -143,10 +146,10 @@ export function AccountPayableListingPage({ onViewInvoice, onNavigateBack }: Acc
   };
 
   return (
-    <PageContainer>
-      <HeaderCard padding="large">
-        <HeaderSection>
-          <HeaderLeft>
+    <PageContainer {...debugProps(COMPONENT_NAME, 'PageContainer')}>
+      <HeaderCard padding="large" {...debugProps(COMPONENT_NAME, 'HeaderCard')}>
+        <HeaderSection {...debugProps(COMPONENT_NAME, 'HeaderSection')}>
+          <HeaderLeft {...debugProps(COMPONENT_NAME, 'HeaderLeft')}>
             {onNavigateBack && (
               <AxButton 
                 variant="secondary" 
@@ -165,7 +168,7 @@ export function AccountPayableListingPage({ onViewInvoice, onNavigateBack }: Acc
               </AxParagraph>
             </div>
           </HeaderLeft>
-          <HeaderRight>
+          <HeaderRight {...debugProps(COMPONENT_NAME, 'HeaderRight')}>
             <AxFormGroup style={{ margin: 0, minWidth: '200px' }}>
               <AxListbox
                 value={statusFilter || ''}
@@ -188,7 +191,7 @@ export function AccountPayableListingPage({ onViewInvoice, onNavigateBack }: Acc
         </AxCard>
       )}
 
-      <TableCard padding="large">
+      <TableCard padding="large" {...debugProps(COMPONENT_NAME, 'TableCard')}>
         <div style={{ flex: 1, overflow: 'auto', minHeight: 0, height: 0, maxHeight: '100%' }}>
           {loading ? (
             <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '200px' }}>

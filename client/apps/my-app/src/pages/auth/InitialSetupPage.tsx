@@ -12,6 +12,9 @@ import {
 import { useI18n } from '../../i18n/I18nProvider';
 import { createUser } from '../../api/userApi';
 import styled from '@emotion/styled';
+import { debugProps } from '../../utils/emotionCache';
+
+const COMPONENT_NAME = 'InitialSetupPage';
 
 const SetupContainer = styled.div`
   display: flex;
@@ -143,13 +146,13 @@ export function InitialSetupPage({ onSetupComplete }: InitialSetupPageProps) {
   };
 
   return (
-    <SetupContainer>
-      <SetupCard>
-        <TitleSection>
+    <SetupContainer {...debugProps(COMPONENT_NAME, 'SetupContainer')}>
+      <SetupCard {...debugProps(COMPONENT_NAME, 'SetupCard')}>
+        <TitleSection {...debugProps(COMPONENT_NAME, 'TitleSection')}>
           <AxHeading3>{t('setup.title')}</AxHeading3>
           <AxParagraph>{t('setup.subtitle')}</AxParagraph>
         </TitleSection>
-        <SetupForm onSubmit={handleSubmit}>
+        <SetupForm onSubmit={handleSubmit} {...debugProps(COMPONENT_NAME, 'SetupForm')}>
           {getFormFields().map((key) => {
             const label = labels[key] || key.charAt(0).toUpperCase() + key.slice(1).replace(/([A-Z])/g, ' $1').trim();
             const value = formData[key] ?? '';
@@ -166,6 +169,7 @@ export function InitialSetupPage({ onSetupComplete }: InitialSetupPageProps) {
                     }}
                     placeholder='{"key": "value"}'
                     disabled={loading}
+                    {...debugProps(COMPONENT_NAME, 'StyledTextarea')}
                   />
                 </AxFormGroup>
               );

@@ -19,6 +19,9 @@ import {
 import { useI18n } from '../../i18n/I18nProvider';
 import { fetchWarehouses, createWarehouse, updateWarehouse, deleteWarehouse, Warehouse } from '../../api/warehouseApi';
 import styled from '@emotion/styled';
+import { debugProps } from '../../utils/emotionCache';
+
+const COMPONENT_NAME = 'WarehouseListingPage';
 
 const PageContainer = styled.div`
   display: flex;
@@ -166,10 +169,10 @@ export function WarehouseListingPage({ onNavigateBack }: WarehouseListingPagePro
 
   if (loading) {
     return (
-      <PageContainer>
-        <HeaderCard padding="large">
-          <HeaderSection>
-            <HeaderLeft>
+      <PageContainer {...debugProps(COMPONENT_NAME, 'PageContainer')}>
+        <HeaderCard padding="large" {...debugProps(COMPONENT_NAME, 'HeaderCard')}>
+          <HeaderSection {...debugProps(COMPONENT_NAME, 'HeaderSection')}>
+            <HeaderLeft {...debugProps(COMPONENT_NAME, 'HeaderLeft')}>
               {onNavigateBack && (
                 <AxButton 
                   variant="secondary" 
@@ -188,14 +191,14 @@ export function WarehouseListingPage({ onNavigateBack }: WarehouseListingPagePro
                 </AxParagraph>
               </div>
             </HeaderLeft>
-            <HeaderRight>
+            <HeaderRight {...debugProps(COMPONENT_NAME, 'HeaderRight')}>
               <AxButton variant="primary" onClick={handleAdd}>
                 {t('common.add')}
               </AxButton>
             </HeaderRight>
           </HeaderSection>
         </HeaderCard>
-        <TableCard padding="large">
+        <TableCard padding="large" {...debugProps(COMPONENT_NAME, 'TableCard')}>
           <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '200px' }}>
             <AxParagraph>{t('common.loading')}</AxParagraph>
           </div>
@@ -206,10 +209,10 @@ export function WarehouseListingPage({ onNavigateBack }: WarehouseListingPagePro
 
   if (error) {
     return (
-      <PageContainer>
-        <HeaderCard padding="large">
-          <HeaderSection>
-            <HeaderLeft>
+      <PageContainer {...debugProps(COMPONENT_NAME, 'PageContainer')}>
+        <HeaderCard padding="large" {...debugProps(COMPONENT_NAME, 'HeaderCard')}>
+          <HeaderSection {...debugProps(COMPONENT_NAME, 'HeaderSection')}>
+            <HeaderLeft {...debugProps(COMPONENT_NAME, 'HeaderLeft')}>
               {onNavigateBack && (
                 <AxButton 
                   variant="secondary" 
@@ -228,14 +231,14 @@ export function WarehouseListingPage({ onNavigateBack }: WarehouseListingPagePro
                 </AxParagraph>
               </div>
             </HeaderLeft>
-            <HeaderRight>
+            <HeaderRight {...debugProps(COMPONENT_NAME, 'HeaderRight')}>
               <AxButton variant="primary" onClick={handleAdd}>
                 {t('common.add')}
               </AxButton>
             </HeaderRight>
           </HeaderSection>
         </HeaderCard>
-        <TableCard padding="large">
+        <TableCard padding="large" {...debugProps(COMPONENT_NAME, 'TableCard')}>
           <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '200px', flexDirection: 'column', gap: 'var(--spacing-md)' }}>
             <AxParagraph style={{ color: 'var(--color-error)' }}>Error: {error}</AxParagraph>
             <AxButton variant="secondary" onClick={loadWarehouses}>
@@ -248,10 +251,10 @@ export function WarehouseListingPage({ onNavigateBack }: WarehouseListingPagePro
   }
 
   return (
-    <PageContainer>
-      <HeaderCard padding="large">
-        <HeaderSection>
-          <HeaderLeft>
+    <PageContainer {...debugProps(COMPONENT_NAME, 'PageContainer')}>
+      <HeaderCard padding="large" {...debugProps(COMPONENT_NAME, 'HeaderCard')}>
+        <HeaderSection {...debugProps(COMPONENT_NAME, 'HeaderSection')}>
+          <HeaderLeft {...debugProps(COMPONENT_NAME, 'HeaderLeft')}>
             {onNavigateBack && (
               <AxButton 
                 variant="secondary" 
@@ -270,7 +273,7 @@ export function WarehouseListingPage({ onNavigateBack }: WarehouseListingPagePro
               </AxParagraph>
             </div>
           </HeaderLeft>
-          <HeaderRight>
+          <HeaderRight {...debugProps(COMPONENT_NAME, 'HeaderRight')}>
             <AxButton variant="primary" onClick={handleAdd}>
               {t('common.add')}
             </AxButton>
@@ -278,7 +281,7 @@ export function WarehouseListingPage({ onNavigateBack }: WarehouseListingPagePro
         </HeaderSection>
       </HeaderCard>
 
-      <TableCard padding="large">
+      <TableCard padding="large" {...debugProps(COMPONENT_NAME, 'TableCard')}>
         <AxTable fullWidth variant="bordered">
           <AxTableHead>
             <AxTableRow>

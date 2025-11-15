@@ -20,6 +20,9 @@ import { fetchCustomers, Customer } from '../../api/customerApi';
 import { fetchAddressesByCustomerId, Address } from '../../api/addressApi';
 import { fetchOrderById, updateOrder, Order } from '../../api/orderApi';
 import styled from '@emotion/styled';
+import { debugProps } from '../../utils/emotionCache';
+
+const COMPONENT_NAME = 'AccountReceivableDetailPage';
 
 const PageContainer = styled.div`
   display: flex;
@@ -308,7 +311,7 @@ export function AccountReceivableDetailPage(props: AccountReceivableDetailPagePr
     if (!order) return null;
     
     return (
-      <StepContent>
+      <StepContent {...debugProps(COMPONENT_NAME, 'StepContent')}>
         <AxHeading3 style={{ marginBottom: 'var(--spacing-md)' }}>
           {t('accountsReceivable.invoice.title')}
         </AxHeading3>
@@ -316,7 +319,7 @@ export function AccountReceivableDetailPage(props: AccountReceivableDetailPagePr
           {t('accountsReceivable.invoice.description')}
         </AxParagraph>
 
-        <InfoSection>
+        <InfoSection {...debugProps(COMPONENT_NAME, 'InfoSection')}>
           <InfoRow>
             <AxParagraph style={{ fontWeight: 'var(--font-weight-bold)' }}>
               {t('accountsReceivable.invoice.invoiceNumber')}
@@ -404,7 +407,7 @@ export function AccountReceivableDetailPage(props: AccountReceivableDetailPagePr
     if (!order) return null;
     
     return (
-      <StepContent>
+      <StepContent {...debugProps(COMPONENT_NAME, 'StepContent')}>
         <AxHeading3 style={{ marginBottom: 'var(--spacing-md)' }}>
           {t('accountsReceivable.payment.title')}
         </AxHeading3>
@@ -451,7 +454,7 @@ export function AccountReceivableDetailPage(props: AccountReceivableDetailPagePr
             />
           </AxFormGroup>
 
-          <InfoSection>
+          <InfoSection {...debugProps(COMPONENT_NAME, 'InfoSection')}>
             <InfoRow>
               <AxParagraph style={{ fontWeight: 'var(--font-weight-bold)' }}>
                 {t('accountsReceivable.payment.invoiceAmount')}
@@ -488,7 +491,7 @@ export function AccountReceivableDetailPage(props: AccountReceivableDetailPagePr
           </InfoSection>
         </div>
 
-        <ButtonGroup>
+        <ButtonGroup {...debugProps(COMPONENT_NAME, 'ButtonGroup')}>
           <AxButton
             variant="secondary"
             onClick={() => setCurrentStep('invoice')}
@@ -565,7 +568,7 @@ export function AccountReceivableDetailPage(props: AccountReceivableDetailPagePr
     const historyRecords = getHistoryRecords();
     
     return (
-      <StepContent>
+      <StepContent {...debugProps(COMPONENT_NAME, 'StepContent')}>
         <AxHeading3 style={{ marginBottom: 'var(--spacing-md)' }}>
           {t('accountsReceivable.history.title')}
         </AxHeading3>
@@ -614,7 +617,7 @@ export function AccountReceivableDetailPage(props: AccountReceivableDetailPagePr
           </div>
         )}
 
-        <ButtonGroup>
+        <ButtonGroup {...debugProps(COMPONENT_NAME, 'ButtonGroup')}>
           <AxButton
             variant="secondary"
             onClick={() => setCurrentStep('payment')}
@@ -628,8 +631,8 @@ export function AccountReceivableDetailPage(props: AccountReceivableDetailPagePr
 
   if (loading) {
     return (
-      <PageContainer>
-        <ContentCard padding="large">
+      <PageContainer {...debugProps(COMPONENT_NAME, 'PageContainer')}>
+        <ContentCard padding="large" {...debugProps(COMPONENT_NAME, 'ContentCard')}>
           <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', height: '100%', gap: 'var(--spacing-md)' }}>
             <AxParagraph>Loading invoice...</AxParagraph>
           </div>
@@ -640,8 +643,8 @@ export function AccountReceivableDetailPage(props: AccountReceivableDetailPagePr
 
   if (!order) {
     return (
-      <PageContainer>
-        <ContentCard padding="large">
+      <PageContainer {...debugProps(COMPONENT_NAME, 'PageContainer')}>
+        <ContentCard padding="large" {...debugProps(COMPONENT_NAME, 'ContentCard')}>
           <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', height: '100%', gap: 'var(--spacing-md)' }}>
             <AxParagraph>Invoice not found</AxParagraph>
             {onNavigateBack && (
@@ -660,10 +663,10 @@ export function AccountReceivableDetailPage(props: AccountReceivableDetailPagePr
     : 'N/A';
 
   return (
-    <PageContainer>
-      <HeaderCard padding="large">
-        <HeaderSection>
-          <HeaderLeft>
+    <PageContainer {...debugProps(COMPONENT_NAME, 'PageContainer')}>
+      <HeaderCard padding="large" {...debugProps(COMPONENT_NAME, 'HeaderCard')}>
+        <HeaderSection {...debugProps(COMPONENT_NAME, 'HeaderSection')}>
+          <HeaderLeft {...debugProps(COMPONENT_NAME, 'HeaderLeft')}>
             {onNavigateBack && (
               <AxButton 
                 variant="secondary" 
@@ -682,7 +685,7 @@ export function AccountReceivableDetailPage(props: AccountReceivableDetailPagePr
               </AxParagraph>
             </div>
           </HeaderLeft>
-          <HeaderRight>
+          <HeaderRight {...debugProps(COMPONENT_NAME, 'HeaderRight')}>
             <div style={{ display: 'flex', gap: 'var(--spacing-md)', flexWrap: 'wrap', alignItems: 'flex-start' }}>
               {order.invoiceNumber && (
                 <div style={{ 
@@ -742,12 +745,13 @@ export function AccountReceivableDetailPage(props: AccountReceivableDetailPagePr
         </HeaderSection>
       </HeaderCard>
 
-      <ContentCard padding="large">
-        <StepIndicator>
+      <ContentCard padding="large" {...debugProps(COMPONENT_NAME, 'ContentCard')}>
+        <StepIndicator {...debugProps(COMPONENT_NAME, 'StepIndicator')}>
           <Step
             $active={currentStep === 'invoice'}
             $completed={isStepCompleted('invoice')}
             onClick={() => setCurrentStep('invoice')}
+            {...debugProps(COMPONENT_NAME, 'Step')}
           >
             {t('accountsReceivable.step.invoice')}
           </Step>
@@ -755,6 +759,7 @@ export function AccountReceivableDetailPage(props: AccountReceivableDetailPagePr
             $active={currentStep === 'payment'}
             $completed={isStepCompleted('payment')}
             onClick={() => setCurrentStep('payment')}
+            {...debugProps(COMPONENT_NAME, 'Step')}
           >
             {t('accountsReceivable.step.payment')}
           </Step>
@@ -762,6 +767,7 @@ export function AccountReceivableDetailPage(props: AccountReceivableDetailPagePr
             $active={currentStep === 'history'}
             $completed={isStepCompleted('history')}
             onClick={() => setCurrentStep('history')}
+            {...debugProps(COMPONENT_NAME, 'Step')}
           >
             {t('accountsReceivable.step.history')}
           </Step>

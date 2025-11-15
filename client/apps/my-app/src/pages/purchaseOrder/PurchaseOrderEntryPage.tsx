@@ -24,6 +24,9 @@ import {
 } from '../../api/purchaseOrderApi';
 import styled from '@emotion/styled';
 import { PurchaseOrderStep, EntrySubStep } from './types';
+import { debugProps } from '../../utils/emotionCache';
+
+const COMPONENT_NAME = 'PurchaseOrderEntryPage';
 import { PurchaseOrderEntryStepPage } from './PurchaseOrderEntryStepPage';
 import { PurchaseOrderApprovalStepPage } from './PurchaseOrderApprovalStepPage';
 import { PurchaseOrderReceivedStepPage } from './PurchaseOrderReceivedStepPage';
@@ -1062,10 +1065,10 @@ export function PurchaseOrderEntryPage(props: PurchaseOrderEntryPageProps = {}) 
   const selectedVendor = vendors.find(v => v.id === po?.supplierId);
 
   return (
-    <PageContainer>
-      <HeaderCard padding="large">
-        <HeaderSection>
-          <HeaderLeft>
+    <PageContainer {...debugProps(COMPONENT_NAME, 'PageContainer')}>
+      <HeaderCard padding="large" {...debugProps(COMPONENT_NAME, 'HeaderCard')}>
+        <HeaderSection {...debugProps(COMPONENT_NAME, 'HeaderSection')}>
+          <HeaderLeft {...debugProps(COMPONENT_NAME, 'HeaderLeft')}>
             {onNavigateBack && (
               <AxButton 
                 variant="secondary" 
@@ -1086,7 +1089,7 @@ export function PurchaseOrderEntryPage(props: PurchaseOrderEntryPageProps = {}) 
               )}
             </div>
           </HeaderLeft>
-          <HeaderRight>
+          <HeaderRight {...debugProps(COMPONENT_NAME, 'HeaderRight')}>
             {(() => {
               if (po?.id && selectedVendor) {
                 const shippingAddress = addresses.find(a => a.id === po.shippingAddressId);
@@ -1198,9 +1201,9 @@ export function PurchaseOrderEntryPage(props: PurchaseOrderEntryPageProps = {}) 
         </HeaderSection>
       </HeaderCard>
 
-      <ContentCard padding="large">
-        <StepIndicator>
-          <StepScrollContainer>
+      <ContentCard padding="large" {...debugProps(COMPONENT_NAME, 'ContentCard')}>
+        <StepIndicator {...debugProps(COMPONENT_NAME, 'StepIndicator')}>
+          <StepScrollContainer {...debugProps(COMPONENT_NAME, 'StepScrollContainer')}>
             {steps
               .filter(step => {
                 if (readOnly) {
@@ -1217,6 +1220,7 @@ export function PurchaseOrderEntryPage(props: PurchaseOrderEntryPageProps = {}) 
                     key={step.key}
                     $active={isActive}
                     $completed={isCompleted}
+                    {...debugProps(COMPONENT_NAME, 'Step')}
                     onClick={() => {
                       if (readOnly) {
                         if (isCompleted) {
@@ -1241,7 +1245,7 @@ export function PurchaseOrderEntryPage(props: PurchaseOrderEntryPageProps = {}) 
                 );
               })}
           </StepScrollContainer>
-          <HistoryStepContainer>
+          <HistoryStepContainer {...debugProps(COMPONENT_NAME, 'HistoryStepContainer')}>
             {(() => {
               const historyStep = steps.find(s => s.key === 'history');
               if (!historyStep) return null;
@@ -1252,6 +1256,7 @@ export function PurchaseOrderEntryPage(props: PurchaseOrderEntryPageProps = {}) 
                   key="history"
                   $active={isActive}
                   $completed={isCompleted}
+                  {...debugProps(COMPONENT_NAME, 'Step')}
                   onClick={() => {
                     setCurrentStep('history');
                   }}
@@ -1264,12 +1269,12 @@ export function PurchaseOrderEntryPage(props: PurchaseOrderEntryPageProps = {}) 
           </HistoryStepContainer>
         </StepIndicator>
 
-        <StepContent>
+        <StepContent {...debugProps(COMPONENT_NAME, 'StepContent')}>
           {renderStepContent()}
         </StepContent>
 
         {!readOnly && (
-          <ButtonGroup>
+          <ButtonGroup {...debugProps(COMPONENT_NAME, 'ButtonGroup')}>
             <AxButton
               variant="secondary"
               onClick={handlePrevious}
@@ -1343,7 +1348,7 @@ export function PurchaseOrderEntryPage(props: PurchaseOrderEntryPageProps = {}) 
           </ButtonGroup>
         )}
         {readOnly && currentStep === 'history' && (
-          <ButtonGroup>
+          <ButtonGroup {...debugProps(COMPONENT_NAME, 'ButtonGroup')}>
             <AxButton
               variant="secondary"
               onClick={() => {
@@ -1359,7 +1364,7 @@ export function PurchaseOrderEntryPage(props: PurchaseOrderEntryPageProps = {}) 
           </ButtonGroup>
         )}
         {readOnly && currentStep !== 'history' && (
-          <ButtonGroup>
+          <ButtonGroup {...debugProps(COMPONENT_NAME, 'ButtonGroup')}>
             <AxButton
               variant="secondary"
               onClick={() => {

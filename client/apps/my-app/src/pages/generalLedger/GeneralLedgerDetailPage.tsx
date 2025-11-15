@@ -16,6 +16,9 @@ import { fetchCustomers, Customer } from '../../api/customerApi';
 import { fetchProducts, Product } from '../../api/productApi';
 import { fetchOrderById, Order } from '../../api/orderApi';
 import styled from '@emotion/styled';
+import { debugProps } from '../../utils/emotionCache';
+
+const COMPONENT_NAME = 'GeneralLedgerDetailPage';
 
 const PageContainer = styled.div`
   display: flex;
@@ -113,8 +116,8 @@ export function GeneralLedgerDetailPage(props: GeneralLedgerDetailPageProps = {}
 
   if (loading) {
     return (
-      <PageContainer>
-        <ContentCard padding="large">
+      <PageContainer {...debugProps(COMPONENT_NAME, 'PageContainer')}>
+        <ContentCard padding="large" {...debugProps(COMPONENT_NAME, 'ContentCard')}>
           <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', height: '100%', gap: 'var(--spacing-md)' }}>
             <AxParagraph>Loading general ledger entry...</AxParagraph>
           </div>
@@ -125,8 +128,8 @@ export function GeneralLedgerDetailPage(props: GeneralLedgerDetailPageProps = {}
 
   if (!order) {
     return (
-      <PageContainer>
-        <ContentCard padding="large">
+      <PageContainer {...debugProps(COMPONENT_NAME, 'PageContainer')}>
+        <ContentCard padding="large" {...debugProps(COMPONENT_NAME, 'ContentCard')}>
           <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', height: '100%', gap: 'var(--spacing-md)' }}>
             <AxParagraph>Order not found</AxParagraph>
             {onNavigateBack && (
@@ -168,10 +171,10 @@ export function GeneralLedgerDetailPage(props: GeneralLedgerDetailPageProps = {}
   const paymentAmount = order.jsonData?.paymentAmount || 0;
 
   return (
-    <PageContainer>
-      <HeaderCard padding="large">
-        <HeaderSection>
-          <HeaderLeft>
+    <PageContainer {...debugProps(COMPONENT_NAME, 'PageContainer')}>
+      <HeaderCard padding="large" {...debugProps(COMPONENT_NAME, 'HeaderCard')}>
+        <HeaderSection {...debugProps(COMPONENT_NAME, 'HeaderSection')}>
+          <HeaderLeft {...debugProps(COMPONENT_NAME, 'HeaderLeft')}>
             {onNavigateBack && (
               <AxButton 
                 variant="secondary" 
@@ -193,12 +196,12 @@ export function GeneralLedgerDetailPage(props: GeneralLedgerDetailPageProps = {}
         </HeaderSection>
       </HeaderCard>
 
-      <ContentCard padding="large">
+      <ContentCard padding="large" {...debugProps(COMPONENT_NAME, 'ContentCard')}>
         <AxHeading3 style={{ marginBottom: 'var(--spacing-md)' }}>
           {t('generalLedger.detail.title')}
         </AxHeading3>
 
-        <InfoSection>
+        <InfoSection {...debugProps(COMPONENT_NAME, 'InfoSection')}>
           <InfoRow>
             <AxParagraph style={{ fontWeight: 'var(--font-weight-bold)' }}>
               {t('generalLedger.detail.orderNumber')}

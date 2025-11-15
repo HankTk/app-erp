@@ -28,6 +28,9 @@ import {
 } from '../../api/orderApi';
 import styled from '@emotion/styled';
 import { OrderStep, EntrySubStep } from './types';
+import { debugProps } from '../../utils/emotionCache';
+
+const COMPONENT_NAME = 'OrderEntryPage';
 import { OrderEntryStepPage } from './OrderEntryStepPage';
 import { OrderApprovalStepPage } from './OrderApprovalStepPage';
 import { OrderConfirmationStepPage } from './OrderConfirmationStepPage';
@@ -1906,10 +1909,10 @@ export function OrderEntryPage(props: OrderEntryPageProps = {}) {
   };
 
   return (
-    <PageContainer>
-      <HeaderCard padding="large">
-        <HeaderSection>
-          <HeaderLeft>
+    <PageContainer {...debugProps(COMPONENT_NAME, 'PageContainer')}>
+      <HeaderCard padding="large" {...debugProps(COMPONENT_NAME, 'HeaderCard')}>
+        <HeaderSection {...debugProps(COMPONENT_NAME, 'HeaderSection')}>
+          <HeaderLeft {...debugProps(COMPONENT_NAME, 'HeaderLeft')}>
             {onNavigateBack && (
               <AxButton 
                 variant="secondary" 
@@ -1928,7 +1931,7 @@ export function OrderEntryPage(props: OrderEntryPageProps = {}) {
               </AxParagraph>
             </div>
           </HeaderLeft>
-          <HeaderRight>
+          <HeaderRight {...debugProps(COMPONENT_NAME, 'HeaderRight')}>
             <div style={{ display: 'flex', gap: 'var(--spacing-md)', flexWrap: 'wrap', alignItems: 'flex-start' }}>
               {order?.orderNumber && (
                 <div style={{ 
@@ -2058,9 +2061,9 @@ export function OrderEntryPage(props: OrderEntryPageProps = {}) {
         </HeaderSection>
       </HeaderCard>
 
-      <ContentCard padding="large">
-        <StepIndicator>
-          <StepScrollContainer>
+      <ContentCard padding="large" {...debugProps(COMPONENT_NAME, 'ContentCard')}>
+        <StepIndicator {...debugProps(COMPONENT_NAME, 'StepIndicator')}>
+          <StepScrollContainer {...debugProps(COMPONENT_NAME, 'StepScrollContainer')}>
             {steps
               .filter(step => {
                 // In read-only mode, only show completed steps (except history)
@@ -2080,6 +2083,7 @@ export function OrderEntryPage(props: OrderEntryPageProps = {}) {
                     key={step.key}
                     $active={isActive}
                     $completed={isCompleted}
+                    {...debugProps(COMPONENT_NAME, 'Step')}
                     onClick={() => {
                       if (readOnly) {
                         // In read-only mode, only allow access to completed steps
@@ -2106,7 +2110,7 @@ export function OrderEntryPage(props: OrderEntryPageProps = {}) {
                 );
               })}
           </StepScrollContainer>
-          <HistoryStepContainer>
+          <HistoryStepContainer {...debugProps(COMPONENT_NAME, 'HistoryStepContainer')}>
             {(() => {
               const historyStep = steps.find(s => s.key === 'history');
               if (!historyStep) return null;
@@ -2117,6 +2121,7 @@ export function OrderEntryPage(props: OrderEntryPageProps = {}) {
                   key="history"
                   $active={isActive}
                   $completed={isCompleted}
+                  {...debugProps(COMPONENT_NAME, 'Step')}
                   onClick={() => {
                     setCurrentStep('history');
                   }}
@@ -2129,12 +2134,12 @@ export function OrderEntryPage(props: OrderEntryPageProps = {}) {
           </HistoryStepContainer>
         </StepIndicator>
 
-        <StepContent>
+        <StepContent {...debugProps(COMPONENT_NAME, 'StepContent')}>
           {renderStepContent()}
         </StepContent>
 
         {!readOnly && (
-          <ButtonGroup>
+          <ButtonGroup {...debugProps(COMPONENT_NAME, 'ButtonGroup')}>
             <AxButton
               variant="secondary"
               onClick={handlePrevious}
@@ -2224,7 +2229,7 @@ export function OrderEntryPage(props: OrderEntryPageProps = {}) {
           </ButtonGroup>
         )}
         {readOnly && currentStep === 'history' && (
-          <ButtonGroup>
+          <ButtonGroup {...debugProps(COMPONENT_NAME, 'ButtonGroup')}>
             <AxButton
               variant="secondary"
               onClick={() => {
@@ -2240,7 +2245,7 @@ export function OrderEntryPage(props: OrderEntryPageProps = {}) {
           </ButtonGroup>
         )}
         {readOnly && currentStep !== 'history' && (
-          <ButtonGroup>
+          <ButtonGroup {...debugProps(COMPONENT_NAME, 'ButtonGroup')}>
             <AxButton
               variant="secondary"
               onClick={() => {

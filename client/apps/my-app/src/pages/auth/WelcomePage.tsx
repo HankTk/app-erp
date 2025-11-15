@@ -5,6 +5,9 @@ import {
 } from '@ui/components';
 import { useI18n } from '../../i18n/I18nProvider';
 import styled from '@emotion/styled';
+import { debugProps } from '../../utils/emotionCache';
+
+const COMPONENT_NAME = 'WelcomePage';
 
 const HeroContainer = styled.div`
   display: flex;
@@ -136,12 +139,12 @@ export function WelcomePage({ user, onPageChange }: WelcomePageProps) {
   const welcomeMessage = t('welcome.message').replace('{name}', userName);
 
   return (
-    <HeroContainer>
-      <HeroContent>
-        <HeroTitle>{t('welcome.title')}</HeroTitle>
-        <HeroSubtitle>{welcomeMessage}</HeroSubtitle>
+    <HeroContainer {...debugProps(COMPONENT_NAME, 'HeroContainer')}>
+      <HeroContent {...debugProps(COMPONENT_NAME, 'HeroContent')}>
+        <HeroTitle {...debugProps(COMPONENT_NAME, 'HeroTitle')}>{t('welcome.title')}</HeroTitle>
+        <HeroSubtitle {...debugProps(COMPONENT_NAME, 'HeroSubtitle')}>{welcomeMessage}</HeroSubtitle>
         
-        <MenuCardsGrid>
+        <MenuCardsGrid {...debugProps(COMPONENT_NAME, 'MenuCardsGrid')}>
           {menuItems.map((item) => (
             <MenuCard
               key={item.id}
@@ -152,10 +155,11 @@ export function WelcomePage({ user, onPageChange }: WelcomePageProps) {
                   onPageChange(item.id);
                 }
               }}
+              {...debugProps(COMPONENT_NAME, 'MenuCard')}
             >
-              <MenuCardTitle>{t(item.labelKey)}</MenuCardTitle>
+              <MenuCardTitle {...debugProps(COMPONENT_NAME, 'MenuCardTitle')}>{t(item.labelKey)}</MenuCardTitle>
               {item.subtitleKey && (
-                <MenuCardSubtitle>{t(item.subtitleKey)}</MenuCardSubtitle>
+                <MenuCardSubtitle {...debugProps(COMPONENT_NAME, 'MenuCardSubtitle')}>{t(item.subtitleKey)}</MenuCardSubtitle>
               )}
             </MenuCard>
           ))}

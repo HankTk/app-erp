@@ -1,6 +1,9 @@
 import styled from '@emotion/styled';
 import { AxButton, AxHeading3, AxParagraph } from '@ui/components';
 import { useI18n } from '../i18n/I18nProvider';
+import { debugProps } from '../utils/emotionCache';
+
+const COMPONENT_NAME = 'Drawer';
 
 const AxOverlay = styled.div<{ $isOpen: boolean }>`
   position: fixed;
@@ -79,23 +82,23 @@ export function Drawer({ isOpen, onToggle, theme, onThemeChange }: DrawerProps)
 
   return (
     <>
-      <AxOverlay $isOpen={isOpen} onClick={onToggle} />
-      <AxDrawer $isOpen={isOpen}>
-        <AxDrawerHeader>
-          <AxDrawerTitleWrapper>
-            <AxDrawerTitle>{t('app.settings')}</AxDrawerTitle>
+      <AxOverlay $isOpen={isOpen} onClick={onToggle} {...debugProps(COMPONENT_NAME, 'AxOverlay')} />
+      <AxDrawer $isOpen={isOpen} {...debugProps(COMPONENT_NAME, 'AxDrawer')}>
+        <AxDrawerHeader {...debugProps(COMPONENT_NAME, 'AxDrawerHeader')}>
+          <AxDrawerTitleWrapper {...debugProps(COMPONENT_NAME, 'AxDrawerTitleWrapper')}>
+            <AxDrawerTitle {...debugProps(COMPONENT_NAME, 'AxDrawerTitle')}>{t('app.settings')}</AxDrawerTitle>
           </AxDrawerTitleWrapper>
         </AxDrawerHeader>
-        <AxDrawerContent>
-          <AxDrawerSection>
+        <AxDrawerContent {...debugProps(COMPONENT_NAME, 'AxDrawerContent')}>
+          <AxDrawerSection {...debugProps(COMPONENT_NAME, 'AxDrawerSection')}>
             <AxParagraph>{t('app.theme')}</AxParagraph>
             <AxButton onClick={onThemeChange} variant="secondary" fullWidth>
               {theme === 'light' ? t('app.switchToDark') : t('app.switchToLight')}
             </AxButton>
           </AxDrawerSection>
-          <AxDrawerSection>
+          <AxDrawerSection {...debugProps(COMPONENT_NAME, 'AxDrawerSection')}>
             <AxParagraph>{t('app.language')}</AxParagraph>
-            <AxLanguageButtons>
+            <AxLanguageButtons {...debugProps(COMPONENT_NAME, 'AxLanguageButtons')}>
               <AxButton
                 onClick={() => setLanguage('en')}
                 variant={language === 'en' ? 'primary' : 'secondary'}
