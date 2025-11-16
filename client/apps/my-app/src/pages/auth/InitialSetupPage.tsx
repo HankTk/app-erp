@@ -19,26 +19,57 @@ const COMPONENT_NAME = 'InitialSetupPage';
 const SetupContainer = styled.div`
   display: flex;
   justify-content: center;
-  align-items: flex-start;
-  min-height: 100vh;
-  padding: var(--spacing-lg);
+  align-items: center;
+  height: 100vh;
+  width: 100vw;
+  padding: var(--spacing-md);
   background-color: var(--color-background-page);
-  overflow-y: auto;
+  overflow: hidden;
+  box-sizing: border-box;
 `;
 
 const SetupCard = styled(AxCard)`
   width: 100%;
   max-width: 500px;
-  padding: var(--spacing-2xl) !important;
-  margin: var(--spacing-lg) 0;
-  max-height: calc(100vh - 2 * var(--spacing-lg));
+  max-height: calc(100vh - 2 * var(--spacing-md));
+  padding: var(--spacing-lg) !important;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  box-sizing: border-box;
+`;
+
+const SetupCardContent = styled.div`
+  display: flex;
+  flex-direction: column;
   overflow-y: auto;
+  overflow-x: hidden;
+  flex: 1;
+  min-height: 0;
 `;
 
 const SetupForm = styled.form`
   display: flex;
   flex-direction: column;
   gap: var(--spacing-lg);
+  flex: 1;
+  min-height: 0;
+`;
+
+const FormSection = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+`;
+
+const SectionTitle = styled(AxParagraph)`
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin: 0;
+  margin-bottom: var(--spacing-xs);
 `;
 
 const ErrorMessage = styled(AxParagraph)`
@@ -49,39 +80,16 @@ const ErrorMessage = styled(AxParagraph)`
 
 const TitleSection = styled.div`
   text-align: center;
-  margin-bottom: var(--spacing-xl);
+  margin-bottom: var(--spacing-lg);
+  flex-shrink: 0;
 `;
 
-const StyledTextarea = styled.textarea`
-  font-family: var(--font-family-base);
-  font-size: var(--font-size-base);
-  font-weight: var(--font-weight-normal);
-  line-height: var(--line-height-normal);
-  padding: var(--spacing-sm) calc(var(--spacing-sm) + 6px);
-  border: 2px solid var(--color-border-default);
-  border-radius: var(--radius-md);
-  outline: none;
-  transition: border-color var(--transition-base), box-shadow var(--transition-base);
-  width: 100%;
-  min-height: 120px;
-  resize: vertical;
-  color: var(--color-text-primary);
-  background-color: var(--color-background-default);
-
-  &:focus {
-    border-color: var(--color-border-focus);
-    box-shadow: var(--shadow-focus-sm);
-  }
-
-  &:disabled {
-    background-color: var(--color-background-disabled);
-    cursor: not-allowed;
-    opacity: var(--opacity-disabled);
-  }
-
-  &::placeholder {
-    color: var(--color-text-tertiary);
-  }
+const ButtonGroup = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+  margin-top: var(--spacing-sm);
+  flex-shrink: 0;
 `;
 
 interface InitialSetupPageProps {
@@ -96,8 +104,11 @@ export function InitialSetupPage({ onSetupComplete }: InitialSetupPageProps) {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
-  const getFormFields = () => {
-    return ['userid', 'password', 'role', 'firstName', 'lastName', 'email', 'jsonData'];
+  const getFormFields = (): { account: string[] } => {
+    // Organized by sections
+    return {
+      account: ['userid', 'password', 'role']
+    };
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -109,20 +120,8 @@ export function InitialSetupPage({ onSetupComplete }: InitialSetupPageProps) {
       // Prepare form data for API
       const dataToSave: Record<string, any> = { ...formData };
       
-      // Parse jsonData from string to object if it's a valid JSON string
-      if (dataToSave.jsonData) {
-        if (typeof dataToSave.jsonData === 'string' && dataToSave.jsonData.trim() !== '') {
-          try {
-            dataToSave.jsonData = JSON.parse(dataToSave.jsonData);
-          } catch (e) {
-            setError('Invalid JSON format in JSON Data field. Please check your JSON syntax.');
-            setLoading(false);
-            return;
-          }
-        }
-      } else {
-        dataToSave.jsonData = null;
-      }
+      // Set jsonData to null (not used in initial setup)
+      dataToSave.jsonData = null;
 
       const createdUser = await createUser(dataToSave);
       // Don't return password in response
@@ -139,170 +138,151 @@ export function InitialSetupPage({ onSetupComplete }: InitialSetupPageProps) {
     userid: 'User ID',
     password: 'Password',
     role: 'Role',
-    firstName: 'First Name',
-    lastName: 'Last Name',
-    email: 'Email',
-    jsonData: 'JSON Data',
   };
 
   return (
     <SetupContainer {...debugProps(COMPONENT_NAME, 'SetupContainer')}>
       <SetupCard {...debugProps(COMPONENT_NAME, 'SetupCard')}>
-        <TitleSection {...debugProps(COMPONENT_NAME, 'TitleSection')}>
-          <AxHeading3>{t('setup.title')}</AxHeading3>
-          <AxParagraph>{t('setup.subtitle')}</AxParagraph>
-        </TitleSection>
-        <SetupForm onSubmit={handleSubmit} {...debugProps(COMPONENT_NAME, 'SetupForm')}>
-          {getFormFields().map((key) => {
-            const label = labels[key] || key.charAt(0).toUpperCase() + key.slice(1).replace(/([A-Z])/g, ' $1').trim();
-            const value = formData[key] ?? '';
+        <SetupCardContent {...debugProps(COMPONENT_NAME, 'SetupCardContent')}>
+          <TitleSection {...debugProps(COMPONENT_NAME, 'TitleSection')}>
+            <AxHeading3 style={{ marginBottom: 'var(--spacing-xs)' }}>{t('setup.title')}</AxHeading3>
+            <AxParagraph style={{ fontSize: 'var(--font-size-sm)' }}>{t('setup.subtitle')}</AxParagraph>
+          </TitleSection>
+          <SetupForm onSubmit={handleSubmit} {...debugProps(COMPONENT_NAME, 'SetupForm')}>
+            {/* Account Information Section */}
+            <FormSection>
+              <SectionTitle>Account Information</SectionTitle>
+              {(getFormFields().account || []).map((key) => {
+                const label = labels[key];
+                const value = formData[key] ?? '';
 
-            // Handle jsonData as textarea
-            if (key === 'jsonData') {
-              return (
-                <AxFormGroup key={key}>
-                  <AxLabel>{label}</AxLabel>
-                  <StyledTextarea
-                    value={value}
-                    onChange={(e) => {
-                      setFormData({ ...formData, [key]: e.target.value });
-                    }}
-                    placeholder='{"key": "value"}'
-                    disabled={loading}
-                    {...debugProps(COMPONENT_NAME, 'StyledTextarea')}
-                  />
-                </AxFormGroup>
-              );
-            }
+                // Handle password as password input
+                if (key === 'password') {
+                  return (
+                    <AxFormGroup key={key}>
+                      <AxLabel>{label}</AxLabel>
+                      <input
+                        type="password"
+                        value={value}
+                        onChange={(e) => {
+                          setFormData({ ...formData, [key]: e.target.value });
+                        }}
+                        placeholder="Enter password"
+                        autoComplete="new-password"
+                        disabled={loading}
+                        required
+                        style={{
+                          fontFamily: 'var(--font-family-base)',
+                          fontSize: 'var(--font-size-base)',
+                          fontWeight: 'var(--font-weight-normal)',
+                          lineHeight: 'var(--line-height-normal)',
+                          padding: 'var(--spacing-sm) calc(var(--spacing-sm) + 6px)',
+                          border: '2px solid var(--color-border-default)',
+                          borderRadius: 'var(--radius-md)',
+                          outline: 'none',
+                          transition: 'border-color var(--transition-base), box-shadow var(--transition-base)',
+                          width: '100%',
+                          color: 'var(--color-text-primary)',
+                          backgroundColor: 'var(--color-background-default)',
+                          boxSizing: 'border-box',
+                        }}
+                        onFocus={(e) => {
+                          e.target.style.borderColor = 'var(--color-border-focus)';
+                          e.target.style.boxShadow = 'var(--shadow-focus-sm)';
+                        }}
+                        onBlur={(e) => {
+                          e.target.style.borderColor = 'var(--color-border-default)';
+                          e.target.style.boxShadow = 'none';
+                        }}
+                      />
+                    </AxFormGroup>
+                  );
+                }
 
-            // Handle role as listbox
-            if (key === 'role') {
-              const roleOptions = [
-                { value: 'user', label: 'User' },
-                { value: 'admin', label: 'Admin' },
-              ];
-              return (
-                <AxFormGroup key={key}>
-                  <AxLabel>{label}</AxLabel>
-                  <AxListbox
-                    options={roleOptions}
-                    value={value || 'admin'}
-                    onChange={(selectedValue) => {
-                      setFormData({ ...formData, [key]: selectedValue || 'admin' });
-                    }}
-                    placeholder="Select role"
-                    disabled={loading}
-                    fullWidth
-                  />
-                </AxFormGroup>
-              );
-            }
+                // Handle role as listbox
+                if (key === 'role') {
+                  const roleOptions = [
+                    { value: 'user', label: 'User' },
+                    { value: 'admin', label: 'Admin' },
+                  ];
+                  return (
+                    <AxFormGroup key={key}>
+                      <AxLabel>{label}</AxLabel>
+                      <AxListbox
+                        options={roleOptions}
+                        value={value || 'admin'}
+                        onChange={(selectedValue) => {
+                          setFormData({ ...formData, [key]: selectedValue || 'admin' });
+                        }}
+                        placeholder="Select role"
+                        disabled={loading}
+                        fullWidth
+                      />
+                    </AxFormGroup>
+                  );
+                }
 
-            // Handle password as password input
-            if (key === 'password') {
-              return (
-                <AxFormGroup key={key}>
-                  <AxLabel>{label}</AxLabel>
-                  <input
-                    type="password"
-                    value={value}
-                    onChange={(e) => {
-                      setFormData({ ...formData, [key]: e.target.value });
-                    }}
-                    placeholder="Enter password"
-                    autoComplete="new-password"
-                    disabled={loading}
-                    required
-                    style={{
-                      fontFamily: 'var(--font-family-base)',
-                      fontSize: 'var(--font-size-base)',
-                      fontWeight: 'var(--font-weight-normal)',
-                      lineHeight: 'var(--line-height-normal)',
-                      padding: 'var(--spacing-sm) calc(var(--spacing-sm) + 6px)',
-                      border: '2px solid var(--color-border-default)',
-                      borderRadius: 'var(--radius-md)',
-                      outline: 'none',
-                      transition: 'border-color var(--transition-base), box-shadow var(--transition-base)',
-                      width: '100%',
-                      color: 'var(--color-text-primary)',
-                      backgroundColor: 'var(--color-background-default)',
-                      boxSizing: 'border-box',
-                    }}
-                    onFocus={(e) => {
-                      e.target.style.borderColor = 'var(--color-border-focus)';
-                      e.target.style.boxShadow = 'var(--shadow-focus-sm)';
-                    }}
-                    onBlur={(e) => {
-                      e.target.style.borderColor = 'var(--color-border-default)';
-                      e.target.style.boxShadow = 'none';
-                    }}
-                  />
-                </AxFormGroup>
-              );
-            }
+                // Handle userid
+                return (
+                  <AxFormGroup key={key}>
+                    <AxLabel>{label}</AxLabel>
+                    <AxInput
+                      type="text"
+                      value={value}
+                      onChange={(e) => {
+                        setFormData({ ...formData, [key]: e.target.value });
+                      }}
+                      disabled={loading}
+                      fullWidth
+                      required
+                    />
+                  </AxFormGroup>
+                );
+              })}
+            </FormSection>
 
-            // Handle other fields
-            let inputType = 'text';
-            if (key === 'email') {
-              inputType = 'email';
-            }
-
-            return (
-              <AxFormGroup key={key}>
-                <AxLabel>{label}</AxLabel>
-                <AxInput
-                  type={inputType}
-                  value={value}
-                  onChange={(e) => {
-                    setFormData({ ...formData, [key]: e.target.value });
-                  }}
-                  disabled={loading}
-                  fullWidth
-                  required={key !== 'jsonData'}
-                />
-              </AxFormGroup>
-            );
-          })}
-          {error && <ErrorMessage>{error}</ErrorMessage>}
-          <div style={{ display: 'flex', gap: 'var(--spacing-md)', flexDirection: 'column' }}>
-            <AxButton
-              type="submit"
-              variant="primary"
-              fullWidth
-              disabled={loading}
-            >
-              {loading ? t('setup.creating') : t('setup.create')}
-            </AxButton>
-            <AxButton
-              type="button"
-              variant="secondary"
-              fullWidth
-              disabled={loading}
-              onClick={async () => {
-                if (confirm(t('setup.closeConfirm'))) {
-                  // Check if running in Electron
-                  if (window.electronAPI) {
-                    // Close Electron app
-                    await window.electronAPI.closeApp();
-                  } else {
-                    // Fallback for browser: try to close window
-                    if (window.opener) {
-                      window.close();
+            {error && <ErrorMessage>{error}</ErrorMessage>}
+            
+            <ButtonGroup>
+              <AxButton
+                type="submit"
+                variant="primary"
+                fullWidth
+                disabled={loading}
+              >
+                {loading ? t('setup.creating') : t('setup.create')}
+              </AxButton>
+              <AxButton
+                type="button"
+                variant="secondary"
+                fullWidth
+                disabled={loading}
+                onClick={async () => {
+                  if (confirm(t('setup.closeConfirm'))) {
+                    // Check if running in Electron
+                    if (window.electronAPI) {
+                      // Close Electron app
+                      await window.electronAPI.closeApp();
                     } else {
-                      window.close();
-                      // If window.close() doesn't work, navigate to about:blank
-                      setTimeout(() => {
-                        window.location.href = 'about:blank';
-                      }, 100);
+                      // Fallback for browser: try to close window
+                      if (window.opener) {
+                        window.close();
+                      } else {
+                        window.close();
+                        // If window.close() doesn't work, navigate to about:blank
+                        setTimeout(() => {
+                          window.location.href = 'about:blank';
+                        }, 100);
+                      }
                     }
                   }
-                }
-              }}
-            >
-              {t('setup.cancel')}
-            </AxButton>
-          </div>
+                }}
+              >
+                {t('setup.cancel')}
+              </AxButton>
+            </ButtonGroup>
         </SetupForm>
+        </SetupCardContent>
       </SetupCard>
     </SetupContainer>
   );

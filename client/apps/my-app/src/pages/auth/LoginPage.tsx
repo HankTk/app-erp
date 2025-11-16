@@ -117,6 +117,32 @@ export function LoginPage({ onLoginSuccess }: LoginPageProps) {
           >
             {loading ? t('login.loading') : t('login.submit')}
           </AxButton>
+          <AxButton
+            type="button"
+            variant="secondary"
+            fullWidth
+            disabled={loading}
+            onClick={async () => {
+              // Check if running in Electron
+              if (window.electronAPI) {
+                // Close Electron app
+                await window.electronAPI.closeApp();
+              } else {
+                // Fallback for browser: try to close window
+                if (window.opener) {
+                  window.close();
+                } else {
+                  window.close();
+                  // If window.close() doesn't work, navigate to about:blank
+                  setTimeout(() => {
+                    window.location.href = 'about:blank';
+                  }, 100);
+                }
+              }
+            }}
+          >
+            Close
+          </AxButton>
         </LoginForm>
       </LoginCard>
     </LoginContainer>

@@ -116,30 +116,44 @@ function AppContent() {
     const checkUsers = async () => {
       try {
         const users = await fetchUsers();
-        setHasUsers(users.length > 0);
+        const hasUsersInSystem = users.length > 0;
+        setHasUsers(hasUsersInSystem);
+        
+        // If no users exist and we have a saved user in localStorage, clear it
+        // because the saved user might be invalid
+        if (!hasUsersInSystem) {
+          const savedUser = localStorage.getItem('user');
+          if (savedUser) {
+            localStorage.removeItem('user');
+            setUser(null);
+          }
+        }
       } catch (err) {
         console.error('Error checking users:', err);
-        // If we can't check, assume there are users (fallback to login)
-        setHasUsers(true);
+        // If we can't check, default to false (show initial setup) to be safe
+        // This ensures the initial setup page appears if there's a network/API issue
+        setHasUsers(false);
       } finally {
         setCheckingUsers(false);
       }
     };
 
-    // Load user from localStorage on mount
+    // Load user from localStorage on mount, but still check if users exist
     const savedUser = localStorage.getItem('user');
     if (savedUser) {
       try {
-        setUser(JSON.parse(savedUser));
-        setHasUsers(true); // If user is logged in, assume users exist
-        setCheckingUsers(false);
+        const parsedUser = JSON.parse(savedUser);
+        // Set user temporarily, but still check if users exist in system
+        // This allows us to validate the saved user is still valid
+        setUser(parsedUser);
       } catch (e) {
         localStorage.removeItem('user');
-        checkUsers();
+        setUser(null);
       }
-    } else {
-      checkUsers();
     }
+    
+    // Always check users to determine if we should show initial setup or login
+    checkUsers();
   }, []);
 
   const handleLoginSuccess = (loggedInUser: any) => {

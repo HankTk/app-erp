@@ -2,6 +2,7 @@ import {
   AxTitle,
   AxParagraph,
   AxCard,
+  AxButton,
 } from '@ui/components';
 import { useI18n } from '../../i18n/I18nProvider';
 import styled from '@emotion/styled';
@@ -21,6 +22,7 @@ const HeroContainer = styled.div`
   overflow-y: auto;
   overflow-x: hidden;
   box-sizing: border-box;
+  position: relative;
 `;
 
 const HeroContent = styled.div`
@@ -140,7 +142,7 @@ export function WelcomePage({ user, onPageChange }: WelcomePageProps) {
 
   return (
     <HeroContainer {...debugProps(COMPONENT_NAME, 'HeroContainer')}>
-      <HeroContent {...debugProps(COMPONENT_NAME, 'HeroContent')}>
+        <HeroContent {...debugProps(COMPONENT_NAME, 'HeroContent')}>
         <HeroTitle {...debugProps(COMPONENT_NAME, 'HeroTitle')}>{t('welcome.title')}</HeroTitle>
         <HeroSubtitle {...debugProps(COMPONENT_NAME, 'HeroSubtitle')}>{welcomeMessage}</HeroSubtitle>
         
@@ -164,8 +166,8 @@ export function WelcomePage({ user, onPageChange }: WelcomePageProps) {
             </MenuCard>
           ))}
         </MenuCardsGrid>
-      </HeroContent>
-    </HeroContainer>
+        </HeroContent>
+      </HeroContainer>
   );
 }
 
