@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { ThemeProvider, useTheme, AxSection, AxSectionTitle, AxContainer } from '@ui/components';
+import { ThemeProvider, useTheme, AxSection, AxSectionTitle, AxContainer, AxHeading3, AxParagraph, AxButton } from '@ui/components';
 import { I18nProvider, useI18n } from './i18n/I18nProvider';
 import { Sidebar } from './components/Sidebar';
 import { Drawer } from './components/Drawer';
@@ -26,6 +26,8 @@ import { GeneralLedgerPage } from './pages/generalLedger/GeneralLedgerPage';
 import { InventoryControlPage } from './pages/inventory/InventoryControlPage';
 import { RMAListingPage } from './pages/rma/RMAListingPage';
 import { RMAEntryPage } from './pages/rma/RMAEntryPage';
+import { ShopFloorControlPage } from './pages/rma/ShopFloorControlPage';
+import { ShopFloorControlListingPage } from './pages/shopFloorControl/ShopFloorControlListingPage';
 import { fetchUsers } from './api/userApi';
 import styled from '@emotion/styled';
 import { debugProps } from './utils/emotionCache';
@@ -85,7 +87,7 @@ const FullWidthContainer = styled.div`
   transition: background-color var(--transition-base);
 `;
 
-type AppPage = 'welcome' | 'master' | 'users' | 'customers' | 'vendors' | 'products' | 'addresses' | 'orders' | 'order-entry' | 'accounts-receivable' | 'accounts-receivable-detail' | 'purchase-order' | 'purchase-order-entry' | 'accounts-payable' | 'accounts-payable-detail' | 'general-ledger' | 'general-ledger-detail' | 'inventory-control' | 'rma' | 'rma-entry';
+type AppPage = 'welcome' | 'master' | 'users' | 'customers' | 'vendors' | 'products' | 'addresses' | 'orders' | 'order-entry' | 'accounts-receivable' | 'accounts-receivable-detail' | 'purchase-order' | 'purchase-order-entry' | 'accounts-payable' | 'accounts-payable-detail' | 'general-ledger' | 'general-ledger-detail' | 'inventory-control' | 'rma' | 'rma-entry' | 'shop-floor-control' | 'shop-floor-control-entry' | 'shop';
 
 function AppContent() {
   const [user, setUser] = useState<any>(null);
@@ -99,6 +101,9 @@ function AppContent() {
   const [glOrderIdToView, setGlOrderIdToView] = useState<string | null>(null);
   const [rmaIdToEdit, setRmaIdToEdit] = useState<string | null>(null);
   const [rmaIdToView, setRmaIdToView] = useState<string | null>(null);
+  const [shopFloorControlRmaId, setShopFloorControlRmaId] = useState<string | null>(null);
+  const [sfcRmaId, setSfcRmaId] = useState<string | null>(null);
+  const [sfcPreviousPage, setSfcPreviousPage] = useState<AppPage | null>(null);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [checkingUsers, setCheckingUsers] = useState(true);
@@ -214,6 +219,11 @@ function AppContent() {
         return translate('module.rma');
       case 'rma-entry':
         return translate('module.rma');
+      case 'shop-floor-control':
+      case 'shop-floor-control-entry':
+        return translate('module.shopFloorControl');
+      case 'shop':
+        return translate('module.shop');
       case 'master':
         return translate('master.title');
       case 'welcome':
@@ -256,7 +266,7 @@ function AppContent() {
         onToggle={() => setSidebarOpen(!sidebarOpen)}
         currentPage={currentPage}
         onPageChange={(page) => {
-          if (page === 'welcome' || page === 'master' || page === 'users' || page === 'customers' || page === 'vendors' || page === 'products' || page === 'addresses' || page === 'orders' || page === 'order-entry' || page === 'accounts-receivable' || page === 'accounts-receivable-detail' || page === 'purchase-order' || page === 'purchase-order-entry' || page === 'accounts-payable' || page === 'accounts-payable-detail' || page === 'general-ledger' || page === 'general-ledger-detail' || page === 'inventory-control' || page === 'rma' || page === 'rma-entry') {
+          if (page === 'welcome' || page === 'master' || page === 'users' || page === 'customers' || page === 'vendors' || page === 'products' || page === 'addresses' || page === 'orders' || page === 'order-entry' || page === 'accounts-receivable' || page === 'accounts-receivable-detail' || page === 'purchase-order' || page === 'purchase-order-entry' || page === 'accounts-payable' || page === 'accounts-payable-detail' || page === 'general-ledger' || page === 'general-ledger-detail' || page === 'inventory-control' || page === 'rma' || page === 'rma-entry' || page === 'shop-floor-control' || page === 'shop-floor-control-entry' || page === 'shop') {
             setCurrentPage(page);
           }
         }}
@@ -273,7 +283,7 @@ function AppContent() {
         onSettingsClick={() => setDrawerOpen(!drawerOpen)}
         title={getPageTitle(currentPage, t)}
       />
-      {currentPage === 'orders' || currentPage === 'order-entry' || currentPage === 'accounts-receivable' || currentPage === 'accounts-receivable-detail' || currentPage === 'purchase-order' || currentPage === 'purchase-order-entry' || currentPage === 'accounts-payable' || currentPage === 'accounts-payable-detail' || currentPage === 'general-ledger' || currentPage === 'general-ledger-detail' || currentPage === 'inventory-control' || currentPage === 'customers' || currentPage === 'vendors' || currentPage === 'products' || currentPage === 'addresses' || currentPage === 'users' || currentPage === 'master' || currentPage === 'rma' || currentPage === 'rma-entry' ? (
+      {currentPage === 'orders' || currentPage === 'order-entry' || currentPage === 'accounts-receivable' || currentPage === 'accounts-receivable-detail' || currentPage === 'purchase-order' || currentPage === 'purchase-order-entry' || currentPage === 'accounts-payable' || currentPage === 'accounts-payable-detail' || currentPage === 'general-ledger' || currentPage === 'general-ledger-detail' || currentPage === 'inventory-control' || currentPage === 'customers' || currentPage === 'vendors' || currentPage === 'products' || currentPage === 'addresses' || currentPage === 'users' || currentPage === 'master' || currentPage === 'rma' || currentPage === 'rma-entry' || currentPage === 'shop-floor-control' || currentPage === 'shop-floor-control-entry' || currentPage === 'shop' ? (
         <FullWidthContainer {...debugProps(COMPONENT_NAME, 'FullWidthContainer')}>
           <AppContainer {...debugProps(COMPONENT_NAME, 'AppContainer')}>
             {currentPage === 'orders' ? (
@@ -467,6 +477,11 @@ function AppContent() {
                     setRmaIdToEdit(null);
                     setCurrentPage('rma-entry');
                   }}
+                  onNavigateToShopFloorControl={(rmaId: string) => {
+                    setSfcRmaId(rmaId);
+                    setSfcPreviousPage('rma'); // Track that we came from RMA listing page
+                    setCurrentPage('shop-floor-control-entry');
+                  }}
                   onNavigateBack={() => setCurrentPage('welcome')}
                 />
               </div>
@@ -480,11 +495,71 @@ function AppContent() {
                     setRmaIdToView(null);
                     setCurrentPage('rma');
                   }}
+                  onNavigateToShopFloorControl={(rmaId: string) => {
+                    setSfcRmaId(rmaId);
+                    setSfcPreviousPage('rma-entry'); // Track that we came from RMA entry page
+                    setCurrentPage('shop-floor-control-entry');
+                  }}
                   onNavigateBack={() => {
                     setRmaIdToEdit(null);
                     setRmaIdToView(null);
                     setCurrentPage('rma');
                   }}
+                />
+              </div>
+            ) : currentPage === 'shop-floor-control' ? (
+              <div style={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column', overflow: 'hidden', width: '100%' }}>
+                <ShopFloorControlListingPage
+                  onProcessRMA={(rmaId: string) => {
+                    setSfcRmaId(rmaId);
+                    setSfcPreviousPage('shop-floor-control'); // Track that we came from SFC listing page
+                    setCurrentPage('shop-floor-control-entry');
+                  }}
+                  onNavigateBack={() => setCurrentPage('welcome')}
+                />
+              </div>
+            ) : currentPage === 'shop-floor-control-entry' ? (
+              <div style={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column', overflow: 'hidden', width: '100%' }}>
+                {sfcRmaId ? (
+                  <ShopFloorControlPage
+                    rmaId={sfcRmaId}
+                    backButtonLabel={sfcPreviousPage === 'rma-entry' ? 'Back to RMA' : sfcPreviousPage === 'rma' ? 'Back to RMA' : 'Back to SFC'}
+                    onNavigateBack={() => {
+                      // Return to the page we came from
+                      const previousPage = sfcPreviousPage || 'shop-floor-control';
+                      setSfcRmaId(null);
+                      setSfcPreviousPage(null);
+                      setCurrentPage(previousPage);
+                    }}
+                  />
+                ) : (
+                  <div style={{ padding: 'var(--spacing-lg)', display: 'flex', flexDirection: 'column', gap: 'var(--spacing-md)', alignItems: 'center', justifyContent: 'center', height: '100%' }}>
+                    <AxHeading3>Shop Floor Control</AxHeading3>
+                    <AxParagraph style={{ color: 'var(--color-text-secondary)' }}>
+                      No RMA selected
+                    </AxParagraph>
+                    <AxButton 
+                      variant="secondary" 
+                      onClick={() => {
+                        setSfcRmaId(null);
+                        setCurrentPage('shop-floor-control');
+                      }}
+                    >
+                      ← Back
+                    </AxButton>
+                  </div>
+                )}
+              </div>
+            ) : currentPage === 'shop' ? (
+              <div style={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column', overflow: 'hidden', width: '100%' }}>
+                {/* Shop redirects to Shop Floor Control */}
+                <ShopFloorControlListingPage
+                  onProcessRMA={(rmaId: string) => {
+                    setSfcRmaId(rmaId);
+                    setSfcPreviousPage('shop-floor-control'); // Track that we came from SFC listing page
+                    setCurrentPage('shop-floor-control-entry');
+                  }}
+                  onNavigateBack={() => setCurrentPage('welcome')}
                 />
               </div>
             ) : currentPage === 'master' ? (
@@ -508,7 +583,7 @@ function AppContent() {
               <WelcomePage
                 user={user}
                 onPageChange={(page) => {
-                  if (page === 'master' || page === 'users' || page === 'customers' || page === 'vendors' || page === 'products' || page === 'addresses' || page === 'orders' || page === 'order-entry' || page === 'accounts-receivable' || page === 'accounts-receivable-detail' || page === 'purchase-order' || page === 'purchase-order-entry' || page === 'accounts-payable' || page === 'accounts-payable-detail' || page === 'general-ledger' || page === 'general-ledger-detail' || page === 'inventory-control' || page === 'rma' || page === 'rma-entry') {
+                  if (page === 'master' || page === 'users' || page === 'customers' || page === 'vendors' || page === 'products' || page === 'addresses' || page === 'orders' || page === 'order-entry' || page === 'accounts-receivable' || page === 'accounts-receivable-detail' || page === 'purchase-order' || page === 'purchase-order-entry' || page === 'accounts-payable' || page === 'accounts-payable-detail' || page === 'general-ledger' || page === 'general-ledger-detail' || page === 'inventory-control' || page === 'rma' || page === 'rma-entry' || page === 'shop' || page === 'shop-floor-control' || page === 'shop-floor-control-entry') {
                     setCurrentPage(page);
                   }
                 }}

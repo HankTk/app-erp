@@ -56,7 +56,7 @@ const HeaderCard = styled(AxCard)`
 const HeaderSection = styled.div`
   display: flex;
   justify-content: space-between;
-  align-items: flex-start;
+  align-items: center;
   gap: var(--spacing-lg);
   margin-bottom: 0;
 `;
@@ -70,8 +70,9 @@ const HeaderLeft = styled.div`
 
 const HeaderRight = styled.div`
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   gap: var(--spacing-md);
+  flex-wrap: wrap;
 `;
 
 const ContentCard = styled(AxCard)`
@@ -106,10 +107,11 @@ interface RMAEntryPageProps {
   rmaIdToEdit?: string | null;
   onNavigateBack?: () => void;
   readOnly?: boolean;
+  onNavigateToShopFloorControl?: (rmaId: string) => void;
 }
 
 export function RMAEntryPage(props: RMAEntryPageProps = {}) {
-  const { onNavigateToRMAs, rmaIdToEdit, onNavigateBack, readOnly = false } = props;
+  const { onNavigateToRMAs, rmaIdToEdit, onNavigateBack, readOnly = false, onNavigateToShopFloorControl } = props;
   const { t } = useI18n();
   const [rma, setRma] = useState<RMA | null>(null);
   const [customers, setCustomers] = useState<Customer[]>([]);
@@ -521,6 +523,15 @@ export function RMAEntryPage(props: RMAEntryPageProps = {}) {
                 disabled={loading || readOnly || submitting}
               />
             </div>
+            {rma?.id && onNavigateToShopFloorControl && (
+              <AxButton
+                variant="primary"
+                onClick={() => onNavigateToShopFloorControl(rma.id!)}
+                style={{ minWidth: 'auto', whiteSpace: 'nowrap', height: 'fit-content' }}
+              >
+                Shop Floor Control
+              </AxButton>
+            )}
           </HeaderRight>
         </HeaderSection>
       </HeaderCard>

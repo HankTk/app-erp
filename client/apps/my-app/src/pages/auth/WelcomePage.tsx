@@ -124,7 +124,7 @@ const menuItems = [
   { id: 'general-ledger', labelKey: 'module.generalLedger', subtitleKey: null, disabled: false },
   { id: 'accounts-payable', labelKey: 'module.accountsPayable', subtitleKey: null, disabled: false },
   { id: 'rma', labelKey: 'module.rma', subtitleKey: null, disabled: false },
-  { id: 'shop', labelKey: 'module.shop', subtitleKey: 'module.comingSoon', disabled: true },
+  { id: 'shop-floor-control', labelKey: 'module.shopFloorControl', subtitleKey: null, disabled: false },
   { id: 'master', labelKey: 'sidebar.master', subtitleKey: null, disabled: false },
 ];
 

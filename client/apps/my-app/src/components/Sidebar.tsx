@@ -133,7 +133,7 @@ const menuItems: MenuItem[] = [
   { id: 'welcome', labelKey: 'sidebar.welcome', disabled: false },
   { id: 'orders', labelKey: 'sidebar.customerOrder', disabled: false },
   { id: 'purchase-order', labelKey: 'module.purchaseOrder', disabled: false },
-  { id: 'shop', labelKey: 'module.shop', disabled: true },
+  { id: 'shop-floor-control', labelKey: 'module.shopFloorControl', disabled: false },
   { id: 'rma', labelKey: 'module.rma', disabled: false },
   { id: 'inventory-control', labelKey: 'module.inventoryControl', disabled: false },
   { id: 'accounts-receivable', labelKey: 'module.accountsReceivable', disabled: false },

@@ -73,9 +73,10 @@ interface RMAListingPageProps {
   onEditRMA?: (rmaId: string) => void;
   onViewRMA?: (rmaId: string) => void;
   onNavigateBack?: () => void;
+  onNavigateToShopFloorControl?: (rmaId: string) => void;
 }
 
-export function RMAListingPage({ onNavigateToRMAEntry, onEditRMA, onViewRMA, onNavigateBack }: RMAListingPageProps = {} as RMAListingPageProps) {
+export function RMAListingPage({ onNavigateToRMAEntry, onEditRMA, onViewRMA, onNavigateBack, onNavigateToShopFloorControl }: RMAListingPageProps = {} as RMAListingPageProps) {
   const [rmas, setRmas] = useState<RMA[]>([]);
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [loading, setLoading] = useState(true);
@@ -398,7 +399,7 @@ export function RMAListingPage({ onNavigateToRMAEntry, onEditRMA, onViewRMA, onN
                       {rma.items?.length || 0}
                     </AxTableCell>
                     <AxTableCell align="center">
-                      <div style={{ display: 'flex', gap: 'var(--spacing-sm)', justifyContent: 'center' }}>
+                      <div style={{ display: 'flex', gap: 'var(--spacing-sm)', justifyContent: 'center', flexWrap: 'wrap' }}>
                         <AxButton 
                           variant="secondary" 
                           size="small"
@@ -416,6 +417,16 @@ export function RMAListingPage({ onNavigateToRMAEntry, onEditRMA, onViewRMA, onN
                         >
                           Edit
                         </AxButton>
+                        {rma.id && onNavigateToShopFloorControl && (
+                          <AxButton 
+                            variant="primary" 
+                            size="small"
+                            onClick={() => onNavigateToShopFloorControl(rma.id!)}
+                            style={{ minWidth: 'auto', whiteSpace: 'nowrap' }}
+                          >
+                            Shop Floor
+                          </AxButton>
+                        )}
                         <AxButton 
                           variant="danger" 
                           size="small"

@@ -24,6 +24,7 @@ export const en = {
   'sidebar.customerOrder': 'Customer Order',
   'sidebar.logout': 'Logout',
   'module.shop': 'Shop',
+  'module.shopFloorControl': 'Shop Floor Control',
   'module.orderEntry': 'Order Entry',
   'module.accountsReceivable': 'Accounts Receivable',
   'accountsReceivable.subtitle': 'View and manage invoice details and payment status',

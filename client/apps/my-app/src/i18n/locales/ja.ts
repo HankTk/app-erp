@@ -24,6 +24,7 @@ export const ja = {
   'sidebar.customerOrder': '顧客注文',
   'sidebar.logout': 'ログアウト',
   'module.shop': 'ショップ',
+  'module.shopFloorControl': 'ショップフロア制御',
   'module.orderEntry': '受注入力',
   'module.accountsReceivable': '売掛金',
   'accountsReceivable.subtitle': '請求書の詳細と支払い状況を確認・管理',

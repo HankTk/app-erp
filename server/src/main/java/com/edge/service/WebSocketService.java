@@ -7,6 +7,7 @@ import com.edge.entity.Order;
 import com.edge.entity.Product;
 import com.edge.entity.PurchaseOrder;
 import com.edge.entity.RMA;
+import com.edge.entity.SFC;
 import com.edge.entity.User;
 import com.edge.entity.Vendor;
 import com.edge.entity.Warehouse;
@@ -130,6 +131,14 @@ public class WebSocketService {
         broadcastEntityDelete("rma", rmaId);
     }
     
+    public void broadcastSFCUpdate(SFC sfc) {
+        broadcastEntityUpdate("sfc", sfc);
+    }
+    
+    public void broadcastSFCDelete(String sfcId) {
+        broadcastEntityDelete("sfc", sfcId);
+    }
+    
     private String getEntityId(Object entity) {
         if (entity instanceof Order) {
             return ((Order) entity).getId();
@@ -151,6 +160,8 @@ public class WebSocketService {
             return ((Inventory) entity).getId();
         } else if (entity instanceof RMA) {
             return ((RMA) entity).getId();
+        } else if (entity instanceof SFC) {
+            return ((SFC) entity).getId();
         }
         return "unknown";
     }
