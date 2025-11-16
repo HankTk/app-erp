@@ -1,12 +1,12 @@
-# DOMエレメントからソースコードの位置を特定する方法
+# How to Identify Source Code Location from DOM Elements
 
-Emotionのstyledコンポーネントは自動生成されたクラス名を使用するため、DOMエレメントからソースコードの位置を特定するのが困難です。このドキュメントでは、デバッグを容易にするための方法を説明します。
+Since Emotion's styled components use auto-generated class names, it's difficult to identify the source code location from DOM elements. This document explains methods to make debugging easier.
 
-## 方法1: data属性を使用する（推奨）
+## Method 1: Using data attributes (Recommended)
 
-`debugProps`ヘルパー関数を使用して、DOMエレメントにデバッグ情報を追加できます。
+You can add debug information to DOM elements using the `debugProps` helper function.
 
-### 基本的な使用方法
+### Basic Usage
 
 ```tsx
 import { debugProps } from '../../utils/emotionCache';
@@ -17,48 +17,48 @@ const PageContainer = styled.div`
   /* ... styles ... */
 `;
 
-// コンポーネント内で使用
+// Use in component
 <PageContainer {...debugProps(COMPONENT_NAME, 'PageContainer')}>
   {/* ... */}
 </PageContainer>
 ```
 
-### ブラウザでの確認方法
+### How to Check in Browser
 
-1. ブラウザの開発者ツールを開く（F12）
-2. 要素を選択（またはElementsタブで確認）
-3. 選択した要素の属性を確認：
-   - `id="AccountPayableDetailPage-PageContainer"` - **ID属性（検索しやすい）**
-   - `data-component="AccountPayableDetailPage"` - コンポーネント名
-   - `data-element="PageContainer"` - 要素名
-   - `data-testid="AccountPayableDetailPage-PageContainer"` - テスト用ID
-   - `data-file="src/pages/accountPayable/AccountPayableDetailPage.tsx"` - **ファイルパス（直接開ける）**
-   - `data-debug="AccountPayableDetailPage.PageContainer"` - 検索用の短縮形式
+1. Open browser developer tools (F12)
+2. Select element (or check in Elements tab)
+3. Check attributes of selected element:
+   - `id="AccountPayableDetailPage-PageContainer"` - **ID attribute (easy to search)**
+   - `data-component="AccountPayableDetailPage"` - Component name
+   - `data-element="PageContainer"` - Element name
+   - `data-testid="AccountPayableDetailPage-PageContainer"` - Test ID
+   - `data-file="src/pages/accountPayable/AccountPayableDetailPage.tsx"` - **File path (can open directly)**
+   - `data-debug="AccountPayableDetailPage.PageContainer"` - Short form for searching
 
-4. ソースコード内で検索：
-   - **方法1（推奨）**: `id`属性で検索（例: `AccountPayableDetailPage-PageContainer`）
-   - **方法2**: `data-file`属性のファイルパスを直接開く
-   - **方法3**: `data-component`でコンポーネントファイルを検索
-   - **方法4**: `data-element`で該当する要素を検索
+4. Search in source code:
+   - **Method 1 (Recommended)**: Search by `id` attribute (e.g., `AccountPayableDetailPage-PageContainer`)
+   - **Method 2**: Open file path from `data-file` attribute directly
+   - **Method 3**: Search component file by `data-component`
+   - **Method 4**: Search corresponding element by `data-element`
 
-### 開発者ツールでの検索方法
+### How to Search in Developer Tools
 
-**Elementsタブで検索:**
-- `Ctrl+F` (Windows) または `Cmd+F` (Mac) で検索バーを開く
-- `id="AccountPayableDetailPage-PageContainer"` で検索
-- または `data-debug="AccountPayableDetailPage.PageContainer"` で検索
+**Search in Elements tab:**
+- Press `Ctrl+F` (Windows) or `Cmd+F` (Mac) to open search bar
+- Search for `id="AccountPayableDetailPage-PageContainer"`
+- Or search for `data-debug="AccountPayableDetailPage.PageContainer"`
 
-**Consoleタブで検索:**
+**Search in Console tab:**
 ```javascript
-// 特定の要素を検索
+// Search for specific element
 document.querySelector('[data-component="AccountPayableDetailPage"]');
 document.querySelector('#AccountPayableDetailPage-PageContainer');
 
-// すべてのデバッグ要素を一覧表示
+// List all debug elements
 document.querySelectorAll('[data-debug]');
 ```
 
-### より詳細な情報を追加する場合
+### Adding More Detailed Information
 
 ```tsx
 import { debugPropsWithLocation } from '../../utils/emotionCache';
@@ -72,57 +72,57 @@ import { debugPropsWithLocation } from '../../utils/emotionCache';
 </Step>
 ```
 
-## 方法2: React DevToolsを使用する
+## Method 2: Using React DevTools
 
-React DevTools拡張機能を使用すると、コンポーネントツリーから直接ソースコードにジャンプできます。
+Using the React DevTools extension, you can jump directly to source code from the component tree.
 
-1. React DevToolsをインストール（Chrome/Firefox拡張機能）
-2. 開発者ツールで「Components」タブを開く
-3. コンポーネントツリーから該当するコンポーネントを選択
-4. 右クリック → 「Show source」でソースコードを表示
+1. Install React DevTools (Chrome/Firefox extension)
+2. Open "Components" tab in developer tools
+3. Select corresponding component from component tree
+4. Right-click → "Show source" to display source code
 
-## 方法3: ソースマップを使用する
+## Method 3: Using Source Maps
 
-Viteは開発環境で自動的にソースマップを有効にしています。
+Vite automatically enables source maps in development environment.
 
-1. 開発者ツールの「Sources」タブを開く
-2. 元のソースファイル（`.tsx`ファイル）が表示されます
-3. ブレークポイントを設定してデバッグできます
+1. Open "Sources" tab in developer tools
+2. Original source files (`.tsx` files) will be displayed
+3. You can set breakpoints and debug
 
-## 方法4: ブラウザの検索機能を使用する
+## Method 4: Using Browser Search Function
 
-1. 開発者ツールで要素を選択
-2. 生成されたクラス名（例: `css-1a2b3c`）をコピー
-3. ソースコード内で検索（ただし、これはあまり効果的ではありません）
+1. Select element in developer tools
+2. Copy generated class name (e.g., `css-1a2b3c`)
+3. Search in source code (however, this is not very effective)
 
-## ベストプラクティス
+## Best Practices
 
-1. **主要なコンポーネントに`debugProps`を追加**
-   - ページレベルのコンテナ
-   - 再利用可能なコンポーネント
-   - 複雑なレイアウト要素
+1. **Add `debugProps` to major components**
+   - Page-level containers
+   - Reusable components
+   - Complex layout elements
 
-2. **コンポーネント名を定数として定義**
+2. **Define component name as constant**
    ```tsx
    const COMPONENT_NAME = 'AccountPayableDetailPage';
    ```
 
-3. **開発環境でのみ有効**
-   - `debugProps`は開発環境でのみ動作します
-   - 本番環境では何も追加されません（パフォーマンスへの影響なし）
+3. **Enable only in development environment**
+   - `debugProps` only works in development environment
+   - Nothing is added in production (no performance impact)
 
-## 例: AccountPayableDetailPageでの実装
+## Example: Implementation in AccountPayableDetailPage
 
 ```tsx
 import { debugProps } from '../../utils/emotionCache';
 
 const COMPONENT_NAME = 'AccountPayableDetailPage';
 
-// styledコンポーネントの定義
+// Define styled components
 const PageContainer = styled.div`...`;
 const HeaderCard = styled(AxCard)`...`;
 
-// 使用
+// Usage
 <PageContainer {...debugProps(COMPONENT_NAME, 'PageContainer')}>
   <HeaderCard {...debugProps(COMPONENT_NAME, 'HeaderCard')}>
     {/* ... */}
@@ -130,27 +130,27 @@ const HeaderCard = styled(AxCard)`...`;
 </PageContainer>
 ```
 
-## トラブルシューティング
+## Troubleshooting
 
-### data属性が表示されない場合
+### When data attributes are not displayed
 
-- `process.env.NODE_ENV === 'development'`であることを確認
-- 開発サーバーを再起動
-- ブラウザのキャッシュをクリア
+- Verify that `process.env.NODE_ENV === 'development'`
+- Restart development server
+- Clear browser cache
 
-### 要素が見つからない場合
+### When element is not found
 
-- React DevToolsでコンポーネントツリーを確認
-- コンソールで `enableClickDebug()` を実行して、クリックした要素の情報を表示
+- Check component tree in React DevTools
+- Execute `enableClickDebug()` in console to display information about clicked element
 
-## 方法5: コンソールヘルパー関数を使用する
+## Method 5: Using Console Helper Functions
 
-`debugHelper.ts` に便利な関数が用意されています。ブラウザのコンソールで使用できます。
+Convenient functions are available in `debugHelper.ts`. You can use them in the browser console.
 
-### クリックデバッグを有効化
+### Enable Click Debugging
 
 ```javascript
-// コンソールに貼り付けて実行
+// Paste and execute in console
 document.addEventListener('click', (e) => {
   const target = e.target.closest('[data-component]');
   if (target) {
@@ -165,20 +165,20 @@ document.addEventListener('click', (e) => {
 }, true);
 ```
 
-### 要素を検索
+### Search for Elements
 
 ```javascript
-// 特定のコンポーネントの要素を検索
+// Search for elements of specific component
 document.querySelectorAll('[data-component="AccountPayableDetailPage"]');
 
-// 特定の要素名を検索
+// Search for specific element name
 document.querySelectorAll('[data-element="PageContainer"]');
 
-// IDで検索（最も簡単）
+// Search by ID (easiest)
 document.getElementById('AccountPayableDetailPage-PageContainer');
 ```
 
-### すべてのデバッグ要素を一覧表示
+### List All Debug Elements
 
 ```javascript
 Array.from(document.querySelectorAll('[data-debug]')).map(el => ({
@@ -188,9 +188,8 @@ Array.from(document.querySelectorAll('[data-debug]')).map(el => ({
 }));
 ```
 
-## 参考リンク
+## Reference Links
 
-- [Emotion公式ドキュメント](https://emotion.sh/docs/introduction)
+- [Emotion Official Documentation](https://emotion.sh/docs/introduction)
 - [React DevTools](https://react.dev/learn/react-developer-tools)
-- [Viteソースマップ設定](https://vitejs.dev/config/build-options.html#build-sourcemap)
-
+- [Vite Source Map Configuration](https://vitejs.dev/config/build-options.html#build-sourcemap)
