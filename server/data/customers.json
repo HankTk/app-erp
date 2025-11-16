@@ -1,1 +1,1 @@
-[]
+[{"id":"04c4557f-6cd4-4916-9915-abaa33e95ab3","customerNumber":"1001","companyName":"Corp A","firstName":null,"lastName":null,"email":null,"phone":null,"jsonData":{"addressIds":["56841d38-37d1-4891-b0b9-efd87e70e930"]},"fullName":"Corp A"},{"id":"473670a4-2dad-4a1c-a254-c7429491c668","customerNumber":"1002","companyName":"Corp B","firstName":null,"lastName":null,"email":null,"phone":null,"jsonData":{"addressIds":["ef428976-be14-444d-a220-cca840cd368a"]},"fullName":"Corp B"}]
