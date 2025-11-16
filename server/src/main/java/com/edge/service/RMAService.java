@@ -2,10 +2,8 @@ package com.edge.service;
 
 import com.edge.entity.RMA;
 import com.edge.entity.RMAItem;
-import com.edge.entity.Order;
 import com.edge.entity.Product;
 import com.edge.entity.Warehouse;
-import com.edge.entity.Customer;
 import com.edge.repository.RMARepository;
 import com.edge.repository.OrderRepository;
 import com.edge.repository.ProductRepository;
@@ -84,22 +82,39 @@ public class RMAService {
         // Get existing RMA to check status change
         RMA existingRMA = rmaRepository.getRMAById(id)
             .orElseThrow(() -> new RuntimeException("RMA not found with id: " + id));
-        String oldStatus = existingRMA.getStatus();
+        String newStatus = rmaDetails.getStatus();
+        boolean wasReceived = isReceivedStatus(existingRMA);
+        boolean willBeReceived = "RECEIVED".equals(newStatus);
+        boolean willBeProcessed = "PROCESSED".equals(newStatus);
+        boolean willBeCancelled = "CANCELLED".equals(newStatus);
         
         // Enrich RMA items with product information
         enrichRMAItems(rmaDetails);
         
-        // Set received date when status changes to RECEIVED
-        if ("RECEIVED".equals(rmaDetails.getStatus()) && !"RECEIVED".equals(oldStatus)) {
+        // Set received date when status changes to RECEIVED or PROCESSED
+        if (willBeReceived && !wasReceived) {
+            // Status changing to RECEIVED for the first time
+            rmaDetails.setReceivedDate(LocalDateTime.now());
+        } else if (willBeProcessed && !wasReceived && rmaDetails.getReceivedDate() == null) {
+            // Status changing directly to PROCESSED (skipping RECEIVED)
+            // Set receivedDate to indicate items were received
             rmaDetails.setReceivedDate(LocalDateTime.now());
         }
         
         RMA updated = rmaRepository.updateRMA(id, rmaDetails);
         System.out.println("RMAService.updateRMA - Updated status: " + updated.getStatus());
         
-        // Handle inventory increase when RMA is received (restock items)
-        if ("RECEIVED".equals(updated.getStatus()) && !"RECEIVED".equals(oldStatus)) {
+        // Handle inventory adjustments based on status changes
+        if (willBeReceived && !wasReceived) {
+            // Status changed to RECEIVED - increase inventory
             increaseInventoryForRMA(updated);
+        } else if (willBeProcessed && !wasReceived) {
+            // Status changed directly to PROCESSED (skipping RECEIVED) - increase inventory
+            // This handles the case where RMA is marked as PROCESSED without going through RECEIVED
+            increaseInventoryForRMA(updated);
+        } else if (willBeCancelled && wasReceived) {
+            // Status changed to CANCELLED after being received - rollback inventory
+            decreaseInventoryForRMA(existingRMA);
         }
         
         // Broadcast update via WebSocket
@@ -243,6 +258,19 @@ public class RMAService {
         }
     }
     
+    /**
+     * Checks if an RMA has been received (status is RECEIVED or PROCESSED and has receivedDate)
+     */
+    private boolean isReceivedStatus(RMA rma) {
+        if (rma == null) return false;
+        String status = rma.getStatus();
+        return ("RECEIVED".equals(status) || "PROCESSED".equals(status)) 
+            && rma.getReceivedDate() != null;
+    }
+    
+    /**
+     * Increases inventory when RMA items are received/restocked
+     */
     private void increaseInventoryForRMA(RMA rma) {
         if (rma.getItems() == null || rma.getItems().isEmpty()) {
             return;
@@ -268,9 +296,50 @@ public class RMAService {
                 try {
                     inventoryService.adjustInventory(item.getProductId(), warehouseId, item.getReturnedQuantity());
                     System.out.println("Increased inventory (restocked) for product " + item.getProductId() + 
-                        " by " + item.getReturnedQuantity() + " in warehouse " + warehouseId);
+                        " by " + item.getReturnedQuantity() + " in warehouse " + warehouseId + " for RMA " + rma.getRmaNumber());
                 } catch (Exception e) {
-                    System.err.println("Error increasing inventory for product " + item.getProductId() + ": " + e.getMessage());
+                    System.err.println("Error increasing inventory for product " + item.getProductId() + 
+                        " in RMA " + rma.getRmaNumber() + ": " + e.getMessage());
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+    
+    /**
+     * Decreases inventory when RMA is cancelled after items were received (rollback restock)
+     */
+    private void decreaseInventoryForRMA(RMA rma) {
+        if (rma.getItems() == null || rma.getItems().isEmpty()) {
+            return;
+        }
+        
+        // Get default warehouse (first active warehouse, or first warehouse if none active)
+        List<Warehouse> warehouses = warehouseRepository.getActiveWarehouses();
+        if (warehouses.isEmpty()) {
+            warehouses = warehouseRepository.getAllWarehouses();
+        }
+        
+        if (warehouses.isEmpty()) {
+            System.out.println("Warning: No warehouses found. Cannot decrease inventory for RMA " + rma.getId());
+            return;
+        }
+        
+        Warehouse defaultWarehouse = warehouses.get(0);
+        String warehouseId = defaultWarehouse.getId();
+        
+        // Decrease inventory for each RMA item (rollback restock)
+        for (RMAItem item : rma.getItems()) {
+            if (item.getProductId() != null && item.getReturnedQuantity() != null && item.getReturnedQuantity() > 0) {
+                try {
+                    // Use negative quantity to decrease inventory
+                    inventoryService.adjustInventory(item.getProductId(), warehouseId, -item.getReturnedQuantity());
+                    System.out.println("Decreased inventory (rollback) for product " + item.getProductId() + 
+                        " by " + item.getReturnedQuantity() + " in warehouse " + warehouseId + " for cancelled RMA " + rma.getRmaNumber());
+                } catch (Exception e) {
+                    System.err.println("Error decreasing inventory for product " + item.getProductId() + 
+                        " in RMA " + rma.getRmaNumber() + ": " + e.getMessage());
+                    e.printStackTrace();
                 }
             }
         }

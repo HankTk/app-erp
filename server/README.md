@@ -115,6 +115,24 @@ See [client/README.md](client/README.md) for detailed component documentation.
 
 ## Setup and Execution
 
+### Initial Data Reset
+
+To reset all data to initial state (useful for development/testing):
+
+```bash
+cd server
+./reset-data.sh
+```
+
+This script will:
+- Reset all data files to empty arrays `[]`
+- Reset all counters to their initial values
+- Optionally create a backup before resetting
+
+For detailed information, see [RESET_DATA_README.md](RESET_DATA_README.md).
+
+---
+
 ### Prerequisites
 
 - Java 17 or higher
