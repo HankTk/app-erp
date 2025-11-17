@@ -3,7 +3,7 @@ import { Customer } from '../../api/customerApi';
 import { Address } from '../../api/addressApi';
 import { Product } from '../../api/productApi';
 
-export type OrderStep = 'entry' | 'approval' | 'confirmation' | 'shipping_instruction' | 'shipping' | 'invoicing' | 'payment' | 'history';
+export type OrderStep = 'entry' | 'approval' | 'confirmation' | 'shipping_instruction' | 'shipping' | 'invoicing' | 'history';
 export type EntrySubStep = 'customer' | 'products' | 'shipping' | 'review';
 
 export interface OrderStepProps {
@@ -72,15 +72,6 @@ export interface OrderInvoicingStepProps extends OrderStepProps {
   invoiceDate: string;
   onInvoiceNumberChange: (number: string) => void;
   onInvoiceDateChange: (date: string) => void;
-}
-
-export interface OrderPaymentStepProps extends OrderStepProps {
-  paymentAmount: number;
-  paymentDate: string;
-  paymentMethod: string;
-  onPaymentAmountChange: (amount: number) => void;
-  onPaymentDateChange: (date: string) => void;
-  onPaymentMethodChange: (method: string) => void;
 }
 
 export interface OrderHistoryStepProps extends OrderStepProps {

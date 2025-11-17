@@ -31,7 +31,6 @@ import { PurchaseOrderEntryStepPage } from './PurchaseOrderEntryStepPage';
 import { PurchaseOrderApprovalStepPage } from './PurchaseOrderApprovalStepPage';
 import { PurchaseOrderReceivedStepPage } from './PurchaseOrderReceivedStepPage';
 import { PurchaseOrderInvoicingStepPage } from './PurchaseOrderInvoicingStepPage';
-import { PurchaseOrderPaymentStepPage } from './PurchaseOrderPaymentStepPage';
 import { PurchaseOrderHistoryStepPage } from './PurchaseOrderHistoryStepPage';
 
 const PageContainer = styled.div`
@@ -199,17 +198,11 @@ export function PurchaseOrderEntryPage(props: PurchaseOrderEntryPageProps = {}) 
   const [invoiceNumber, setInvoiceNumber] = useState<string>('');
   const [invoiceDate, setInvoiceDate] = useState<string>('');
 
-  // Payment state
-  const [paymentAmount, setPaymentAmount] = useState<number>(0);
-  const [paymentDate, setPaymentDate] = useState<string>('');
-  const [paymentMethod, setPaymentMethod] = useState<string>('');
-
   const steps: { key: PurchaseOrderStep; label: string; description: string }[] = [
     { key: 'entry', label: t('purchaseOrderEntry.step.entry'), description: t('purchaseOrderEntry.step.entry') },
     { key: 'approval', label: t('purchaseOrderEntry.step.approval'), description: t('purchaseOrderEntry.step.approval') },
     { key: 'received', label: t('purchaseOrderEntry.step.received'), description: t('purchaseOrderEntry.step.received') },
     { key: 'invoicing', label: t('purchaseOrderEntry.step.invoicing'), description: t('purchaseOrderEntry.step.invoicing') },
-    { key: 'payment', label: t('purchaseOrderEntry.step.payment'), description: t('purchaseOrderEntry.step.payment') },
     { key: 'history', label: t('purchaseOrderEntry.step.history'), description: t('purchaseOrderEntry.step.history') },
   ];
 
@@ -389,9 +382,6 @@ export function PurchaseOrderEntryPage(props: PurchaseOrderEntryPageProps = {}) 
                 ? new Date(existingPO.invoiceDate).toISOString().split('T')[0]
                 : existingPO.jsonData?.invoiceDate || '';
               setInvoiceDate(invoiceDateValue);
-              setPaymentAmount(existingPO.jsonData.paymentAmount || 0);
-              setPaymentDate(existingPO.jsonData.paymentDate || '');
-              setPaymentMethod(existingPO.jsonData.paymentMethod || '');
             }
             
             // Load expected delivery date
@@ -431,10 +421,10 @@ export function PurchaseOrderEntryPage(props: PurchaseOrderEntryPageProps = {}) 
                 setCurrentStep('invoicing');
                 break;
               case 'INVOICED':
-                setCurrentStep('payment');
+                setCurrentStep('history');
                 break;
               case 'PAID':
-                setCurrentStep('payment');
+                setCurrentStep('history');
                 break;
               default:
                 setCurrentStep('entry');
@@ -687,41 +677,10 @@ export function PurchaseOrderEntryPage(props: PurchaseOrderEntryPageProps = {}) 
         invoiceDate,
         total: updated.total,
       }, updated);
-      setCurrentStep('payment');
+      setCurrentStep('history');
     } catch (err) {
       console.error('Error invoicing PO:', err);
       alert(t('purchaseOrderEntry.failedToInvoice'));
-    } finally {
-      setSubmitting(false);
-    }
-  };
-
-  const handlePayment = async () => {
-    if (!po) return;
-    try {
-      setSubmitting(true);
-      const jsonData = po.jsonData || {};
-      jsonData.paymentAmount = paymentAmount;
-      jsonData.paymentDate = paymentDate;
-      jsonData.paymentMethod = paymentMethod;
-      const updated = await updatePurchaseOrder(po.id!, {
-        ...po,
-        status: 'PAID',
-        jsonData,
-      });
-      setPO(updated);
-      await addHistoryRecord('payment', t('purchaseOrderEntry.history.step.payment'), undefined, 'PAID', {
-        paymentAmount,
-        paymentDate,
-        paymentMethod,
-      }, updated);
-      alert(t('purchaseOrderEntry.paymentCompleted'));
-      if (onNavigateToPOs) {
-        onNavigateToPOs();
-      }
-    } catch (err) {
-      console.error('Error processing payment:', err);
-      alert(t('purchaseOrderEntry.failedToProcessPayment'));
     } finally {
       setSubmitting(false);
     }
@@ -809,8 +768,6 @@ export function PurchaseOrderEntryPage(props: PurchaseOrderEntryPageProps = {}) 
         return po.status === 'RECEIVED' || po.status === 'INVOICED' || po.status === 'PAID';
       case 'invoicing':
         return po.status === 'INVOICED' || po.status === 'PAID';
-      case 'payment':
-        return po.status === 'PAID';
       case 'history':
         return true;
       default:
@@ -841,8 +798,6 @@ export function PurchaseOrderEntryPage(props: PurchaseOrderEntryPageProps = {}) 
         return !!receivedDate;
       case 'invoicing':
         return !!invoiceNumber && !!invoiceDate;
-      case 'payment':
-        return !!paymentAmount && !!paymentDate && !!paymentMethod;
       case 'history':
         return true;
       default:
@@ -1021,25 +976,6 @@ export function PurchaseOrderEntryPage(props: PurchaseOrderEntryPageProps = {}) 
             invoiceDate={invoiceDate}
             onInvoiceNumberChange={setInvoiceNumber}
             onInvoiceDateChange={setInvoiceDate}
-          />
-        );
-      case 'payment':
-        return (
-          <PurchaseOrderPaymentStepPage
-            po={po}
-            onPOUpdate={handlePOUpdate}
-            onNext={handleNext}
-            onPrevious={handlePrevious}
-            onNavigateBack={onNavigateBack}
-            loading={loading}
-            submitting={submitting}
-            readOnly={readOnly}
-            paymentAmount={paymentAmount}
-            paymentDate={paymentDate}
-            paymentMethod={paymentMethod}
-            onPaymentAmountChange={setPaymentAmount}
-            onPaymentDateChange={setPaymentDate}
-            onPaymentMethodChange={setPaymentMethod}
           />
         );
       case 'history':
@@ -1313,14 +1249,6 @@ export function PurchaseOrderEntryPage(props: PurchaseOrderEntryPageProps = {}) 
                 disabled={!canProceedToNext() || submitting}
               >
                 {submitting ? t('purchaseOrderEntry.invoicing') : t('purchaseOrderEntry.createInvoice')}
-              </AxButton>
-            ) : currentStep === 'payment' ? (
-              <AxButton
-                variant="primary"
-                onClick={handlePayment}
-                disabled={!canProceedToNext() || submitting}
-              >
-                {submitting ? t('purchaseOrderEntry.processing') : t('purchaseOrderEntry.completePayment')}
               </AxButton>
             ) : currentStep === 'history' ? (
               <AxButton

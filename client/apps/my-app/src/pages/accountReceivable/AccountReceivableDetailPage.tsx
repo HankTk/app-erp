@@ -187,6 +187,18 @@ export function AccountReceivableDetailPage(props: AccountReceivableDetailPagePr
           setPaymentDate(orderData.jsonData.paymentDate || '');
           setPaymentMethod(orderData.jsonData.paymentMethod || '');
         }
+        
+        // Set initial tab based on order status
+        if (orderData.status === 'PAID' || (orderData.jsonData?.paymentAmount && orderData.jsonData.paymentAmount > 0)) {
+          // If order is paid or has payment recorded, show history tab
+          setCurrentStep('history');
+        } else if (orderData.status === 'INVOICED') {
+          // If order is invoiced but not paid, show payment tab
+          setCurrentStep('payment');
+        } else {
+          // Default to invoice tab
+          setCurrentStep('invoice');
+        }
       } catch (err) {
         console.error('Error loading invoice:', err);
         alert('Failed to load invoice');

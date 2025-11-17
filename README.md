@@ -176,7 +176,7 @@ graph TB
 
 #### Order Entry (O/E)
 - **Purpose**: Manages customer sales orders from creation to fulfillment
-- **Workflow**: Draft → Approval → Confirmation → Shipping Instructions → Shipping → Invoicing → Payment → History
+- **Workflow**: Draft → Approval → Confirmation → Shipping Instructions → Shipping → Invoicing → History
 - **Key Relationships**:
   - **Inventory Control**: Automatically decreases inventory when order status changes to "SHIPPED"
   - **Accounts Receivable**: Creates receivable entries when order is invoiced
@@ -185,7 +185,7 @@ graph TB
 
 #### Purchase Order (P/O)
 - **Purpose**: Manages supplier purchase orders and procurement
-- **Workflow**: Draft → Approval → Received → Invoicing → Payment → History
+- **Workflow**: Draft → Approval → Received → Invoicing → History
 - **Key Relationships**:
   - **Inventory Control**: Automatically increases inventory when PO status changes to "RECEIVED"
   - **Accounts Payable**: Creates payable entries when supplier invoice is received

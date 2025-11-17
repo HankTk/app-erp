@@ -187,6 +187,18 @@ export function AccountPayableDetailPage(props: AccountPayableDetailPageProps = 
           setPaymentDate(poData.jsonData.paymentDate || '');
           setPaymentMethod(poData.jsonData.paymentMethod || '');
         }
+        
+        // Set initial tab based on purchase order status
+        if (poData.status === 'PAID' || (poData.jsonData?.paymentAmount && poData.jsonData.paymentAmount > 0)) {
+          // If PO is paid or has payment recorded, show history tab
+          setCurrentStep('history');
+        } else if (poData.status === 'INVOICED') {
+          // If PO is invoiced but not paid, show payment tab
+          setCurrentStep('payment');
+        } else {
+          // Default to invoice tab
+          setCurrentStep('invoice');
+        }
       } catch (err) {
         console.error('Error loading invoice:', err);
         alert('Failed to load invoice');

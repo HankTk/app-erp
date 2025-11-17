@@ -3,7 +3,7 @@ import { Vendor } from '../../api/vendorApi';
 import { Address } from '../../api/addressApi';
 import { Product } from '../../api/productApi';
 
-export type PurchaseOrderStep = 'entry' | 'approval' | 'received' | 'invoicing' | 'payment' | 'history';
+export type PurchaseOrderStep = 'entry' | 'approval' | 'received' | 'invoicing' | 'history';
 export type EntrySubStep = 'supplier' | 'products' | 'shipping' | 'review';
 
 export interface PurchaseOrderStepProps {
@@ -56,15 +56,6 @@ export interface PurchaseOrderInvoicingStepProps extends PurchaseOrderStepProps 
   invoiceDate: string;
   onInvoiceNumberChange: (number: string) => void;
   onInvoiceDateChange: (date: string) => void;
-}
-
-export interface PurchaseOrderPaymentStepProps extends PurchaseOrderStepProps {
-  paymentAmount: number;
-  paymentDate: string;
-  paymentMethod: string;
-  onPaymentAmountChange: (amount: number) => void;
-  onPaymentDateChange: (date: string) => void;
-  onPaymentMethodChange: (method: string) => void;
 }
 
 export interface PurchaseOrderHistoryStepProps extends PurchaseOrderStepProps {

@@ -37,7 +37,6 @@ import { OrderConfirmationStepPage } from './OrderConfirmationStepPage';
 import { OrderShippingInstructionStepPage } from './OrderShippingInstructionStepPage';
 import { OrderShippingStepPage } from './OrderShippingStepPage';
 import { OrderInvoicingStepPage } from './OrderInvoicingStepPage';
-import { OrderPaymentStepPage } from './OrderPaymentStepPage';
 import { OrderHistoryStepPage } from './OrderHistoryStepPage';
 
 const PageContainer = styled.div`
@@ -212,11 +211,6 @@ export function OrderEntryPage(props: OrderEntryPageProps = {}) {
   const [invoiceNumber, setInvoiceNumber] = useState<string>('');
   const [invoiceDate, setInvoiceDate] = useState<string>('');
 
-  // Payment state
-  const [paymentAmount, setPaymentAmount] = useState<number>(0);
-  const [paymentDate, setPaymentDate] = useState<string>('');
-  const [paymentMethod, setPaymentMethod] = useState<string>('');
-
   const steps: { key: OrderStep; label: string; description: string }[] = [
     { key: 'entry', label: t('orderEntry.step.entry'), description: t('orderEntry.step.entry') },
     { key: 'approval', label: t('orderEntry.step.approval'), description: t('orderEntry.step.approval') },
@@ -224,7 +218,6 @@ export function OrderEntryPage(props: OrderEntryPageProps = {}) {
     { key: 'shipping_instruction', label: t('orderEntry.step.shippingInstruction'), description: t('orderEntry.step.shippingInstruction') },
     { key: 'shipping', label: t('orderEntry.step.shipping'), description: t('orderEntry.step.shipping') },
     { key: 'invoicing', label: t('orderEntry.step.invoicing'), description: t('orderEntry.step.invoicing') },
-    { key: 'payment', label: t('orderEntry.step.payment'), description: t('orderEntry.step.payment') },
     { key: 'history', label: t('orderEntry.step.history'), description: t('orderEntry.step.history') },
   ];
 
@@ -416,9 +409,6 @@ export function OrderEntryPage(props: OrderEntryPageProps = {}) {
                 ? new Date(existingOrder.invoiceDate).toISOString().split('T')[0]
                 : existingOrder.jsonData?.invoiceDate || '';
               setInvoiceDate(invoiceDateValue);
-              setPaymentAmount(existingOrder.jsonData.paymentAmount || 0);
-              setPaymentDate(existingOrder.jsonData.paymentDate || '');
-              setPaymentMethod(existingOrder.jsonData.paymentMethod || '');
               if (existingOrder.shipDate) {
                 setActualShipDate(new Date(existingOrder.shipDate).toISOString().split('T')[0]);
               }
@@ -459,10 +449,10 @@ export function OrderEntryPage(props: OrderEntryPageProps = {}) {
                 setCurrentStep('invoicing');
                 break;
               case 'INVOICED':
-                setCurrentStep('payment');
+                setCurrentStep('history');
                 break;
               case 'PAID':
-                setCurrentStep('payment');
+                setCurrentStep('history');
                 break;
               default:
                 setCurrentStep('entry');
@@ -769,42 +759,10 @@ export function OrderEntryPage(props: OrderEntryPageProps = {}) {
         invoiceDate,
         total: updated.total,
       }, updated);
-      setCurrentStep('payment');
+      setCurrentStep('history');
     } catch (err) {
       console.error('Error invoicing order:', err);
       alert('Failed to invoice order');
-    } finally {
-      setSubmitting(false);
-    }
-  };
-
-  const handlePayment = async () => {
-    if (!order) return;
-    try {
-      setSubmitting(true);
-      const jsonData = order.jsonData || {};
-      jsonData.paymentAmount = paymentAmount;
-      jsonData.paymentDate = paymentDate;
-      jsonData.paymentMethod = paymentMethod;
-      const updated = await updateOrder(order.id!, {
-        ...order,
-        status: 'PAID',
-        jsonData,
-      });
-      setOrder(updated);
-      // 履歴に記録（更新されたorderを使用）
-      await addHistoryRecord('payment', t('orderEntry.history.step.payment'), undefined, 'PAID', {
-        paymentAmount,
-        paymentDate,
-        paymentMethod,
-      }, updated);
-      alert('Order payment completed successfully!');
-      if (onNavigateToOrders) {
-        onNavigateToOrders();
-      }
-    } catch (err) {
-      console.error('Error processing payment:', err);
-      alert('Failed to process payment');
     } finally {
       setSubmitting(false);
     }
@@ -907,8 +865,6 @@ export function OrderEntryPage(props: OrderEntryPageProps = {}) {
         return order.status === 'SHIPPED' || order.status === 'INVOICED' || order.status === 'PAID';
       case 'invoicing':
         return order.status === 'INVOICED' || order.status === 'PAID';
-      case 'payment':
-        return order.status === 'PAID';
       case 'history':
         return true; // 履歴ページは常にアクセス可能
       default:
@@ -959,8 +915,6 @@ export function OrderEntryPage(props: OrderEntryPageProps = {}) {
         return !!actualShipDate;
       case 'invoicing':
         return !!invoiceNumber && !!invoiceDate;
-      case 'payment':
-        return !!paymentAmount && !!paymentDate && !!paymentMethod;
       case 'history':
         return true; // 履歴ページは常に進むことができる
       default:
@@ -1549,71 +1503,6 @@ export function OrderEntryPage(props: OrderEntryPageProps = {}) {
     );
   };
 
-  const renderPaymentStep = () => {
-    return (
-      <div>
-        <AxHeading3 style={{ marginBottom: 'var(--spacing-md)' }}>{t('orderEntry.payment.title')}</AxHeading3>
-        <AxParagraph style={{ marginBottom: 'var(--spacing-lg)', color: 'var(--color-text-secondary)' }}>
-          {t('orderEntry.payment.description')}
-        </AxParagraph>
-        
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-md)' }}>
-          <AxFormGroup>
-            <AxLabel>{t('orderEntry.payment.paymentAmount')}</AxLabel>
-            <AxInput
-              type="number"
-              value={paymentAmount || ''}
-              onChange={(e) => setPaymentAmount(parseFloat(e.target.value) || 0)}
-              placeholder="0.00"
-              fullWidth
-            />
-          </AxFormGroup>
-
-          <AxFormGroup>
-            <AxLabel>{t('orderEntry.payment.paymentDate')}</AxLabel>
-            <AxInput
-              type="date"
-              value={paymentDate}
-              onChange={(e) => setPaymentDate(e.target.value)}
-              fullWidth
-            />
-          </AxFormGroup>
-
-          <AxFormGroup>
-            <AxLabel>{t('orderEntry.payment.paymentMethod')}</AxLabel>
-            <AxListbox
-              options={[
-                { value: 'BANK_TRANSFER', label: t('orderEntry.payment.method.bankTransfer') },
-                { value: 'CREDIT_CARD', label: t('orderEntry.payment.method.creditCard') },
-                { value: 'CASH', label: t('orderEntry.payment.method.cash') },
-                { value: 'CHECK', label: t('orderEntry.payment.method.check') },
-                { value: 'OTHER', label: t('orderEntry.payment.method.other') },
-              ]}
-              value={paymentMethod}
-              onChange={setPaymentMethod}
-              placeholder={t('orderEntry.payment.paymentMethodPlaceholder')}
-              fullWidth
-            />
-          </AxFormGroup>
-
-          <div style={{ padding: 'var(--spacing-md)', backgroundColor: 'var(--color-background-secondary)', borderRadius: 'var(--radius-md)' }}>
-            <AxParagraph style={{ fontWeight: 'var(--font-weight-bold)', marginBottom: 'var(--spacing-sm)' }}>
-              {t('orderEntry.payment.invoiceAmount')}
-            </AxParagraph>
-            <AxParagraph style={{ fontSize: 'var(--font-size-lg)', marginBottom: 'var(--spacing-md)' }}>
-              ${order?.total?.toFixed(2) || '0.00'}
-            </AxParagraph>
-            {paymentAmount > 0 && (
-              <AxParagraph style={{ color: paymentAmount >= (order?.total || 0) ? 'var(--color-success)' : 'var(--color-warning)' }}>
-                {t('orderEntry.payment.paymentAmountLabel')} ${paymentAmount.toFixed(2)} {paymentAmount < (order?.total || 0) && t('orderEntry.payment.shortage')}
-              </AxParagraph>
-            )}
-          </div>
-        </div>
-      </div>
-    );
-  };
-
   const handleOrderUpdate = (updatedOrder: Order) => {
     setOrder(updatedOrder);
   };
@@ -1780,25 +1669,6 @@ export function OrderEntryPage(props: OrderEntryPageProps = {}) {
             invoiceDate={invoiceDate}
             onInvoiceNumberChange={setInvoiceNumber}
             onInvoiceDateChange={setInvoiceDate}
-          />
-        );
-      case 'payment':
-        return (
-          <OrderPaymentStepPage
-            order={order}
-            onOrderUpdate={handleOrderUpdate}
-            onNext={handleNext}
-            onPrevious={handlePrevious}
-            onNavigateBack={onNavigateBack}
-            loading={loading}
-            submitting={submitting}
-            readOnly={readOnly}
-            paymentAmount={paymentAmount}
-            paymentDate={paymentDate}
-            paymentMethod={paymentMethod}
-            onPaymentAmountChange={setPaymentAmount}
-            onPaymentDateChange={setPaymentDate}
-            onPaymentMethodChange={setPaymentMethod}
           />
         );
       case 'history':
@@ -2194,14 +2064,6 @@ export function OrderEntryPage(props: OrderEntryPageProps = {}) {
                 disabled={!canProceedToNext() || submitting}
               >
                 {submitting ? t('orderEntry.invoicing') : t('orderEntry.createInvoice')}
-              </AxButton>
-            ) : currentStep === 'payment' ? (
-              <AxButton
-                variant="primary"
-                onClick={handlePayment}
-                disabled={!canProceedToNext() || submitting}
-              >
-                {submitting ? t('orderEntry.processing') : t('orderEntry.completePayment')}
               </AxButton>
             ) : currentStep === 'history' ? (
               <AxButton
