@@ -103,6 +103,19 @@ public class RMAController {
         }
     }
 
+    @PutMapping(value = "/{rmaId}/items/{itemId}/condition", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE + ";charset=UTF-8")
+    public ResponseEntity<RMA> updateRMAItemCondition(
+            @PathVariable String rmaId,
+            @PathVariable String itemId,
+            @RequestBody UpdateConditionRequest request) {
+        try {
+            RMA updatedRMA = rmaService.updateRMAItemCondition(rmaId, itemId, request.getCondition());
+            return ResponseEntity.ok(updatedRMA);
+        } catch (RuntimeException e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
     @DeleteMapping(value = "/{rmaId}/items/{itemId}")
     public ResponseEntity<RMA> removeRMAItem(
             @PathVariable String rmaId,
@@ -165,6 +178,18 @@ public class RMAController {
 
         public void setQuantity(Integer quantity) {
             this.quantity = quantity;
+        }
+    }
+
+    public static class UpdateConditionRequest {
+        private String condition;
+
+        public String getCondition() {
+            return condition;
+        }
+
+        public void setCondition(String condition) {
+            this.condition = condition;
         }
     }
 }

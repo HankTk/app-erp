@@ -27,20 +27,20 @@ const COMPONENT_NAME = 'AccountPayableDetailPage';
 const PageContainer = styled.div`
   display: flex;
   flex-direction: column;
-  gap: var(--spacing-md);
+  gap: var(--spacing-sm);
   height: 100%;
   width: 100%;
   min-height: 0;
   overflow-y: auto;
   overflow-x: hidden;
-  padding: var(--spacing-lg);
+  padding: var(--spacing-md);
   box-sizing: border-box;
   flex: 1;
 `;
 
 const HeaderCard = styled(AxCard)`
   flex-shrink: 0;
-  padding: var(--spacing-md) var(--spacing-lg) !important;
+  padding: var(--spacing-sm) var(--spacing-md) !important;
 `;
 
 const HeaderSection = styled.div`
@@ -74,8 +74,8 @@ const ContentCard = styled(AxCard)`
 const StepIndicator = styled.div`
   display: flex;
   gap: var(--spacing-sm);
-  margin-bottom: var(--spacing-lg);
-  padding-bottom: var(--spacing-md);
+  margin-bottom: var(--spacing-md);
+  padding-bottom: var(--spacing-sm);
   border-bottom: 2px solid var(--color-border-default);
   flex-shrink: 0;
   align-items: center;
@@ -104,7 +104,7 @@ const Step = styled.div<{ $active: boolean; $completed: boolean }>`
 const StepContent = styled.div`
   display: flex;
   flex-direction: column;
-  gap: var(--spacing-lg);
+  gap: var(--spacing-md);
   overflow: visible;
 `;
 
@@ -112,14 +112,17 @@ const ButtonGroup = styled.div`
   display: flex;
   justify-content: space-between;
   gap: var(--spacing-md);
-  margin-top: var(--spacing-lg);
+  margin-top: var(--spacing-md);
+  padding-top: var(--spacing-sm);
+  border-top: 2px solid var(--color-border-default);
+  flex-shrink: 0;
 `;
 
 const InfoSection = styled.div`
   display: flex;
   flex-direction: column;
-  gap: var(--spacing-sm);
-  padding: var(--spacing-md);
+  gap: var(--spacing-xs);
+  padding: var(--spacing-sm);
   background-color: var(--color-background-secondary);
   border-radius: var(--radius-md);
 `;
@@ -131,7 +134,7 @@ const InfoRow = styled.div`
 `;
 
 const ItemsTable = styled.div`
-  margin-top: var(--spacing-md);
+  margin-top: var(--spacing-sm);
   overflow-x: auto;
 `;
 
@@ -521,10 +524,10 @@ export function AccountPayableDetailPage(props: AccountPayableDetailPageProps = 
           {currentStep === 'payment' && (
             <>
               <div>
-                <AxHeading3 style={{ marginBottom: 'var(--spacing-md)' }}>
+                <AxHeading3 style={{ marginBottom: 'var(--spacing-sm)' }}>
                   {t('accountsPayable.payment.title')}
                 </AxHeading3>
-                <AxParagraph style={{ marginBottom: 'var(--spacing-lg)', color: 'var(--color-text-secondary)' }}>
+                <AxParagraph style={{ marginBottom: 'var(--spacing-md)', color: 'var(--color-text-secondary)' }}>
                   {t('accountsPayable.payment.description')}
                 </AxParagraph>
               </div>

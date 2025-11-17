@@ -100,6 +100,17 @@ export const updateRMAItemReturnedQuantity = async (
   });
 };
 
+export const updateRMAItemCondition = async (
+  rmaId: string,
+  itemId: string,
+  condition: string
+): Promise<RMA> => {
+  return httpRequest<RMA>(`${API_BASE_URL}/${rmaId}/items/${itemId}/condition`, {
+    method: 'PUT',
+    body: { condition },
+  });
+};
+
 export const removeRMAItem = async (
   rmaId: string,
   itemId: string

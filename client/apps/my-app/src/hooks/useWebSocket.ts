@@ -8,8 +8,9 @@ import { Product } from '../api/productApi';
 import { Address } from '../api/addressApi';
 import type { User } from '../api/userApi';
 import { Vendor } from '../api/vendorApi';
+import { RMA } from '../api/rmaApi';
 
-export type EntityType = 'order' | 'customer' | 'product' | 'address' | 'user';
+export type EntityType = 'order' | 'customer' | 'product' | 'address' | 'user' | 'rma';
 
 export interface EntityUpdateMessage {
   type: EntityType;
@@ -30,6 +31,8 @@ interface UseWebSocketOptions {
   onUserDelete?: (userId: string) => void;
   onVendorUpdate?: (vendor: Vendor) => void;
   onVendorDelete?: (vendorId: string) => void;
+  onRMAUpdate?: (rma: RMA) => void;
+  onRMADelete?: (rmaId: string) => void;
   enabled?: boolean;
 }
 
@@ -47,6 +50,8 @@ export function useWebSocket(options: UseWebSocketOptions = {}) {
     onUserDelete,
     onVendorUpdate,
     onVendorDelete,
+    onRMAUpdate,
+    onRMADelete,
     enabled = true,
   } = options;
   const [connected, setConnected] = useState(false);
@@ -211,6 +216,29 @@ export function useWebSocket(options: UseWebSocketOptions = {}) {
             }
           });
         }
+
+        // Subscribe to RMA updates
+        if (onRMAUpdate || onRMADelete) {
+          client.subscribe('/topic/rmas/update', (message: IMessage) => {
+            try {
+              const rma: RMA = JSON.parse(message.body);
+              console.log('Received RMA update:', rma);
+              onRMAUpdate?.(rma);
+            } catch (error) {
+              console.error('Error parsing RMA update:', error);
+            }
+          });
+
+          client.subscribe('/topic/rmas/delete', (message: IMessage) => {
+            try {
+              const rmaId: string = message.body;
+              console.log('Received RMA deletion:', rmaId);
+              onRMADelete?.(rmaId);
+            } catch (error) {
+              console.error('Error parsing RMA deletion:', error);
+            }
+          });
+        }
       },
       onDisconnect: () => {
         console.log('WebSocket disconnected');
@@ -250,6 +278,8 @@ export function useWebSocket(options: UseWebSocketOptions = {}) {
     onUserDelete,
     onVendorUpdate,
     onVendorDelete,
+    onRMAUpdate,
+    onRMADelete,
   ]);
 
   const disconnect = useCallback(() => {

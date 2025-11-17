@@ -16,8 +16,9 @@ import {
   AxListbox,
 } from '@ui/components';
 import { useI18n } from '../../i18n/I18nProvider';
-import { fetchRMAById, updateRMA, updateRMAItemReturnedQuantity, RMA, RMAItem } from '../../api/rmaApi';
+import { fetchRMAById, updateRMA, updateRMAItemReturnedQuantity, updateRMAItemCondition, RMA, RMAItem } from '../../api/rmaApi';
 import { fetchActiveProducts, Product } from '../../api/productApi';
+import { useWebSocket } from '../../hooks/useWebSocket';
 import styled from '@emotion/styled';
 import { debugProps } from '../../utils/emotionCache';
 
@@ -64,6 +65,7 @@ const ContentCard = styled(AxCard)`
   overflow-y: auto;
   overflow-x: hidden;
   padding: var(--spacing-lg) !important;
+  position: relative;
 `;
 
 const FormSection = styled.div`
@@ -71,6 +73,19 @@ const FormSection = styled.div`
   flex-direction: column;
   gap: var(--spacing-sm);
   margin-bottom: var(--spacing-md);
+`;
+
+const TableWrapper = styled.div`
+  position: relative;
+  overflow: visible !important;
+  
+  table {
+    overflow: visible !important;
+  }
+  
+  td {
+    overflow: visible !important;
+  }
 `;
 
 const ButtonGroup = styled.div`
@@ -132,6 +147,19 @@ export function ShopFloorControlPage({ rmaId, onNavigateBack, backButtonLabel = 
     loadData();
   }, [rmaId]);
 
+  // Listen for RMA updates via WebSocket
+  useWebSocket({
+    onRMAUpdate: (updatedRMA: RMA) => {
+      // Only update if it's the RMA we're currently viewing
+      if (updatedRMA.id === rmaId) {
+        console.log('Received RMA update via WebSocket:', updatedRMA);
+        // Update state with the latest data from server
+        setRma(updatedRMA);
+      }
+    },
+    enabled: !!rmaId,
+  });
+
   const loadData = async () => {
     try {
       setLoading(true);
@@ -172,18 +200,45 @@ export function ShopFloorControlPage({ rmaId, onNavigateBack, backButtonLabel = 
   };
 
   const handleUpdateItemCondition = async (itemId: string, condition: string) => {
-    if (!rma?.id || !rma.items) return;
+    if (!rma?.id || !itemId || !condition) {
+      console.error('Missing required parameters:', { rmaId: rma?.id, itemId, condition });
+      return;
+    }
+
+    console.log('Updating condition:', { rmaId: rma.id, itemId, condition });
 
     try {
       setSubmitting(true);
-      const updatedItems = rma.items.map(item => 
-        item.id === itemId ? { ...item, condition } : item
-      );
-      const updatedRMA = await updateRMA(rma.id, { ...rma, items: updatedItems });
-      setRma(updatedRMA);
+      
+      // Optimistic update - update UI immediately
+      if (rma.items) {
+        const updatedItems = rma.items.map(item => 
+          item.id === itemId ? { ...item, condition } : item
+        );
+        setRma({ ...rma, items: updatedItems });
+        console.log('Optimistic update applied, condition set to:', condition);
+      }
+      
+      // Send update to server (WebSocket will confirm the update)
+      console.log('Sending API request to update condition...');
+      const updatedRMA = await updateRMAItemCondition(rma.id, itemId, condition);
+      console.log('API request successful, received updated RMA:', updatedRMA);
+      
+      // Also update state with the response (in case WebSocket is delayed)
+      if (updatedRMA) {
+        setRma(updatedRMA);
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to update item condition');
       console.error('Error updating item condition:', err);
+      
+      // Revert optimistic update on error - reload from server
+      try {
+        const currentRMA = await fetchRMAById(rma.id);
+        setRma(currentRMA);
+      } catch (reloadErr) {
+        console.error('Error reloading RMA after failed update:', reloadErr);
+      }
     } finally {
       setSubmitting(false);
     }
@@ -339,67 +394,73 @@ export function ShopFloorControlPage({ rmaId, onNavigateBack, backButtonLabel = 
           </AxHeading3>
           
           {rma.items && rma.items.length > 0 ? (
-            <AxTable fullWidth>
-              <AxTableHead>
-                <AxTableRow>
-                  <AxTableHeader>Product</AxTableHeader>
-                  <AxTableHeader align="right">Requested Qty</AxTableHeader>
-                  <AxTableHeader align="right">Returned Qty</AxTableHeader>
-                  <AxTableHeader>Condition</AxTableHeader>
-                  <AxTableHeader>Reason</AxTableHeader>
-                  <AxTableHeader align="right">Unit Price</AxTableHeader>
-                  <AxTableHeader align="right">Line Total</AxTableHeader>
-                </AxTableRow>
-              </AxTableHead>
-              <AxTableBody>
-                {rma.items.map((item) => (
-                  <AxTableRow key={item.id}>
-                    <AxTableCell>{getProductName(item.productId)}</AxTableCell>
-                    <AxTableCell align="right">{item.quantity || 0}</AxTableCell>
-                    <AxTableCell align="right">
-                      <AxInput
-                        type="number"
-                        value={item.returnedQuantity || 0}
-                        onChange={(e) => {
-                          const newQty = parseInt(e.target.value) || 0;
-                          if (item.id && newQty >= 0 && newQty <= (item.quantity || 0)) {
-                            handleUpdateReturnedQuantity(item.id, newQty);
-                          }
-                        }}
-                        min="0"
-                        max={item.quantity}
-                        style={{ width: '80px' }}
-                        disabled={submitting || rma.status === 'PROCESSED' || rma.status === 'CANCELLED'}
-                      />
-                    </AxTableCell>
-                    <AxTableCell>
-                      <AxListbox
-                        options={[
-                          { value: 'NEW', label: 'New' },
-                          { value: 'LIKE_NEW', label: 'Like New' },
-                          { value: 'GOOD', label: 'Good' },
-                          { value: 'FAIR', label: 'Fair' },
-                          { value: 'POOR', label: 'Poor' },
-                          { value: 'DAMAGED', label: 'Damaged' },
-                        ]}
-                        value={item.condition || null}
-                        onChange={(value) => {
-                          if (item.id && value) {
-                            handleUpdateItemCondition(item.id, value);
-                          }
-                        }}
-                        placeholder="Select Condition"
-                        disabled={submitting || rma.status === 'PROCESSED' || rma.status === 'CANCELLED'}
-                        fullWidth
-                      />
-                    </AxTableCell>
-                    <AxTableCell>{item.reason || '-'}</AxTableCell>
-                    <AxTableCell align="right">${item.unitPrice?.toFixed(2) || '0.00'}</AxTableCell>
-                    <AxTableCell align="right">${item.lineTotal?.toFixed(2) || '0.00'}</AxTableCell>
+            <TableWrapper>
+              <AxTable fullWidth>
+                <AxTableHead>
+                  <AxTableRow>
+                    <AxTableHeader>Product</AxTableHeader>
+                    <AxTableHeader align="right">Requested Qty</AxTableHeader>
+                    <AxTableHeader align="right">Returned Qty</AxTableHeader>
+                    <AxTableHeader>Condition</AxTableHeader>
+                    <AxTableHeader>Reason</AxTableHeader>
+                    <AxTableHeader align="right">Unit Price</AxTableHeader>
+                    <AxTableHeader align="right">Line Total</AxTableHeader>
                   </AxTableRow>
-                ))}
-              </AxTableBody>
-            </AxTable>
+                </AxTableHead>
+                <AxTableBody>
+                  {rma.items.map((item) => (
+                    <AxTableRow key={item.id}>
+                      <AxTableCell>{getProductName(item.productId)}</AxTableCell>
+                      <AxTableCell align="right">{item.quantity || 0}</AxTableCell>
+                      <AxTableCell align="right">
+                        <AxInput
+                          type="number"
+                          value={item.returnedQuantity || 0}
+                          onChange={(e) => {
+                            const newQty = parseInt(e.target.value) || 0;
+                            if (item.id && newQty >= 0 && newQty <= (item.quantity || 0)) {
+                              handleUpdateReturnedQuantity(item.id, newQty);
+                            }
+                          }}
+                          min="0"
+                          max={item.quantity}
+                          style={{ width: '80px' }}
+                          disabled={submitting || rma.status === 'PROCESSED' || rma.status === 'CANCELLED'}
+                        />
+                      </AxTableCell>
+                      <AxTableCell style={{ position: 'relative', overflow: 'visible' }}>
+                        <AxListbox
+                          options={[
+                            { value: 'NEW', label: 'New' },
+                            { value: 'LIKE_NEW', label: 'Like New' },
+                            { value: 'GOOD', label: 'Good' },
+                            { value: 'FAIR', label: 'Fair' },
+                            { value: 'POOR', label: 'Poor' },
+                            { value: 'DAMAGED', label: 'Damaged' },
+                          ]}
+                          value={item.condition || null}
+                          onChange={(value) => {
+                            console.log('Condition onChange:', { itemId: item.id, value, type: typeof value });
+                            if (item.id && value && typeof value === 'string') {
+                              handleUpdateItemCondition(item.id, value);
+                            } else if (item.id && value && Array.isArray(value) && value.length > 0) {
+                              // Handle array case (shouldn't happen with single select, but just in case)
+                              handleUpdateItemCondition(item.id, value[0]);
+                            }
+                          }}
+                          placeholder="Select Condition"
+                          disabled={submitting || rma.status === 'PROCESSED' || rma.status === 'CANCELLED'}
+                          fullWidth
+                        />
+                      </AxTableCell>
+                      <AxTableCell>{item.reason || '-'}</AxTableCell>
+                      <AxTableCell align="right">${item.unitPrice?.toFixed(2) || '0.00'}</AxTableCell>
+                      <AxTableCell align="right">${item.lineTotal?.toFixed(2) || '0.00'}</AxTableCell>
+                    </AxTableRow>
+                  ))}
+                </AxTableBody>
+              </AxTable>
+            </TableWrapper>
           ) : (
             <AxParagraph style={{ color: 'var(--color-text-secondary)' }}>
               No items to process

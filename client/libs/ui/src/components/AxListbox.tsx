@@ -139,7 +139,7 @@ const StyledListboxDropdown = styled.div<StyledListboxDropdownProps>`
   border: 2px solid var(--color-border-default);
   border-radius: var(--radius-md);
   box-shadow: var(--shadow-lg);
-  z-index: 1000;
+  z-index: 10000;
   max-height: 300px;
   overflow-y: auto;
   display: ${({ $isOpen }) => ($isOpen ? 'block' : 'none')};

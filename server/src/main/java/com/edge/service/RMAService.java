@@ -198,6 +198,28 @@ public class RMAService {
         return rmaRepository.updateRMA(rmaId, rma);
     }
     
+    public RMA updateRMAItemCondition(String rmaId, String itemId, String condition) {
+        RMA rma = rmaRepository.getRMAById(rmaId)
+            .orElseThrow(() -> new RuntimeException("RMA not found with id: " + rmaId));
+        
+        RMAItem item = rma.getItems().stream()
+            .filter(i -> itemId.equals(i.getId()))
+            .findFirst()
+            .orElseThrow(() -> new RuntimeException("RMA item not found with id: " + itemId));
+        
+        item.setCondition(condition);
+        rma.calculateTotals();
+        
+        RMA updated = rmaRepository.updateRMA(rmaId, rma);
+        
+        // Broadcast update via WebSocket
+        if (webSocketService != null) {
+            webSocketService.broadcastRMAUpdate(updated);
+        }
+        
+        return updated;
+    }
+    
     public RMA removeRMAItem(String rmaId, String itemId) {
         RMA rma = rmaRepository.getRMAById(rmaId)
             .orElseThrow(() -> new RuntimeException("RMA not found with id: " + rmaId));
