@@ -20,7 +20,7 @@ import { useI18n } from '../../i18n/I18nProvider';
 const StepContent = styled.div`
   display: flex;
   flex-direction: column;
-  gap: var(--spacing-lg);
+  gap: var(--spacing-md);
   overflow: visible;
 `;
 
@@ -31,8 +31,8 @@ const ItemsTable = styled.div`
 const SubStepIndicator = styled.div`
   display: flex;
   gap: var(--spacing-sm);
-  margin-bottom: var(--spacing-md);
-  padding: var(--spacing-sm);
+  margin-bottom: var(--spacing-sm);
+  padding: var(--spacing-xs);
   background-color: var(--color-background-secondary);
   border-radius: var(--radius-md);
 `;
@@ -119,9 +119,9 @@ export function PurchaseOrderEntryStepPage(props: PurchaseOrderEntryStepProps) {
 
     return (
       <div>
-        <AxHeading3 style={{ marginBottom: 'var(--spacing-md)' }}>{t('purchaseOrderEntry.selectSupplier')}</AxHeading3>
+        <AxHeading3 style={{ marginBottom: 'var(--spacing-sm)' }}>{t('purchaseOrderEntry.selectSupplier')}</AxHeading3>
         {!po?.id && (
-          <AxParagraph style={{ marginBottom: 'var(--spacing-md)', color: 'var(--color-warning)' }}>
+          <AxParagraph style={{ marginBottom: 'var(--spacing-sm)', color: 'var(--color-warning)' }}>
             {t('purchaseOrderEntry.initializing')}
           </AxParagraph>
         )}
@@ -143,7 +143,7 @@ export function PurchaseOrderEntryStepPage(props: PurchaseOrderEntryStepProps) {
           />
         </AxFormGroup>
         {po?.supplierId && (
-          <AxParagraph style={{ marginTop: 'var(--spacing-md)', color: 'var(--color-text-secondary)' }}>
+          <AxParagraph style={{ marginTop: 'var(--spacing-sm)', color: 'var(--color-text-secondary)' }}>
             {t('purchaseOrderEntry.supplierSelected')}
           </AxParagraph>
         )}
@@ -159,14 +159,14 @@ export function PurchaseOrderEntryStepPage(props: PurchaseOrderEntryStepProps) {
 
     return (
       <div>
-        <AxHeading3 style={{ marginBottom: 'var(--spacing-md)' }}>{t('purchaseOrderEntry.addProducts')}</AxHeading3>
+        <AxHeading3 style={{ marginBottom: 'var(--spacing-sm)' }}>{t('purchaseOrderEntry.addProducts')}</AxHeading3>
 
         <div
           style={{
             display: 'flex',
             gap: 'var(--spacing-sm)',
             alignItems: 'flex-end',
-            marginBottom: 'var(--spacing-lg)',
+            marginBottom: 'var(--spacing-md)',
           }}
         >
           <div style={{ flex: 1 }}>
@@ -277,8 +277,8 @@ export function PurchaseOrderEntryStepPage(props: PurchaseOrderEntryStepProps) {
         {po && (
           <div
             style={{
-              marginTop: 'var(--spacing-lg)',
-              padding: 'var(--spacing-md)',
+              marginTop: 'var(--spacing-md)',
+              padding: 'var(--spacing-sm)',
               backgroundColor: 'var(--color-background-secondary)',
               borderRadius: 'var(--radius-md)',
             }}
@@ -305,9 +305,9 @@ export function PurchaseOrderEntryStepPage(props: PurchaseOrderEntryStepProps) {
 
     return (
       <div>
-        <AxHeading3 style={{ marginBottom: 'var(--spacing-md)' }}>{t('purchaseOrderEntry.shippingInformation')}</AxHeading3>
+        <AxHeading3 style={{ marginBottom: 'var(--spacing-sm)' }}>{t('purchaseOrderEntry.shippingInformation')}</AxHeading3>
 
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--spacing-md)' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--spacing-sm)' }}>
           <AxFormGroup>
             <AxLabel>{t('purchaseOrderEntry.shippingAddress')}</AxLabel>
             <AxListbox
@@ -380,9 +380,9 @@ export function PurchaseOrderEntryStepPage(props: PurchaseOrderEntryStepProps) {
   const renderReviewStep = () => {
     return (
       <div>
-        <AxHeading3 style={{ marginBottom: 'var(--spacing-md)' }}>{t('purchaseOrderEntry.reviewOrder')}</AxHeading3>
+        <AxHeading3 style={{ marginBottom: 'var(--spacing-sm)' }}>{t('purchaseOrderEntry.reviewOrder')}</AxHeading3>
 
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-lg)' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-md)' }}>
           <AxFormGroup>
             <AxLabel>{t('purchaseOrderEntry.expectedDeliveryDate')}</AxLabel>
             <AxInput
@@ -404,7 +404,7 @@ export function PurchaseOrderEntryStepPage(props: PurchaseOrderEntryStepProps) {
           </AxFormGroup>
 
           <div>
-            <AxParagraph style={{ fontWeight: 'var(--font-weight-bold)', marginBottom: 'var(--spacing-sm)' }}>
+            <AxParagraph style={{ fontWeight: 'var(--font-weight-bold)', marginBottom: 'var(--spacing-xs)' }}>
               {t('purchaseOrderEntry.orderItems')}
             </AxParagraph>
             <ItemsTable>
@@ -433,20 +433,20 @@ export function PurchaseOrderEntryStepPage(props: PurchaseOrderEntryStepProps) {
 
           <div
             style={{
-              padding: 'var(--spacing-md)',
+              padding: 'var(--spacing-sm)',
               backgroundColor: 'var(--color-background-secondary)',
               borderRadius: 'var(--radius-md)',
             }}
           >
-            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 'var(--spacing-sm)' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 'var(--spacing-xs)' }}>
               <AxParagraph>{t('purchaseOrderEntry.subtotal')}:</AxParagraph>
               <AxParagraph>${po?.subtotal?.toFixed(2) || '0.00'}</AxParagraph>
             </div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 'var(--spacing-sm)' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 'var(--spacing-xs)' }}>
               <AxParagraph>{t('purchaseOrderEntry.tax')}:</AxParagraph>
               <AxParagraph>${po?.tax?.toFixed(2) || '0.00'}</AxParagraph>
             </div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 'var(--spacing-sm)' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 'var(--spacing-xs)' }}>
               <AxParagraph>{t('purchaseOrderEntry.shipping')}:</AxParagraph>
               <AxParagraph>${po?.shippingCost?.toFixed(2) || '0.00'}</AxParagraph>
             </div>
@@ -454,7 +454,7 @@ export function PurchaseOrderEntryStepPage(props: PurchaseOrderEntryStepProps) {
               style={{
                 display: 'flex',
                 justifyContent: 'space-between',
-                paddingTop: 'var(--spacing-sm)',
+                paddingTop: 'var(--spacing-xs)',
                 borderTop: '2px solid var(--color-border-default)',
               }}
             >

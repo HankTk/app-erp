@@ -36,28 +36,28 @@ import { PurchaseOrderHistoryStepPage } from './PurchaseOrderHistoryStepPage';
 const PageContainer = styled.div`
   display: flex;
   flex-direction: column;
-  gap: var(--spacing-md);
+  gap: var(--spacing-sm);
   height: 100%;
   width: 100%;
   min-height: 0;
   overflow-y: auto;
   overflow-x: hidden;
-  padding: var(--spacing-lg);
+  padding: var(--spacing-md);
   box-sizing: border-box;
   flex: 1;
 `;
 
 const HeaderCard = styled(AxCard)`
   flex-shrink: 0;
-  padding: var(--spacing-md) var(--spacing-lg) !important;
+  padding: var(--spacing-sm) var(--spacing-md) !important;
 `;
 
 const HeaderSection = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  gap: var(--spacing-lg);
-  margin-bottom: var(--spacing-md);
+  gap: var(--spacing-md);
+  margin-bottom: var(--spacing-xs);
 `;
 
 const HeaderLeft = styled.div`
@@ -83,8 +83,8 @@ const ContentCard = styled(AxCard)`
 const StepIndicator = styled.div`
   display: flex;
   gap: var(--spacing-sm);
-  margin-bottom: var(--spacing-lg);
-  padding-bottom: var(--spacing-md);
+  margin-bottom: var(--spacing-md);
+  padding-bottom: var(--spacing-sm);
   border-bottom: 2px solid var(--color-border-default);
   flex-shrink: 0;
   align-items: center;
@@ -137,7 +137,7 @@ const Step = styled.div<{ $active: boolean; $completed: boolean }>`
 const StepContent = styled.div`
   display: flex;
   flex-direction: column;
-  gap: var(--spacing-lg);
+  gap: var(--spacing-md);
   overflow: visible;
 `;
 
@@ -145,8 +145,8 @@ const ButtonGroup = styled.div`
   display: flex;
   gap: var(--spacing-sm);
   justify-content: flex-end;
-  margin-top: var(--spacing-lg);
-  padding-top: var(--spacing-md);
+  margin-top: var(--spacing-md);
+  padding-top: var(--spacing-sm);
   border-top: 2px solid var(--color-border-default);
   flex-shrink: 0;
 `;
