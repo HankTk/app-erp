@@ -157,36 +157,9 @@ export function ShopFloorControlPage({ rmaId, onNavigateBack, backButtonLabel = 
     }
   };
 
-  if (loading) {
-    return (
-      <PageContainer {...debugProps(COMPONENT_NAME, 'PageContainer')}>
-        <ContentCard padding="large">
-          <AxParagraph>Loading shop floor control data...</AxParagraph>
-        </ContentCard>
-      </PageContainer>
-    );
-  }
-
-  if (error || !rma) {
-    return (
-      <PageContainer {...debugProps(COMPONENT_NAME, 'PageContainer')}>
-        <ContentCard padding="large">
-          <AxParagraph style={{ color: 'var(--color-danger)' }}>
-            {error || 'RMA not found'}
-          </AxParagraph>
-          {onNavigateBack && (
-            <AxButton variant="secondary" onClick={onNavigateBack} style={{ marginTop: 'var(--spacing-md)' }}>
-              ← Back
-            </AxButton>
-          )}
-        </ContentCard>
-      </PageContainer>
-    );
-  }
-
-  const canMarkAsReceived = rma.status === 'APPROVED';
-  const canMarkAsProcessed = rma.status === 'RECEIVED' && 
-    rma.items?.every(item => (item.returnedQuantity || 0) > 0);
+  const canMarkAsReceived = rma?.status === 'APPROVED';
+  const canMarkAsProcessed = rma?.status === 'RECEIVED' && 
+    rma?.items?.every(item => (item.returnedQuantity || 0) > 0);
 
   return (
     <ShopFloorControlPageRender
