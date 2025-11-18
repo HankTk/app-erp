@@ -1,5 +1,8 @@
 package com.edge;
 
+/**
+ * @author Hidenori Takaku
+ */
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

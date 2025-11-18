@@ -2,6 +2,7 @@
   "name": "emotion-ui-library",
   "version": "1.0.0",
   "private": true,
+  "author": "Hidenori Takaku",
   "description": "Monorepo for Emotion UI library with CSS variables, design tokens, and dark mode support",
   "scripts": {
     "build": "pnpm --filter @ui/components build && pnpm --filter my-dev build && pnpm --filter my-app build && pnpm --filter my-electron build",

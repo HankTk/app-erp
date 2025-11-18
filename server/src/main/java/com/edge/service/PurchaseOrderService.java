@@ -1,5 +1,8 @@
 package com.edge.service;
 
+/**
+ * @author Hidenori Takaku
+ */
 import com.edge.entity.PurchaseOrder;
 import com.edge.entity.PurchaseOrderItem;
 import com.edge.entity.Product;

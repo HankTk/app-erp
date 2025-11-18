@@ -567,6 +567,10 @@ The application outputs detailed logs providing the following information:
 
 This project is published under the MIT License.
 
+## Author
+
+**Hidenori Takaku**
+
 ## Contributing
 
 Please report bugs and feature requests through GitHub Issues.

@@ -1,5 +1,8 @@
 package com.edge.entity;
 
+/**
+ * @author Hidenori Takaku
+ */
 import lombok.Data;
 import java.math.BigDecimal;
 import java.util.Map;

@@ -1,5 +1,8 @@
 package com.edge.controller;
 
+/**
+ * @author Hidenori Takaku
+ */
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

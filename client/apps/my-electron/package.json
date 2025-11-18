@@ -2,6 +2,7 @@
   "name": "my-electron",
   "version": "1.0.0",
   "private": true,
+  "author": "Hidenori Takaku",
   "type": "module",
   "main": "dist/main.js",
   "scripts": {

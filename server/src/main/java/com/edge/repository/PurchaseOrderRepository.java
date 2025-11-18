@@ -1,5 +1,8 @@
 package com.edge.repository;
 
+/**
+ * @author Hidenori Takaku
+ */
 import com.edge.entity.PurchaseOrder;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;

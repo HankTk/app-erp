@@ -1,5 +1,8 @@
 package com.edge.repository;
 
+/**
+ * @author Hidenori Takaku
+ */
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;

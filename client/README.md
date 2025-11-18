@@ -712,3 +712,7 @@ The Electron application (`apps/my-electron`) provides a desktop version of the 
 
 Run `pnpm dev:electron` to start the Electron development environment, or use `pnpm app` to run the main app with Electron.
 
+## Author
+
+**Hidenori Takaku**
+

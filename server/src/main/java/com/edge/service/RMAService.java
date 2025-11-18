@@ -1,5 +1,8 @@
 package com.edge.service;
 
+/**
+ * @author Hidenori Takaku
+ */
 import com.edge.entity.RMA;
 import com.edge.entity.RMAItem;
 import com.edge.entity.Product;

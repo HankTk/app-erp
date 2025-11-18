@@ -1,5 +1,8 @@
 package com.edge.repository;
 
+/**
+ * @author Hidenori Takaku
+ */
 import com.edge.entity.Customer;
 import com.fasterxml.jackson.core.type.TypeReference;
 import org.slf4j.Logger;

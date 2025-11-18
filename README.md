@@ -362,6 +362,10 @@ For more troubleshooting tips, see the [server README](server/README.md) and [cl
 
 This project is published under the MIT License.
 
+## 👤 Author
+
+**Hidenori Takaku**
+
 ## 🤝 Contributing
 
 Please report bugs and feature requests through GitHub Issues.

@@ -1,5 +1,8 @@
 package com.edge.controller;
 
+/**
+ * @author Hidenori Takaku
+ */
 import com.edge.entity.RMA;
 import com.edge.service.RMAService;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -1,5 +1,8 @@
 package com.edge.service;
 
+/**
+ * @author Hidenori Takaku
+ */
 import com.edge.entity.Warehouse;
 import com.edge.repository.WarehouseRepository;
 import org.springframework.beans.factory.annotation.Autowired;

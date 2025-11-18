@@ -1,6 +1,7 @@
 {
   "name": "@ui/components",
   "version": "1.0.0",
+  "author": "Hidenori Takaku",
   "description": "Emotion UI Library",
   "main": "./dist/index.js",
   "module": "./dist/index.esm.js",

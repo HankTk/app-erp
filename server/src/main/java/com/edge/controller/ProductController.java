@@ -1,5 +1,8 @@
 package com.edge.controller;
 
+/**
+ * @author Hidenori Takaku
+ */
 import com.edge.entity.Product;
 import com.edge.service.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;

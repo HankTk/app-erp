@@ -1,5 +1,8 @@
 package com.edge.service;
 
+/**
+ * @author Hidenori Takaku
+ */
 import com.edge.entity.Address;
 import com.edge.entity.Customer;
 import com.edge.repository.AddressRepository;
