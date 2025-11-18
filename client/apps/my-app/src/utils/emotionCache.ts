@@ -29,7 +29,12 @@
  * ```
  */
 export const debugProps = (componentName: string, elementName: string) => {
-  if (process.env.NODE_ENV === 'development') {
+  // In Vite, use import.meta.env.DEV for development mode detection
+  // This is more reliable than process.env.NODE_ENV in Vite projects
+  // @ts-ignore - import.meta.env is available in Vite
+  const isDev = import.meta.env?.DEV === true || (typeof import.meta.env?.DEV === 'undefined' && (process.env.NODE_ENV === 'development' || !process.env.NODE_ENV));
+  
+  if (isDev) {
     // 呼び出し元のファイルパスを取得（スタックトレースから）
     let filePath = '';
     try {
@@ -93,7 +98,11 @@ export const debugPropsWithLocation = (
   elementName: string,
   additionalInfo?: Record<string, string>
 ) => {
-  if (process.env.NODE_ENV === 'development') {
+  // In Vite, use import.meta.env.DEV for development mode detection
+  // @ts-ignore - import.meta.env is available in Vite
+  const isDev = import.meta.env?.DEV === true || (typeof import.meta.env?.DEV === 'undefined' && (process.env.NODE_ENV === 'development' || !process.env.NODE_ENV));
+  
+  if (isDev) {
     // 呼び出し元のファイルパスを取得
     let filePath = '';
     try {
