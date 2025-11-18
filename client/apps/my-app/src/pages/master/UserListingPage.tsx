@@ -1,108 +1,8 @@
 import { useState, useEffect } from 'react';
-import {
-  AxTable,
-  AxTableHead,
-  AxTableBody,
-  AxTableRow,
-  AxTableHeader,
-  AxTableCell,
-  AxCard,
-  AxHeading3,
-  AxParagraph,
-  AxButton,
-  AxDialog,
-  AxInput,
-  AxLabel,
-  AxFormGroup,
-  AxListbox,
-} from '@ui/components';
 import { useI18n } from '../../i18n/I18nProvider';
+import { AxButton } from '@ui/components';
 import { fetchUsers, createUser, updateUser, deleteUser, User } from '../../api/userApi';
-import styled from '@emotion/styled';
-import { debugProps } from '../../utils/emotionCache';
-
-const COMPONENT_NAME = 'UserListingPage';
-
-const PageContainer = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-md);
-  height: 100%;
-  width: 100%;
-  min-height: 0;
-  overflow-y: auto;
-  overflow-x: hidden;
-  padding: var(--spacing-lg);
-  box-sizing: border-box;
-  flex: 1;
-`;
-
-const HeaderCard = styled(AxCard)`
-  flex-shrink: 0;
-  padding: var(--spacing-md) var(--spacing-lg) !important;
-`;
-
-const HeaderSection = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 0;
-  gap: var(--spacing-md);
-`;
-
-const HeaderLeft = styled.div`
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-md);
-  flex: 1;
-`;
-
-const HeaderRight = styled.div`
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-sm);
-`;
-
-const TableCard = styled(AxCard)`
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  min-height: 0;
-  max-height: calc(100% - 6rem);
-  overflow: hidden;
-`;
-
-const StyledTextarea = styled.textarea`
-  font-family: var(--font-family-base);
-  font-size: var(--font-size-base);
-  font-weight: var(--font-weight-normal);
-  line-height: var(--line-height-normal);
-  padding: var(--spacing-sm) calc(var(--spacing-sm) + 6px);
-  border: 2px solid var(--color-border-default);
-  border-radius: var(--radius-md);
-  outline: none;
-  transition: border-color var(--transition-base), box-shadow var(--transition-base);
-  width: 100%;
-  min-height: 120px;
-  resize: vertical;
-  color: var(--color-text-primary);
-  background-color: var(--color-background-default);
-
-  &:focus {
-    border-color: var(--color-border-focus);
-    box-shadow: var(--shadow-focus-sm);
-  }
-
-  &:disabled {
-    background-color: var(--color-background-disabled);
-    cursor: not-allowed;
-    opacity: var(--opacity-disabled);
-  }
-
-  &::placeholder {
-    color: var(--color-text-tertiary);
-  }
-`;
+import { UserListingPageRender } from './UserListingPage.render';
 
 interface ColumnConfig {
   key: string;
@@ -436,348 +336,45 @@ export function UserListingPage({ onNoUsersRemaining, onNavigateBack }: UserList
     return ['userid', 'password', 'role', 'firstName', 'lastName', 'email', 'jsonData'];
   };
 
-  if (loading) {
-    return (
-      <PageContainer {...debugProps(COMPONENT_NAME, 'PageContainer')}>
-        <HeaderCard padding="large" {...debugProps(COMPONENT_NAME, 'HeaderCard')}>
-          <HeaderSection {...debugProps(COMPONENT_NAME, 'HeaderSection')}>
-            <HeaderLeft {...debugProps(COMPONENT_NAME, 'HeaderLeft')}>
-              {onNavigateBack && (
-                <AxButton 
-                  variant="secondary" 
-                  onClick={onNavigateBack}
-                  style={{ minWidth: 'auto', padding: 'var(--spacing-sm) var(--spacing-md)' }}
-                >
-                  ← Back
-                </AxButton>
-              )}
-              <div>
-                <AxHeading3 style={{ marginBottom: 'var(--spacing-xs)' }}>
-                  {l10n('user.title')}
-                </AxHeading3>
-                <AxParagraph style={{ color: 'var(--color-text-secondary)' }}>
-                  {l10n('user.subtitle')}
-                </AxParagraph>
-              </div>
-            </HeaderLeft>
-            <HeaderRight {...debugProps(COMPONENT_NAME, 'HeaderRight')}>
-              <AxButton variant="primary" onClick={handleAdd}>{l10n('user.addNew')}</AxButton>
-            </HeaderRight>
-          </HeaderSection>
-        </HeaderCard>
-        <TableCard padding="large" {...debugProps(COMPONENT_NAME, 'TableCard')}>
-          <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '200px' }}>
-            <AxParagraph>Loading users...</AxParagraph>
-          </div>
-        </TableCard>
-      </PageContainer>
-    );
-  }
+  const handleDeleteCancel = () => {
+    setDeleteDialogOpen(false);
+    setSelectedUser(null);
+  };
 
-  if (error) {
-    return (
-      <PageContainer {...debugProps(COMPONENT_NAME, 'PageContainer')}>
-        <HeaderCard padding="large" {...debugProps(COMPONENT_NAME, 'HeaderCard')}>
-          <HeaderSection {...debugProps(COMPONENT_NAME, 'HeaderSection')}>
-            <HeaderLeft {...debugProps(COMPONENT_NAME, 'HeaderLeft')}>
-              {onNavigateBack && (
-                <AxButton 
-                  variant="secondary" 
-                  onClick={onNavigateBack}
-                  style={{ minWidth: 'auto', padding: 'var(--spacing-sm) var(--spacing-md)' }}
-                >
-                  ← Back
-                </AxButton>
-              )}
-              <div>
-                <AxHeading3 style={{ marginBottom: 'var(--spacing-xs)' }}>
-                  {l10n('user.title')}
-                </AxHeading3>
-                <AxParagraph style={{ color: 'var(--color-text-secondary)' }}>
-                  {l10n('user.subtitle')}
-                </AxParagraph>
-              </div>
-            </HeaderLeft>
-            <HeaderRight {...debugProps(COMPONENT_NAME, 'HeaderRight')}>
-              <AxButton variant="primary" onClick={handleAdd}>{l10n('user.addNew')}</AxButton>
-            </HeaderRight>
-          </HeaderSection>
-        </HeaderCard>
-        <TableCard padding="large" {...debugProps(COMPONENT_NAME, 'TableCard')}>
-          <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '200px', flexDirection: 'column', gap: 'var(--spacing-md)' }}>
-            <AxParagraph style={{ color: 'var(--color-error)' }}>Error: {error}</AxParagraph>
-            <AxButton variant="secondary" onClick={() => window.location.reload()}>
-              Retry
-            </AxButton>
-          </div>
-        </TableCard>
-      </PageContainer>
-    );
-  }
+  const handleDialogClose = () => {
+    setDialogMode(null);
+    setFormData({});
+    setSelectedUser(null);
+  };
+
+  const handleFormDataChange = (data: Record<string, any>) => {
+    setFormData(data);
+  };
 
   return (
-    <PageContainer {...debugProps(COMPONENT_NAME, 'PageContainer')}>
-      <HeaderCard padding="large" {...debugProps(COMPONENT_NAME, 'HeaderCard')}>
-        <HeaderSection {...debugProps(COMPONENT_NAME, 'HeaderSection')}>
-          <HeaderLeft {...debugProps(COMPONENT_NAME, 'HeaderLeft')}>
-            {onNavigateBack && (
-              <AxButton 
-                variant="secondary" 
-                onClick={onNavigateBack}
-                style={{ minWidth: 'auto', padding: 'var(--spacing-sm) var(--spacing-md)' }}
-              >
-                ← Back
-              </AxButton>
-            )}
-            <div>
-              <AxHeading3 style={{ marginBottom: 'var(--spacing-xs)' }}>
-                {l10n('user.title')}
-              </AxHeading3>
-              <AxParagraph style={{ color: 'var(--color-text-secondary)' }}>
-                {l10n('user.subtitle')}
-              </AxParagraph>
-            </div>
-          </HeaderLeft>
-          <HeaderRight {...debugProps(COMPONENT_NAME, 'HeaderRight')}>
-            <AxButton variant="primary" onClick={handleAdd}>{l10n('user.addNew')}</AxButton>
-          </HeaderRight>
-        </HeaderSection>
-      </HeaderCard>
-
-      <TableCard padding="large" {...debugProps(COMPONENT_NAME, 'TableCard')}>
-        <div style={{ flex: 1, overflow: 'auto', minHeight: 0 }}>
-          {users.length === 0 ? (
-            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '200px' }}>
-              <AxParagraph>No users found</AxParagraph>
-            </div>
-          ) : (
-            <AxTable fullWidth stickyHeader>
-              <AxTableHead>
-                <AxTableRow>
-                  {columns.map((column) => (
-                    <AxTableHeader key={column.key} align={column.align}>
-                      {column.label}
-                    </AxTableHeader>
-                  ))}
-                </AxTableRow>
-              </AxTableHead>
-              <AxTableBody>
-                {users.map((user, index) => (
-                  <AxTableRow key={user.id || user._id || index}>
-                    {columns.map((column) => (
-                      <AxTableCell key={column.key} align={column.align}>
-                        {column.render
-                          ? column.render(user[column.key], user)
-                          : user[column.key] ?? ''}
-                      </AxTableCell>
-                    ))}
-                  </AxTableRow>
-                ))}
-              </AxTableBody>
-            </AxTable>
-          )}
-        </div>
-      </TableCard>
-
-      {/* Add/Edit User Dialog */}
-      <AxDialog
-        open={dialogMode !== null}
-        onClose={() => {
-          setDialogMode(null);
-          setFormData({});
-          setSelectedUser(null);
-        }}
-        title={dialogMode === 'add' ? l10n('user.dialog.add') : l10n('user.dialog.edit')}
-        size="large"
-        footer={
-          <div style={{ display: 'flex', gap: 'var(--spacing-sm)', justifyContent: 'flex-end' }}>
-            <AxButton 
-              variant="secondary" 
-              onClick={() => {
-                setDialogMode(null);
-                setFormData({});
-                setSelectedUser(null);
-              }}
-              disabled={submitting}
-            >
-              {l10n('user.dialog.cancel')}
-            </AxButton>
-            <AxButton 
-              variant="primary" 
-              onClick={handleSave}
-              disabled={submitting}
-            >
-              {submitting ? l10n('user.dialog.loading') : l10n('user.dialog.save')}
-            </AxButton>
-          </div>
-        }
-      >
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-lg)' }}>
-          {getFormFields().map((key) => {
-            // Generate user-friendly labels
-            const labels: Record<string, string> = {
-              userid: 'User ID',
-              password: 'Password',
-              role: 'Role',
-              firstName: 'First Name',
-              lastName: 'Last Name',
-              email: 'Email',
-              jsonData: 'JSON Data',
-            };
-            const label = labels[key] || key.charAt(0).toUpperCase() + key.slice(1).replace(/([A-Z])/g, ' $1').trim();
-            
-            const value = formData[key] ?? '';
-            
-            // Handle jsonData as textarea
-            if (key === 'jsonData') {
-              return (
-                <AxFormGroup key={key}>
-                  <AxLabel>{label}</AxLabel>
-                  <StyledTextarea
-                    value={value}
-                    onChange={(e) => {
-                      setFormData({ ...formData, [key]: e.target.value });
-                    }}
-                    placeholder='{"key": "value"}'
-                    style={{ marginTop: 'var(--spacing-xs)' }}
-                    disabled={submitting}
-                  />
-                </AxFormGroup>
-              );
-            }
-            
-            // Handle role as listbox
-            if (key === 'role') {
-              const roleOptions = [
-                { value: 'user', label: 'User' },
-                { value: 'admin', label: 'Admin' },
-              ];
-              return (
-                <AxFormGroup key={key}>
-                  <AxLabel>{label}</AxLabel>
-                  <AxListbox
-                    options={roleOptions}
-                    value={value || null}
-                    onChange={(selectedValue) => {
-                      setFormData({ ...formData, [key]: selectedValue || '' });
-                    }}
-                    placeholder="Select role"
-                    style={{ marginTop: 'var(--spacing-xs)' }}
-                    disabled={submitting}
-                    fullWidth
-                  />
-                </AxFormGroup>
-              );
-            }
-            
-            // Handle password as password input
-            if (key === 'password') {
-              // For password fields, always use password type to ensure masking
-              return (
-                <AxFormGroup key={key}>
-                  <AxLabel>{label}</AxLabel>
-                  <input
-                    type="password"
-                    value={value || ''}
-                    onChange={(e) => {
-                      setFormData({ ...formData, [key]: e.target.value });
-                    }}
-                    placeholder={dialogMode === 'edit' ? 'Enter new password (leave blank to keep current)' : 'Enter password'}
-                    autoComplete={dialogMode === 'edit' ? 'new-password' : 'new-password'}
-                    disabled={submitting}
-                    style={{
-                      fontFamily: 'var(--font-family-base)',
-                      fontSize: 'var(--font-size-base)',
-                      fontWeight: 'var(--font-weight-normal)',
-                      lineHeight: 'var(--line-height-normal)',
-                      padding: 'var(--spacing-sm) calc(var(--spacing-sm) + 6px)',
-                      border: '2px solid var(--color-border-default)',
-                      borderRadius: 'var(--radius-md)',
-                      outline: 'none',
-                      transition: 'border-color var(--transition-base), box-shadow var(--transition-base)',
-                      width: '100%',
-                      color: 'var(--color-text-primary)',
-                      backgroundColor: 'var(--color-background-default)',
-                      marginTop: 'var(--spacing-xs)',
-                      boxSizing: 'border-box',
-                    }}
-                    onFocus={(e) => {
-                      e.target.style.borderColor = 'var(--color-border-focus)';
-                      e.target.style.boxShadow = 'var(--shadow-focus-sm)';
-                    }}
-                    onBlur={(e) => {
-                      e.target.style.borderColor = 'var(--color-border-default)';
-                      e.target.style.boxShadow = 'none';
-                    }}
-                  />
-                </AxFormGroup>
-              );
-            }
-            
-            // Handle other fields
-            let inputType = 'text';
-            if (key === 'email') {
-              inputType = 'email';
-            }
-
-            return (
-              <AxFormGroup key={key}>
-                <AxLabel>{label}</AxLabel>
-                <AxInput
-                  type={inputType}
-                  value={value}
-                  onChange={(e) => {
-                    setFormData({ ...formData, [key]: e.target.value });
-                  }}
-                  style={{ marginTop: 'var(--spacing-xs)' }}
-                  disabled={submitting}
-                  fullWidth
-                />
-              </AxFormGroup>
-            );
-          })}
-        </div>
-      </AxDialog>
-
-      {/* Delete Confirmation Dialog */}
-      <AxDialog
-        open={deleteDialogOpen}
-        onClose={() => {
-          setDeleteDialogOpen(false);
-          setSelectedUser(null);
-        }}
-        title={l10n('user.dialog.delete')}
-        size="medium"
-        footer={
-          <div style={{ display: 'flex', gap: 'var(--spacing-sm)', justifyContent: 'flex-end' }}>
-            <AxButton 
-              variant="secondary" 
-              onClick={() => {
-                setDeleteDialogOpen(false);
-                setSelectedUser(null);
-              }}
-              disabled={submitting}
-            >
-              {l10n('user.dialog.cancel')}
-            </AxButton>
-            <AxButton 
-              variant="danger" 
-              onClick={handleDelete}
-              disabled={submitting}
-            >
-              {submitting ? l10n('user.dialog.loading') : l10n('user.dialog.confirm')}
-            </AxButton>
-          </div>
-        }
-      >
-        <AxParagraph style={{ marginBottom: 'var(--spacing-md)' }}>
-          {l10n('user.dialog.deleteConfirm')}
-        </AxParagraph>
-        <AxParagraph style={{ color: 'var(--color-text-secondary)', fontSize: 'var(--font-size-sm)' }}>
-          {l10n('user.dialog.deleteMessage')}
-        </AxParagraph>
-      </AxDialog>
-    </PageContainer>
+    <UserListingPageRender
+      users={users}
+      columns={columns}
+      loading={loading}
+      error={error}
+      dialogMode={dialogMode}
+      deleteDialogOpen={deleteDialogOpen}
+      selectedUser={selectedUser}
+      formData={formData}
+      submitting={submitting}
+      onNoUsersRemaining={onNoUsersRemaining}
+      onNavigateBack={onNavigateBack}
+      onAdd={handleAdd}
+      onEdit={handleEdit}
+      onDeleteClick={handleDeleteClick}
+      onDeleteConfirm={handleDelete}
+      onDeleteCancel={handleDeleteCancel}
+      onSave={handleSave}
+      onDialogClose={handleDialogClose}
+      onFormDataChange={handleFormDataChange}
+      onRetry={() => window.location.reload()}
+      getFormFields={getFormFields}
+    />
   );
 }
 

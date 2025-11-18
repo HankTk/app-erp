@@ -1,97 +1,10 @@
 import { useState, useEffect } from 'react';
-import {
-  AxTable,
-  AxTableHead,
-  AxTableBody,
-  AxTableRow,
-  AxTableHeader,
-  AxTableCell,
-  AxCard,
-  AxHeading3,
-  AxParagraph,
-  AxButton,
-  AxFormGroup,
-  AxListbox,
-  AxInput,
-} from '@ui/components';
 import { fetchOrders, Order } from '../../api/orderApi';
 import { fetchPurchaseOrders, PurchaseOrder } from '../../api/purchaseOrderApi';
 import { fetchCustomers, Customer } from '../../api/customerApi';
 import { fetchVendors, Vendor } from '../../api/vendorApi';
 import { fetchProducts, Product } from '../../api/productApi';
-import styled from '@emotion/styled';
-import { debugProps } from '../../utils/emotionCache';
-
-const COMPONENT_NAME = 'GeneralLedgerListingPage';
-
-const PageContainer = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-md);
-  height: 100%;
-  min-height: 0;
-  overflow: hidden;
-  width: 100%;
-  padding: var(--spacing-lg);
-  box-sizing: border-box;
-`;
-
-const HeaderCard = styled(AxCard)`
-  flex-shrink: 0;
-  padding: var(--spacing-md) var(--spacing-lg) !important;
-`;
-
-const HeaderSection = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 0;
-  gap: var(--spacing-md);
-`;
-
-const HeaderLeft = styled.div`
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-md);
-  flex: 1;
-`;
-
-const HeaderRight = styled.div`
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-sm);
-  flex-wrap: wrap;
-`;
-
-const TableCard = styled(AxCard)`
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  min-height: 0;
-  max-height: calc(100vh - 190px);
-  overflow: hidden;
-`;
-
-const TableWrapper = styled.div`
-  flex: 1;
-  overflow: auto;
-  min-height: 0;
-  height: 0;
-  max-height: 100%;
-  position: relative;
-`;
-
-const SummarySection = styled.div`
-  flex-shrink: 0;
-  margin-top: var(--spacing-lg);
-  padding: var(--spacing-md);
-  background-color: var(--color-background-secondary);
-  border-radius: var(--radius-md);
-  display: flex;
-  justify-content: space-between;
-  gap: var(--spacing-lg);
-  flex-wrap: wrap;
-`;
+import { GeneralLedgerListingPageRender } from './GeneralLedgerListingPage.render';
 
 interface GLEntry {
   id: string;
@@ -473,298 +386,33 @@ export function GeneralLedgerListingPage({ onViewEntry, onNavigateBack }: Genera
     .reduce((sum, e) => sum + e.amount, 0);
   const netIncome = totalRevenue - totalCost - totalExpense;
 
-  if (loading) {
-    return (
-      <PageContainer {...debugProps(COMPONENT_NAME, 'PageContainer')}>
-        <HeaderCard padding="large" {...debugProps(COMPONENT_NAME, 'HeaderCard')}>
-          <HeaderSection {...debugProps(COMPONENT_NAME, 'HeaderSection')}>
-            <HeaderLeft {...debugProps(COMPONENT_NAME, 'HeaderLeft')}>
-              {onNavigateBack && (
-                <AxButton 
-                  variant="secondary" 
-                  onClick={onNavigateBack}
-                  style={{ minWidth: 'auto', padding: 'var(--spacing-sm) var(--spacing-md)' }}
-                >
-                  ← Back
-                </AxButton>
-              )}
-              <div>
-                <AxHeading3 style={{ marginBottom: 'var(--spacing-xs)' }}>
-                  General Ledger
-                </AxHeading3>
-                <AxParagraph style={{ color: 'var(--color-text-secondary)' }}>
-                  Financial transactions based on shipping and payments
-                </AxParagraph>
-              </div>
-            </HeaderLeft>
-          </HeaderSection>
-        </HeaderCard>
-        <TableCard padding="large" {...debugProps(COMPONENT_NAME, 'TableCard')}>
-          <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '200px' }}>
-            <AxParagraph>Loading general ledger entries...</AxParagraph>
-          </div>
-        </TableCard>
-      </PageContainer>
-    );
-  }
-
-  if (error) {
-    return (
-      <PageContainer {...debugProps(COMPONENT_NAME, 'PageContainer')}>
-        <HeaderCard padding="large" {...debugProps(COMPONENT_NAME, 'HeaderCard')}>
-          <HeaderSection {...debugProps(COMPONENT_NAME, 'HeaderSection')}>
-            <HeaderLeft {...debugProps(COMPONENT_NAME, 'HeaderLeft')}>
-              {onNavigateBack && (
-                <AxButton 
-                  variant="secondary" 
-                  onClick={onNavigateBack}
-                  style={{ minWidth: 'auto', padding: 'var(--spacing-sm) var(--spacing-md)' }}
-                >
-                  ← Back
-                </AxButton>
-              )}
-              <div>
-                <AxHeading3 style={{ marginBottom: 'var(--spacing-xs)' }}>
-                  General Ledger
-                </AxHeading3>
-                <AxParagraph style={{ color: 'var(--color-text-secondary)' }}>
-                  Financial transactions based on shipping and payments
-                </AxParagraph>
-              </div>
-            </HeaderLeft>
-          </HeaderSection>
-        </HeaderCard>
-        <TableCard padding="large" {...debugProps(COMPONENT_NAME, 'TableCard')}>
-          <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '200px', flexDirection: 'column', gap: 'var(--spacing-md)' }}>
-            <AxParagraph style={{ color: 'var(--color-error)' }}>Error: {error}</AxParagraph>
-            <AxButton variant="secondary" onClick={() => window.location.reload()}>
-              Retry
-            </AxButton>
-          </div>
-        </TableCard>
-      </PageContainer>
-    );
-  }
-
   return (
-    <PageContainer {...debugProps(COMPONENT_NAME, 'PageContainer')}>
-      <HeaderCard padding="large" {...debugProps(COMPONENT_NAME, 'HeaderCard')}>
-        <HeaderSection {...debugProps(COMPONENT_NAME, 'HeaderSection')}>
-          <HeaderLeft {...debugProps(COMPONENT_NAME, 'HeaderLeft')}>
-            {onNavigateBack && (
-              <AxButton 
-                variant="secondary" 
-                onClick={onNavigateBack}
-                style={{ minWidth: 'auto', padding: 'var(--spacing-sm) var(--spacing-md)' }}
-              >
-                ← Back
-              </AxButton>
-            )}
-            <div>
-              <AxHeading3 style={{ marginBottom: 'var(--spacing-xs)' }}>
-                General Ledger
-              </AxHeading3>
-              <AxParagraph style={{ color: 'var(--color-text-secondary)' }}>
-                Financial transactions based on shipping and payments
-              </AxParagraph>
-            </div>
-          </HeaderLeft>
-          <HeaderRight {...debugProps(COMPONENT_NAME, 'HeaderRight')}>
-            <AxFormGroup style={{ margin: 0 }}>
-              <AxInput
-                type="date"
-                value={dateFrom}
-                onChange={e => setDateFrom(e.target.value)}
-                placeholder="From Date"
-              />
-            </AxFormGroup>
-            <AxFormGroup style={{ margin: 0 }}>
-              <AxInput
-                type="date"
-                value={dateTo}
-                onChange={e => setDateTo(e.target.value)}
-                placeholder="To Date"
-              />
-            </AxFormGroup>
-            <AxFormGroup style={{ margin: 0 }}>
-              <AxListbox
-                options={[
-                  { value: null, label: 'All Types' },
-                  { value: 'REVENUE', label: 'Revenue' },
-                  { value: 'COST', label: 'Cost' },
-                  { value: 'EXPENSE', label: 'Expense' },
-                  { value: 'ACCOUNTS_PAYABLE', label: 'Accounts Payable' },
-                  { value: 'PAYMENT', label: 'Payment' },
-                ]}
-                value={typeFilter}
-                onChange={(value) => setTypeFilter(value)}
-                placeholder="Filter by type"
-                style={{ width: '200px' }}
-              />
-            </AxFormGroup>
-          </HeaderRight>
-        </HeaderSection>
-      </HeaderCard>
-
-      <TableCard padding="large" {...debugProps(COMPONENT_NAME, 'TableCard')}>
-        <TableWrapper {...debugProps(COMPONENT_NAME, 'TableWrapper')}>
-          {filteredEntries.length === 0 ? (
-            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '200px' }}>
-              <AxParagraph>No general ledger entries found</AxParagraph>
-            </div>
-          ) : (
-            <AxTable fullWidth stickyHeader>
-              <AxTableHead>
-                <AxTableRow>
-                  <AxTableHeader>Date</AxTableHeader>
-                  <AxTableHeader>Type</AxTableHeader>
-                  <AxTableHeader>Order/PO/Invoice</AxTableHeader>
-                  <AxTableHeader>Customer/Supplier</AxTableHeader>
-                  <AxTableHeader>Description</AxTableHeader>
-                  <AxTableHeader align="right">Quantity</AxTableHeader>
-                  <AxTableHeader align="right">Debit</AxTableHeader>
-                  <AxTableHeader align="right">Credit</AxTableHeader>
-                  <AxTableHeader align="center">Actions</AxTableHeader>
-                </AxTableRow>
-              </AxTableHead>
-              <AxTableBody>
-                {filteredEntries.map((entry) => {
-                  // Debit for COST, EXPENSE, ACCOUNTS_PAYABLE; Credit for REVENUE and PAYMENT
-                  const debitAmount = entry.type === 'COST' || entry.type === 'EXPENSE' || entry.type === 'ACCOUNTS_PAYABLE' ? entry.amount : 0;
-                  const creditAmount = entry.type === 'REVENUE' || entry.type === 'PAYMENT' ? entry.amount : 0;
-                  
-                  // Determine order/PO number and customer/supplier name
-                  const orderOrPONumber = entry.orderNumber || entry.poNumber || 'N/A';
-                  const customerOrSupplierName = entry.customerName || entry.supplierName || 'N/A';
-                  
-                  return (
-                    <AxTableRow key={entry.id}>
-                      <AxTableCell>{formatDate(entry.date)}</AxTableCell>
-                      <AxTableCell>
-                        <span 
-                          style={{ 
-                            color: getTypeColor(entry.type), 
-                            fontWeight: 600,
-                            padding: '4px 12px',
-                            borderRadius: '12px',
-                            backgroundColor: getTypeBackgroundColor(entry.type),
-                            display: 'inline-block',
-                            fontSize: 'var(--font-size-sm)',
-                          }}
-                        >
-                          {getTypeLabel(entry.type)}
-                        </span>
-                      </AxTableCell>
-                      <AxTableCell>
-                        {entry.poNumber ? `PO: ${entry.poNumber}` : entry.orderNumber ? `Order: ${entry.orderNumber}` : 'N/A'}
-                        {entry.invoiceNumber && ` / ${entry.invoiceNumber}`}
-                      </AxTableCell>
-                      <AxTableCell>{customerOrSupplierName}</AxTableCell>
-                      <AxTableCell>{entry.description}</AxTableCell>
-                      <AxTableCell align="right">{entry.quantity}</AxTableCell>
-                      <AxTableCell align="right" style={{ 
-                        color: debitAmount > 0 ? 'var(--color-error)' : 'var(--color-text-secondary)',
-                        fontWeight: debitAmount > 0 ? 'var(--font-weight-bold)' : 'normal'
-                      }}>
-                        {debitAmount > 0 ? `$${debitAmount.toFixed(2)}` : '-'}
-                      </AxTableCell>
-                      <AxTableCell align="right" style={{ 
-                        color: creditAmount > 0 ? 'var(--color-success)' : 'var(--color-text-secondary)',
-                        fontWeight: creditAmount > 0 ? 'var(--font-weight-bold)' : 'normal'
-                      }}>
-                        {creditAmount > 0 ? `$${creditAmount.toFixed(2)}` : '-'}
-                      </AxTableCell>
-                      <AxTableCell align="center">
-                        {onViewEntry && (entry.orderId || entry.poId) && (
-                          <AxButton 
-                            variant="secondary" 
-                            size="small"
-                            onClick={() => onViewEntry(entry.orderId || entry.poId || '')}
-                            style={{ minWidth: '80px' }}
-                          >
-                            View
-                          </AxButton>
-                        )}
-                      </AxTableCell>
-                    </AxTableRow>
-                  );
-                })}
-              </AxTableBody>
-            </AxTable>
-          )}
-        </TableWrapper>
-        
-        {/* Summary - Always visible outside scrollable area */}
-        {filteredEntries.length > 0 && (
-          <SummarySection {...debugProps(COMPONENT_NAME, 'SummarySection')}>
-            <div>
-              <AxParagraph style={{ fontSize: 'var(--font-size-sm)', color: 'var(--color-text-secondary)', marginBottom: 'var(--spacing-xs)' }}>
-                Total Debit
-              </AxParagraph>
-              <AxParagraph style={{ fontSize: 'var(--font-size-lg)', fontWeight: 'var(--font-weight-bold)', color: 'var(--color-error)' }}>
-                ${totalDebit.toFixed(2)}
-              </AxParagraph>
-            </div>
-            <div>
-              <AxParagraph style={{ fontSize: 'var(--font-size-sm)', color: 'var(--color-text-secondary)', marginBottom: 'var(--spacing-xs)' }}>
-                Total Credit
-              </AxParagraph>
-              <AxParagraph style={{ fontSize: 'var(--font-size-lg)', fontWeight: 'var(--font-weight-bold)', color: 'var(--color-success)' }}>
-                ${totalCredit.toFixed(2)}
-              </AxParagraph>
-            </div>
-            <div>
-              <AxParagraph style={{ fontSize: 'var(--font-size-sm)', color: 'var(--color-text-secondary)', marginBottom: 'var(--spacing-xs)' }}>
-                Total Revenue
-              </AxParagraph>
-              <AxParagraph style={{ fontSize: 'var(--font-size-lg)', fontWeight: 'var(--font-weight-bold)', color: 'var(--color-success)' }}>
-                ${totalRevenue.toFixed(2)}
-              </AxParagraph>
-            </div>
-            <div>
-              <AxParagraph style={{ fontSize: 'var(--font-size-sm)', color: 'var(--color-text-secondary)', marginBottom: 'var(--spacing-xs)' }}>
-                Total Cost
-              </AxParagraph>
-              <AxParagraph style={{ fontSize: 'var(--font-size-lg)', fontWeight: 'var(--font-weight-bold)', color: 'var(--color-error)' }}>
-                ${totalCost.toFixed(2)}
-              </AxParagraph>
-            </div>
-            <div>
-              <AxParagraph style={{ fontSize: 'var(--font-size-sm)', color: 'var(--color-text-secondary)', marginBottom: 'var(--spacing-xs)' }}>
-                Total Expense
-              </AxParagraph>
-              <AxParagraph style={{ fontSize: 'var(--font-size-lg)', fontWeight: 'var(--font-weight-bold)', color: 'var(--color-error)' }}>
-                ${totalExpense.toFixed(2)}
-              </AxParagraph>
-            </div>
-            <div>
-              <AxParagraph style={{ fontSize: 'var(--font-size-sm)', color: 'var(--color-text-secondary)', marginBottom: 'var(--spacing-xs)' }}>
-                Total A/P
-              </AxParagraph>
-              <AxParagraph style={{ fontSize: 'var(--font-size-lg)', fontWeight: 'var(--font-weight-bold)', color: 'var(--color-error)' }}>
-                ${totalAccountsPayable.toFixed(2)}
-              </AxParagraph>
-            </div>
-            <div>
-              <AxParagraph style={{ fontSize: 'var(--font-size-sm)', color: 'var(--color-text-secondary)', marginBottom: 'var(--spacing-xs)' }}>
-                Total Payments
-              </AxParagraph>
-              <AxParagraph style={{ fontSize: 'var(--font-size-lg)', fontWeight: 'var(--font-weight-bold)', color: 'var(--color-primary)' }}>
-                ${totalPayment.toFixed(2)}
-              </AxParagraph>
-            </div>
-            <div>
-              <AxParagraph style={{ fontSize: 'var(--font-size-sm)', color: 'var(--color-text-secondary)', marginBottom: 'var(--spacing-xs)' }}>
-                Net Income
-              </AxParagraph>
-              <AxParagraph style={{ fontSize: 'var(--font-size-lg)', fontWeight: 'var(--font-weight-bold)', color: netIncome >= 0 ? 'var(--color-success)' : 'var(--color-error)' }}>
-                ${netIncome.toFixed(2)}
-              </AxParagraph>
-            </div>
-          </SummarySection>
-        )}
-      </TableCard>
-    </PageContainer>
+    <GeneralLedgerListingPageRender
+      glEntries={glEntries}
+      loading={loading}
+      error={error}
+      typeFilter={typeFilter}
+      dateFrom={dateFrom}
+      dateTo={dateTo}
+      filteredEntries={filteredEntries}
+      onViewEntry={onViewEntry}
+      onNavigateBack={onNavigateBack}
+      onTypeFilterChange={setTypeFilter}
+      onDateFromChange={setDateFrom}
+      onDateToChange={setDateTo}
+      formatDate={formatDate}
+      getTypeColor={getTypeColor}
+      getTypeBackgroundColor={getTypeBackgroundColor}
+      getTypeLabel={getTypeLabel}
+      totalDebit={totalDebit}
+      totalCredit={totalCredit}
+      totalRevenue={totalRevenue}
+      totalCost={totalCost}
+      totalExpense={totalExpense}
+      totalAccountsPayable={totalAccountsPayable}
+      totalPayment={totalPayment}
+      netIncome={netIncome}
+    />
   );
 }
 

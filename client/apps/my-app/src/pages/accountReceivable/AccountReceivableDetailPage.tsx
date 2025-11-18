@@ -1,142 +1,9 @@
 import { useState, useEffect } from 'react';
-import {
-  AxCard,
-  AxHeading3,
-  AxParagraph,
-  AxButton,
-  AxInput,
-  AxLabel,
-  AxFormGroup,
-  AxListbox,
-  AxTable,
-  AxTableHead,
-  AxTableBody,
-  AxTableRow,
-  AxTableHeader,
-  AxTableCell,
-} from '@ui/components';
 import { useI18n } from '../../i18n/I18nProvider';
 import { fetchCustomers, Customer } from '../../api/customerApi';
 import { fetchAddressesByCustomerId, Address } from '../../api/addressApi';
 import { fetchOrderById, updateOrder, Order } from '../../api/orderApi';
-import styled from '@emotion/styled';
-import { debugProps } from '../../utils/emotionCache';
-
-const COMPONENT_NAME = 'AccountReceivableDetailPage';
-
-const PageContainer = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-sm);
-  height: 100%;
-  width: 100%;
-  min-height: 0;
-  overflow-y: auto;
-  overflow-x: hidden;
-  padding: var(--spacing-md);
-  box-sizing: border-box;
-  flex: 1;
-`;
-
-const HeaderCard = styled(AxCard)`
-  flex-shrink: 0;
-  padding: var(--spacing-sm) var(--spacing-md) !important;
-`;
-
-const HeaderSection = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  gap: var(--spacing-md);
-  margin-bottom: var(--spacing-xs);
-`;
-
-const HeaderLeft = styled.div`
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-md);
-  flex: 1;
-`;
-
-const HeaderRight = styled.div`
-  display: flex;
-  align-items: flex-start;
-  gap: var(--spacing-md);
-  flex-wrap: wrap;
-`;
-
-const ContentCard = styled(AxCard)`
-  display: flex;
-  flex-direction: column;
-  overflow: visible;
-  flex-shrink: 0;
-`;
-
-const StepIndicator = styled.div`
-  display: flex;
-  gap: var(--spacing-sm);
-  margin-bottom: var(--spacing-md);
-  padding-bottom: var(--spacing-sm);
-  border-bottom: 2px solid var(--color-border-default);
-  flex-shrink: 0;
-  align-items: center;
-  width: 100%;
-`;
-
-const Step = styled.div<{ $active: boolean; $completed: boolean }>`
-  flex: none;
-  padding: var(--spacing-sm) var(--spacing-md);
-  text-align: center;
-  border-radius: var(--radius-md);
-  white-space: nowrap;
-  font-size: var(--font-size-sm);
-  background-color: ${props => 
-    props.$active ? 'var(--color-primary)' : 
-    props.$completed ? 'var(--color-success)' : 
-    'var(--color-background-secondary)'};
-  color: ${props => 
-    props.$active || props.$completed ? 'var(--color-text-inverse)' : 
-    'var(--color-text-secondary)'};
-  font-weight: ${props => props.$active ? 'var(--font-weight-bold)' : 'var(--font-weight-normal)'};
-  cursor: pointer;
-  transition: all var(--transition-base);
-`;
-
-const StepContent = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-md);
-  overflow: visible;
-`;
-
-const ButtonGroup = styled.div`
-  display: flex;
-  justify-content: space-between;
-  gap: var(--spacing-md);
-  margin-top: var(--spacing-md);
-  padding-top: var(--spacing-sm);
-  border-top: 2px solid var(--color-border-default);
-  flex-shrink: 0;
-`;
-
-const InfoSection = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-xs);
-  padding: var(--spacing-sm);
-  background-color: var(--color-background-secondary);
-  border-radius: var(--radius-md);
-`;
-
-const InfoRow = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-`;
-
-const ItemsTable = styled(AxTable)`
-  margin-top: var(--spacing-sm);
-`;
+import { AccountReceivableDetailPageRender } from './AccountReceivableDetailPage.render';
 
 type AccountReceivableStep = 'invoice' | 'payment' | 'history';
 
@@ -203,8 +70,19 @@ export function AccountReceivableDetailPage(props: AccountReceivableDetailPagePr
           setCurrentStep('invoice');
         }
       } catch (err) {
-        console.error('Error loading invoice:', err);
-        alert('Failed to load invoice');
+        // Set order to null so the "not found" UI is shown
+        setOrder(null);
+        // Only log non-404 errors to console (404 is expected when order doesn't exist)
+        if (err instanceof Error) {
+          const is404 = err.message.includes('404') || err.message.includes('HTTP 404');
+          if (!is404) {
+            console.error('Error loading invoice:', err);
+            alert('Failed to load invoice: ' + err.message);
+          }
+        } else {
+          console.error('Error loading invoice:', err);
+          alert('Failed to load invoice');
+        }
       } finally {
         setLoading(false);
       }
@@ -258,8 +136,6 @@ export function AccountReceivableDetailPage(props: AccountReceivableDetailPagePr
   };
 
   const selectedCustomer = customers.find(c => c.id === order?.customerId);
-  const shippingAddress = addresses.find(a => a.id === order?.shippingAddressId);
-  const billingAddress = addresses.find(a => a.id === order?.billingAddressId);
   const outstandingAmount = (order?.total || 0) - paymentAmount;
 
   const getHistoryRecords = (): HistoryRecord[] => {
@@ -322,208 +198,6 @@ export function AccountReceivableDetailPage(props: AccountReceivableDetailPagePr
     }
   };
 
-  const renderInvoiceStep = () => {
-    if (!order) return null;
-    
-    return (
-      <StepContent {...debugProps(COMPONENT_NAME, 'StepContent')}>
-        <AxHeading3 style={{ marginBottom: 'var(--spacing-sm)' }}>
-          {l10n('accountsReceivable.invoice.title')}
-        </AxHeading3>
-        <AxParagraph style={{ marginBottom: 'var(--spacing-md)', color: 'var(--color-text-secondary)' }}>
-          {l10n('accountsReceivable.invoice.description')}
-        </AxParagraph>
-
-        <InfoSection {...debugProps(COMPONENT_NAME, 'InfoSection')}>
-          <InfoRow>
-            <AxParagraph style={{ fontWeight: 'var(--font-weight-bold)' }}>
-              {l10n('accountsReceivable.invoice.invoiceNumber')}
-            </AxParagraph>
-            <AxParagraph>{order.invoiceNumber || 'N/A'}</AxParagraph>
-          </InfoRow>
-          <InfoRow>
-            <AxParagraph style={{ fontWeight: 'var(--font-weight-bold)' }}>
-              {l10n('accountsReceivable.invoice.invoiceDate')}
-            </AxParagraph>
-            <AxParagraph>{formatDate(order.invoiceDate)}</AxParagraph>
-          </InfoRow>
-          <InfoRow>
-            <AxParagraph style={{ fontWeight: 'var(--font-weight-bold)' }}>
-              {l10n('accountsReceivable.invoice.orderNumber')}
-            </AxParagraph>
-            <AxParagraph>{order.orderNumber || 'N/A'}</AxParagraph>
-          </InfoRow>
-          <InfoRow>
-            <AxParagraph style={{ fontWeight: 'var(--font-weight-bold)' }}>
-              {l10n('accountsReceivable.invoice.customer')}
-            </AxParagraph>
-            <AxParagraph>
-              {selectedCustomer ? (selectedCustomer.companyName || `${selectedCustomer.lastName} ${selectedCustomer.firstName}` || selectedCustomer.email) : 'N/A'}
-            </AxParagraph>
-          </InfoRow>
-        </InfoSection>
-
-        {order.items && order.items.length > 0 && (
-          <ItemsTable fullWidth>
-            <AxTableHead>
-              <AxTableRow>
-                <AxTableHeader>Product</AxTableHeader>
-                <AxTableHeader align="right">Quantity</AxTableHeader>
-                <AxTableHeader align="right">Unit Price</AxTableHeader>
-                <AxTableHeader align="right">Total</AxTableHeader>
-              </AxTableRow>
-            </AxTableHead>
-            <AxTableBody>
-              {order.items.map((item, index) => (
-                <AxTableRow key={index}>
-                  <AxTableCell>{item.productName || item.productCode || 'N/A'}</AxTableCell>
-                  <AxTableCell align="right">{item.quantity || 0}</AxTableCell>
-                  <AxTableCell align="right">${item.unitPrice?.toFixed(2) || '0.00'}</AxTableCell>
-                  <AxTableCell align="right">${item.lineTotal?.toFixed(2) || '0.00'}</AxTableCell>
-                </AxTableRow>
-              ))}
-            </AxTableBody>
-          </ItemsTable>
-        )}
-
-        <InfoSection>
-          <InfoRow>
-            <AxParagraph style={{ fontWeight: 'var(--font-weight-bold)' }}>
-              {l10n('accountsReceivable.invoice.subtotal')}
-            </AxParagraph>
-            <AxParagraph>${order.subtotal?.toFixed(2) || '0.00'}</AxParagraph>
-          </InfoRow>
-          <InfoRow>
-            <AxParagraph style={{ fontWeight: 'var(--font-weight-bold)' }}>
-              {l10n('accountsReceivable.invoice.tax')}
-            </AxParagraph>
-            <AxParagraph>${order.tax?.toFixed(2) || '0.00'}</AxParagraph>
-          </InfoRow>
-          <InfoRow>
-            <AxParagraph style={{ fontWeight: 'var(--font-weight-bold)' }}>
-              {l10n('accountsReceivable.invoice.shipping')}
-            </AxParagraph>
-            <AxParagraph>${order.shippingCost?.toFixed(2) || '0.00'}</AxParagraph>
-          </InfoRow>
-          <InfoRow>
-            <AxParagraph style={{ fontWeight: 'var(--font-weight-bold)', fontSize: 'var(--font-size-lg)' }}>
-              {l10n('accountsReceivable.invoice.total')}
-            </AxParagraph>
-            <AxParagraph style={{ fontSize: 'var(--font-size-lg)', fontWeight: 'var(--font-weight-bold)' }}>
-              ${order.total?.toFixed(2) || '0.00'}
-            </AxParagraph>
-          </InfoRow>
-        </InfoSection>
-      </StepContent>
-    );
-  };
-
-  const renderPaymentStep = () => {
-    if (!order) return null;
-    
-    return (
-      <StepContent {...debugProps(COMPONENT_NAME, 'StepContent')}>
-        <AxHeading3 style={{ marginBottom: 'var(--spacing-sm)' }}>
-          {l10n('accountsReceivable.payment.title')}
-        </AxHeading3>
-        <AxParagraph style={{ marginBottom: 'var(--spacing-md)', color: 'var(--color-text-secondary)' }}>
-          {l10n('accountsReceivable.payment.description')}
-        </AxParagraph>
-
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-xsm)' }}>
-          <AxFormGroup>
-            <AxLabel>{l10n('accountsReceivable.payment.paymentAmount')}</AxLabel>
-            <AxInput
-              type="number"
-              value={paymentAmount || ''}
-              onChange={e => setPaymentAmount(parseFloat(e.target.value) || 0)}
-              placeholder="0.00"
-              style={{ width: '220px' }}
-            />
-          </AxFormGroup>
-
-          <AxFormGroup>
-            <AxLabel>{l10n('accountsReceivable.payment.paymentDate')}</AxLabel>
-            <AxInput
-              type="date"
-              value={paymentDate}
-              onChange={e => setPaymentDate(e.target.value)}
-            />
-          </AxFormGroup>
-
-          <AxFormGroup>
-            <AxLabel>{l10n('accountsReceivable.payment.paymentMethod')}</AxLabel>
-            <AxListbox
-              options={[
-                { value: 'BANK_TRANSFER', label: l10n('accountsReceivable.payment.method.bankTransfer') },
-                { value: 'CREDIT_CARD', label: l10n('accountsReceivable.payment.method.creditCard') },
-                { value: 'CASH', label: l10n('accountsReceivable.payment.method.cash') },
-                { value: 'CHECK', label: l10n('accountsReceivable.payment.method.check') },
-                { value: 'OTHER', label: l10n('accountsReceivable.payment.method.other') },
-              ]}
-              value={paymentMethod}
-              onChange={setPaymentMethod}
-              placeholder={l10n('accountsReceivable.payment.paymentMethodPlaceholder')}
-              style={{ width: '220px' }}
-            />
-          </AxFormGroup>
-
-          <InfoSection {...debugProps(COMPONENT_NAME, 'InfoSection')}>
-            <InfoRow>
-              <AxParagraph style={{ fontWeight: 'var(--font-weight-bold)' }}>
-                {l10n('accountsReceivable.payment.invoiceAmount')}
-              </AxParagraph>
-              <AxParagraph style={{ fontSize: 'var(--font-size-lg)' }}>
-                ${order.total?.toFixed(2) || '0.00'}
-              </AxParagraph>
-            </InfoRow>
-            {paymentAmount > 0 && (
-              <InfoRow>
-                <AxParagraph style={{ fontWeight: 'var(--font-weight-bold)' }}>
-                  {l10n('accountsReceivable.payment.paidAmount')}
-                </AxParagraph>
-                <AxParagraph style={{ fontSize: 'var(--font-size-lg)' }}>
-                  ${paymentAmount.toFixed(2)}
-                </AxParagraph>
-              </InfoRow>
-            )}
-            <InfoRow>
-              <AxParagraph style={{ 
-                fontWeight: 'var(--font-weight-bold)',
-                color: outstandingAmount > 0 ? 'var(--color-warning)' : 'var(--color-success)'
-              }}>
-                {l10n('accountsReceivable.payment.outstanding')}
-              </AxParagraph>
-              <AxParagraph style={{ 
-                fontSize: 'var(--font-size-lg)',
-                fontWeight: 'var(--font-weight-bold)',
-                color: outstandingAmount > 0 ? 'var(--color-warning)' : 'var(--color-success)'
-              }}>
-                ${outstandingAmount.toFixed(2)}
-              </AxParagraph>
-            </InfoRow>
-          </InfoSection>
-        </div>
-
-        <ButtonGroup {...debugProps(COMPONENT_NAME, 'ButtonGroup')}>
-          <AxButton
-            variant="secondary"
-            onClick={() => setCurrentStep('invoice')}
-          >
-            {l10n('accountsReceivable.previous')}
-          </AxButton>
-          <AxButton
-            variant="primary"
-            onClick={handlePayment}
-            disabled={submitting || !paymentAmount || !paymentDate || !paymentMethod}
-          >
-            {submitting ? l10n('accountsReceivable.payment.processing') : l10n('accountsReceivable.payment.record')}
-          </AxButton>
-        </ButtonGroup>
-      </StepContent>
-    );
-  };
-
   const getStepLabel = (step: string): string => {
     const stepLabels: Record<string, string> = {
       'invoicing': l10n('accountsReceivable.history.step.invoicing'),
@@ -578,220 +252,37 @@ export function AccountReceivableDetailPage(props: AccountReceivableDetailPagePr
     return String(value);
   };
 
-  const renderHistoryStep = () => {
-    const historyRecords = getHistoryRecords();
-    
-    return (
-      <StepContent {...debugProps(COMPONENT_NAME, 'StepContent')}>
-        <AxHeading3 style={{ marginBottom: 'var(--spacing-sm)' }}>
-          {l10n('accountsReceivable.history.title')}
-        </AxHeading3>
-        <AxParagraph style={{ marginBottom: 'var(--spacing-md)', color: 'var(--color-text-secondary)' }}>
-          {l10n('accountsReceivable.history.description')}
-        </AxParagraph>
-
-        {historyRecords.length === 0 ? (
-          <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '200px' }}>
-            <AxParagraph>{l10n('accountsReceivable.history.empty')}</AxParagraph>
-          </div>
-        ) : (
-          <div style={{ maxHeight: 'calc(100vh - 400px)', overflowY: 'auto', overflowX: 'hidden' }}>
-            <AxTable fullWidth>
-              <AxTableHead>
-                <AxTableRow>
-                  <AxTableHeader>Date / Time</AxTableHeader>
-                  <AxTableHeader>Step</AxTableHeader>
-                  <AxTableHeader>Status</AxTableHeader>
-                  <AxTableHeader>Notes</AxTableHeader>
-                  <AxTableHeader>Data</AxTableHeader>
-                </AxTableRow>
-              </AxTableHead>
-              <AxTableBody>
-                {historyRecords.map((record, index) => (
-                  <AxTableRow key={index}>
-                    <AxTableCell>{formatDateTime(record.timestamp)}</AxTableCell>
-                    <AxTableCell>{getStepLabel(record.step)}</AxTableCell>
-                    <AxTableCell>{getStatusLabel(record.status)}</AxTableCell>
-                    <AxTableCell>{record.note || 'N/A'}</AxTableCell>
-                    <AxTableCell>
-                      {record.data && Object.keys(record.data).length > 0 ? (
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-xs)' }}>
-                          {Object.entries(record.data).map(([key, value]) => (
-                            <div key={key} style={{ fontSize: 'var(--font-size-sm)' }}>
-                              <strong>{getDataKeyLabel(key)}:</strong> {formatDataValue(key, value)}
-                            </div>
-                          ))}
-                        </div>
-                      ) : 'N/A'}
-                    </AxTableCell>
-                  </AxTableRow>
-                ))}
-              </AxTableBody>
-            </AxTable>
-          </div>
-        )}
-
-        <ButtonGroup {...debugProps(COMPONENT_NAME, 'ButtonGroup')}>
-          <AxButton
-            variant="secondary"
-            onClick={() => setCurrentStep('payment')}
-          >
-            {l10n('accountsReceivable.previous')}
-          </AxButton>
-        </ButtonGroup>
-      </StepContent>
-    );
-  };
-
-  if (loading) {
-    return (
-      <PageContainer {...debugProps(COMPONENT_NAME, 'PageContainer')}>
-        <ContentCard padding="large" {...debugProps(COMPONENT_NAME, 'ContentCard')}>
-          <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', height: '100%', gap: 'var(--spacing-md)' }}>
-            <AxParagraph>Loading invoice...</AxParagraph>
-          </div>
-        </ContentCard>
-      </PageContainer>
-    );
-  }
-
-  if (!order) {
-    return (
-      <PageContainer {...debugProps(COMPONENT_NAME, 'PageContainer')}>
-        <ContentCard padding="large" {...debugProps(COMPONENT_NAME, 'ContentCard')}>
-          <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', height: '100%', gap: 'var(--spacing-md)' }}>
-            <AxParagraph>Invoice not found</AxParagraph>
-            {onNavigateBack && (
-              <AxButton variant="secondary" onClick={onNavigateBack}>
-                {l10n('accountsReceivable.back')}
-              </AxButton>
-            )}
-          </div>
-        </ContentCard>
-      </PageContainer>
-    );
-  }
-
   const selectedCustomerName = selectedCustomer 
     ? (selectedCustomer.companyName || `${selectedCustomer.lastName} ${selectedCustomer.firstName}` || selectedCustomer.email)
     : 'N/A';
 
   return (
-    <PageContainer {...debugProps(COMPONENT_NAME, 'PageContainer')}>
-      <HeaderCard padding="large" {...debugProps(COMPONENT_NAME, 'HeaderCard')}>
-        <HeaderSection {...debugProps(COMPONENT_NAME, 'HeaderSection')}>
-          <HeaderLeft {...debugProps(COMPONENT_NAME, 'HeaderLeft')}>
-            {onNavigateBack && (
-              <AxButton 
-                variant="secondary" 
-                onClick={onNavigateBack}
-                style={{ minWidth: 'auto', padding: 'var(--spacing-sm) var(--spacing-md)' }}
-              >
-                {l10n('accountsReceivable.back')}
-              </AxButton>
-            )}
-            <div style={{ flex: 1 }}>
-              <AxHeading3 style={{ marginBottom: 'var(--spacing-xs)' }}>
-                {l10n('module.accountsReceivable')}
-              </AxHeading3>
-              <AxParagraph style={{ color: 'var(--color-text-secondary)' }}>
-                {l10n('accountsReceivable.subtitle')}
-              </AxParagraph>
-            </div>
-          </HeaderLeft>
-          <HeaderRight {...debugProps(COMPONENT_NAME, 'HeaderRight')}>
-            <div style={{ display: 'flex', gap: 'var(--spacing-md)', flexWrap: 'wrap', alignItems: 'flex-start' }}>
-              {order.invoiceNumber && (
-                <div style={{ 
-                  padding: 'var(--spacing-sm)', 
-                  backgroundColor: 'var(--color-background-secondary)', 
-                  borderRadius: 'var(--radius-md)',
-                }}>
-                  <AxParagraph style={{ fontSize: 'var(--font-size-sm)', color: 'var(--color-text-secondary)', marginBottom: 'var(--spacing-xs)' }}>
-                    {l10n('accountsReceivable.invoice.invoiceNumber')}
-                  </AxParagraph>
-                  <AxParagraph style={{ fontWeight: 'var(--font-weight-bold)' }}>
-                    {order.invoiceNumber}
-                  </AxParagraph>
-                </div>
-              )}
-              <div style={{ 
-                padding: 'var(--spacing-sm)', 
-                backgroundColor: 'var(--color-background-secondary)', 
-                borderRadius: 'var(--radius-md)',
-              }}>
-                <AxParagraph style={{ fontSize: 'var(--font-size-sm)', color: 'var(--color-text-secondary)', marginBottom: 'var(--spacing-xs)' }}>
-                  {l10n('accountsReceivable.customer')}
-                </AxParagraph>
-                <AxParagraph style={{ fontWeight: 'var(--font-weight-bold)' }}>
-                  {selectedCustomerName}
-                </AxParagraph>
-              </div>
-              <div style={{ 
-                padding: 'var(--spacing-sm)', 
-                backgroundColor: 'var(--color-background-secondary)', 
-                borderRadius: 'var(--radius-md)',
-              }}>
-                <AxParagraph style={{ fontSize: 'var(--font-size-sm)', color: 'var(--color-text-secondary)', marginBottom: 'var(--spacing-xs)' }}>
-                  {l10n('accountsReceivable.total')}
-                </AxParagraph>
-                <AxParagraph style={{ fontWeight: 'var(--font-weight-bold)' }}>
-                  ${order.total?.toFixed(2) || '0.00'}
-                </AxParagraph>
-              </div>
-              <div style={{ 
-                padding: 'var(--spacing-sm)', 
-                backgroundColor: 'var(--color-background-secondary)', 
-                borderRadius: 'var(--radius-md)',
-              }}>
-                <AxParagraph style={{ fontSize: 'var(--font-size-sm)', color: 'var(--color-text-secondary)', marginBottom: 'var(--spacing-xs)' }}>
-                  {l10n('accountsReceivable.outstanding')}
-                </AxParagraph>
-                <AxParagraph style={{ 
-                  fontWeight: 'var(--font-weight-bold)',
-                  color: outstandingAmount > 0 ? 'var(--color-warning)' : 'var(--color-success)'
-                }}>
-                  ${outstandingAmount.toFixed(2)}
-                </AxParagraph>
-              </div>
-            </div>
-          </HeaderRight>
-        </HeaderSection>
-      </HeaderCard>
-
-      <ContentCard padding="large" {...debugProps(COMPONENT_NAME, 'ContentCard')}>
-        <StepIndicator {...debugProps(COMPONENT_NAME, 'StepIndicator')}>
-          <Step
-            $active={currentStep === 'invoice'}
-            $completed={isStepCompleted('invoice')}
-            onClick={() => setCurrentStep('invoice')}
-            {...debugProps(COMPONENT_NAME, 'Step')}
-          >
-            {l10n('accountsReceivable.step.invoice')}
-          </Step>
-          <Step
-            $active={currentStep === 'payment'}
-            $completed={isStepCompleted('payment')}
-            onClick={() => setCurrentStep('payment')}
-            {...debugProps(COMPONENT_NAME, 'Step')}
-          >
-            {l10n('accountsReceivable.step.payment')}
-          </Step>
-          <Step
-            $active={currentStep === 'history'}
-            $completed={isStepCompleted('history')}
-            onClick={() => setCurrentStep('history')}
-            {...debugProps(COMPONENT_NAME, 'Step')}
-          >
-            {l10n('accountsReceivable.step.history')}
-          </Step>
-        </StepIndicator>
-
-        {currentStep === 'invoice' && renderInvoiceStep()}
-        {currentStep === 'payment' && renderPaymentStep()}
-        {currentStep === 'history' && renderHistoryStep()}
-      </ContentCard>
-    </PageContainer>
+    <AccountReceivableDetailPageRender
+      currentStep={currentStep}
+      order={order}
+      loading={loading}
+      submitting={submitting}
+      paymentAmount={paymentAmount}
+      paymentDate={paymentDate}
+      paymentMethod={paymentMethod}
+      selectedCustomer={selectedCustomer}
+      selectedCustomerName={selectedCustomerName || 'N/A'}
+      outstandingAmount={outstandingAmount}
+      historyRecords={getHistoryRecords()}
+      onNavigateBack={onNavigateBack}
+      onStepChange={setCurrentStep}
+      onPaymentAmountChange={setPaymentAmount}
+      onPaymentDateChange={setPaymentDate}
+      onPaymentMethodChange={setPaymentMethod}
+      onPaymentSubmit={handlePayment}
+      formatDate={formatDate}
+      formatDateTime={formatDateTime}
+      isStepCompleted={isStepCompleted}
+      getStepLabel={getStepLabel}
+      getStatusLabel={getStatusLabel}
+      getDataKeyLabel={getDataKeyLabel}
+      formatDataValue={formatDataValue}
+    />
   );
 }
 

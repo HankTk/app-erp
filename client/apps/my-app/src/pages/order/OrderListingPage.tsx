@@ -1,73 +1,8 @@
 import { useState, useEffect } from 'react';
-import {
-  AxTable,
-  AxTableHead,
-  AxTableBody,
-  AxTableRow,
-  AxTableHeader,
-  AxTableCell,
-  AxCard,
-  AxHeading3,
-  AxParagraph,
-  AxButton,
-  AxDialog,
-  AxFormGroup,
-  AxListbox,
-} from '@ui/components';
 import { fetchOrders, deleteOrder, Order } from '../../api/orderApi';
 import { fetchCustomers, Customer } from '../../api/customerApi';
 import { fetchAddresses, Address } from '../../api/addressApi';
-import styled from '@emotion/styled';
-import { debugProps } from '../../utils/emotionCache';
-
-const COMPONENT_NAME = 'OrderListingPage';
-
-const PageContainer = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-md);
-  height: 100%;
-  min-height: 0;
-  overflow: hidden;
-  width: 100%;
-  padding: var(--spacing-lg);
-  box-sizing: border-box;
-`;
-
-const HeaderCard = styled(AxCard)`
-  flex-shrink: 0;
-  padding: var(--spacing-md) var(--spacing-lg) !important;
-`;
-
-const HeaderSection = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 0;
-  gap: var(--spacing-md);
-`;
-
-const HeaderLeft = styled.div`
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-md);
-  flex: 1;
-`;
-
-const HeaderRight = styled.div`
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-sm);
-`;
-
-const TableCard = styled(AxCard)`
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  min-height: 0;
-  max-height: calc(100vh - 280px);
-  overflow: hidden;
-`;
+import { OrderListingPageRender } from './OrderListingPage.render';
 
 
 interface OrderListingPageProps {
@@ -161,14 +96,12 @@ export function OrderListingPage({ onNavigateToOrderEntry, onEditOrder, onViewOr
 
   const handleView = (order: Order) => {
     if (onViewOrder && order.id) {
-      // Navigate to order entry page in read-only mode
       onViewOrder(order.id);
     }
   };
 
   const handleEdit = (order: Order) => {
     if (onEditOrder && order.id) {
-      // Navigate to order entry page for editing
       onEditOrder(order.id);
     }
   };
@@ -193,6 +126,11 @@ export function OrderListingPage({ onNavigateToOrderEntry, onEditOrder, onViewOr
     } finally {
       setSubmitting(false);
     }
+  };
+
+  const handleDeleteCancel = () => {
+    setDeleteDialogOpen(false);
+    setSelectedOrder(null);
   };
 
 
@@ -272,259 +210,30 @@ export function OrderListingPage({ onNavigateToOrderEntry, onEditOrder, onViewOr
     }
   };
 
-  if (loading) {
-    return (
-      <PageContainer {...debugProps(COMPONENT_NAME, 'PageContainer')}>
-        <HeaderCard padding="large" {...debugProps(COMPONENT_NAME, 'HeaderCard')}>
-          <HeaderSection {...debugProps(COMPONENT_NAME, 'HeaderSection')}>
-            <HeaderLeft {...debugProps(COMPONENT_NAME, 'HeaderLeft')}>
-              {onNavigateBack && (
-                <AxButton 
-                  variant="secondary" 
-                  onClick={onNavigateBack}
-                  style={{ minWidth: 'auto', padding: 'var(--spacing-sm) var(--spacing-md)' }}
-                >
-                  ← Back
-                </AxButton>
-              )}
-              <div>
-                <AxHeading3 style={{ marginBottom: 'var(--spacing-xs)' }}>
-                  Orders
-                </AxHeading3>
-                <AxParagraph style={{ color: 'var(--color-text-secondary)' }}>
-                  View and manage all orders
-                </AxParagraph>
-              </div>
-            </HeaderLeft>
-            <HeaderRight {...debugProps(COMPONENT_NAME, 'HeaderRight')}>
-            </HeaderRight>
-          </HeaderSection>
-        </HeaderCard>
-        <TableCard padding="large" {...debugProps(COMPONENT_NAME, 'TableCard')}>
-          <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '200px' }}>
-            <AxParagraph>Loading orders...</AxParagraph>
-          </div>
-        </TableCard>
-      </PageContainer>
-    );
-  }
-
-  if (error) {
-    return (
-      <PageContainer {...debugProps(COMPONENT_NAME, 'PageContainer')}>
-        <HeaderCard padding="large" {...debugProps(COMPONENT_NAME, 'HeaderCard')}>
-          <HeaderSection {...debugProps(COMPONENT_NAME, 'HeaderSection')}>
-            <HeaderLeft {...debugProps(COMPONENT_NAME, 'HeaderLeft')}>
-              {onNavigateBack && (
-                <AxButton 
-                  variant="secondary" 
-                  onClick={onNavigateBack}
-                  style={{ minWidth: 'auto', padding: 'var(--spacing-sm) var(--spacing-md)' }}
-                >
-                  ← Back
-                </AxButton>
-              )}
-              <div>
-                <AxHeading3 style={{ marginBottom: 'var(--spacing-xs)' }}>
-                  Orders
-                </AxHeading3>
-                <AxParagraph style={{ color: 'var(--color-text-secondary)' }}>
-                  View and manage all orders
-                </AxParagraph>
-              </div>
-            </HeaderLeft>
-            <HeaderRight {...debugProps(COMPONENT_NAME, 'HeaderRight')}>
-            </HeaderRight>
-          </HeaderSection>
-        </HeaderCard>
-        <TableCard padding="large" {...debugProps(COMPONENT_NAME, 'TableCard')}>
-          <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '200px', flexDirection: 'column', gap: 'var(--spacing-md)' }}>
-            <AxParagraph style={{ color: 'var(--color-error)' }}>Error: {error}</AxParagraph>
-            <AxButton variant="secondary" onClick={() => window.location.reload()}>
-              Retry
-            </AxButton>
-          </div>
-        </TableCard>
-      </PageContainer>
-    );
-  }
-
   return (
-    <PageContainer {...debugProps(COMPONENT_NAME, 'PageContainer')}>
-      <HeaderCard padding="large" {...debugProps(COMPONENT_NAME, 'HeaderCard')}>
-        <HeaderSection {...debugProps(COMPONENT_NAME, 'HeaderSection')}>
-          <HeaderLeft {...debugProps(COMPONENT_NAME, 'HeaderLeft')}>
-            {onNavigateBack && (
-              <AxButton 
-                variant="secondary" 
-                onClick={onNavigateBack}
-                style={{ minWidth: 'auto', padding: 'var(--spacing-sm) var(--spacing-md)' }}
-              >
-                ← Back
-              </AxButton>
-            )}
-            <div>
-              <AxHeading3 style={{ marginBottom: 'var(--spacing-xs)' }}>
-                Orders
-              </AxHeading3>
-              <AxParagraph style={{ color: 'var(--color-text-secondary)' }}>
-                View and manage all orders
-              </AxParagraph>
-            </div>
-          </HeaderLeft>
-          <HeaderRight {...debugProps(COMPONENT_NAME, 'HeaderRight')}>
-            <AxFormGroup style={{ margin: 0, minWidth: '200px' }}>
-              <AxListbox
-                options={[
-                  { value: null, label: 'All Statuses' },
-                  { value: 'DRAFT', label: 'Draft' },
-                  { value: 'PENDING_APPROVAL', label: 'Pending Approval' },
-                  { value: 'APPROVED', label: 'Approved' },
-                  { value: 'SHIPPING_INSTRUCTED', label: 'Shipping Instructed' },
-                  { value: 'SHIPPED', label: 'Shipped' },
-                  { value: 'INVOICED', label: 'Invoiced' },
-                  { value: 'PAID', label: 'Paid' },
-                  { value: 'CANCELLED', label: 'Cancelled' },
-                ]}
-                value={statusFilter}
-                onChange={(value) => setStatusFilter(value)}
-                placeholder="Filter by status"
-              />
-            </AxFormGroup>
-            {onNavigateToOrderEntry && (
-              <AxButton variant="primary" onClick={onNavigateToOrderEntry}>
-                Create Order
-              </AxButton>
-            )}
-          </HeaderRight>
-        </HeaderSection>
-      </HeaderCard>
-
-      <TableCard padding="large" {...debugProps(COMPONENT_NAME, 'TableCard')}>
-        <div style={{ flex: 1, overflow: 'auto', minHeight: 0, height: 0, maxHeight: '100%' }}>
-          {filteredOrders.length === 0 ? (
-            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '200px' }}>
-              <AxParagraph>No orders found</AxParagraph>
-            </div>
-          ) : (
-            <AxTable fullWidth stickyHeader>
-              <AxTableHead>
-                <AxTableRow>
-                  <AxTableHeader>Order Number</AxTableHeader>
-                  <AxTableHeader>Customer</AxTableHeader>
-                  <AxTableHeader>Status</AxTableHeader>
-                  <AxTableHeader>Order Date</AxTableHeader>
-                  <AxTableHeader>Ship Date</AxTableHeader>
-                  <AxTableHeader align="right">Total</AxTableHeader>
-                  <AxTableHeader align="center">Items</AxTableHeader>
-                  <AxTableHeader align="center">Actions</AxTableHeader>
-                </AxTableRow>
-              </AxTableHead>
-              <AxTableBody>
-                {filteredOrders.map((order) => (
-                  <AxTableRow key={order.id}>
-                    <AxTableCell>{order.orderNumber || order.id?.substring(0, 8) || 'N/A'}</AxTableCell>
-                    <AxTableCell>{getCustomerName(order.customerId)}</AxTableCell>
-                    <AxTableCell>
-                      <span 
-                        style={{ 
-                          color: getStatusColor(order.status), 
-                          fontWeight: 600,
-                          padding: '4px 12px',
-                          borderRadius: '12px',
-                          backgroundColor: getStatusBackgroundColor(order.status),
-                          display: 'inline-block',
-                          fontSize: 'var(--font-size-sm)',
-                        }}
-                      >
-                        {getStatusLabel(order.status)}
-                      </span>
-                    </AxTableCell>
-                    <AxTableCell>{formatDate(order.orderDate)}</AxTableCell>
-                    <AxTableCell>{formatDate(order.shipDate)}</AxTableCell>
-                    <AxTableCell align="right">
-                      ${order.total?.toFixed(2) || '0.00'}
-                    </AxTableCell>
-                    <AxTableCell align="center">
-                      {order.items?.length || 0}
-                    </AxTableCell>
-                    <AxTableCell align="center">
-                      <div style={{ display: 'flex', gap: 'var(--spacing-sm)', justifyContent: 'center' }}>
-                        <AxButton 
-                          variant="secondary" 
-                          size="small"
-                          onClick={() => handleView(order)}
-                          style={{ minWidth: '80px' }}
-                        >
-                          View
-                        </AxButton>
-                        <AxButton 
-                          variant="secondary" 
-                          size="small"
-                          onClick={() => handleEdit(order)}
-                          disabled={order.status === 'PAID' || order.status === 'CANCELLED'}
-                          style={{ minWidth: '80px' }}
-                        >
-                          Edit
-                        </AxButton>
-                        <AxButton 
-                          variant="danger" 
-                          size="small"
-                          onClick={() => handleDeleteClick(order)}
-                          style={{ minWidth: '80px' }}
-                        >
-                          Delete
-                        </AxButton>
-                      </div>
-                    </AxTableCell>
-                  </AxTableRow>
-                ))}
-              </AxTableBody>
-            </AxTable>
-          )}
-        </div>
-      </TableCard>
-
-
-      {/* Delete Confirmation Dialog */}
-      <AxDialog
-        open={deleteDialogOpen}
-        onClose={() => {
-          setDeleteDialogOpen(false);
-          setSelectedOrder(null);
-        }}
-        title="Delete Order"
-        size="medium"
-        footer={
-          <div style={{ display: 'flex', gap: 'var(--spacing-sm)', justifyContent: 'flex-end' }}>
-            <AxButton 
-              variant="secondary" 
-              onClick={() => {
-                setDeleteDialogOpen(false);
-                setSelectedOrder(null);
-              }}
-              disabled={submitting}
-            >
-              Cancel
-            </AxButton>
-            <AxButton 
-              variant="danger" 
-              onClick={handleDelete}
-              disabled={submitting}
-            >
-              {submitting ? 'Deleting...' : 'Delete'}
-            </AxButton>
-          </div>
-        }
-      >
-        <AxParagraph style={{ marginBottom: 'var(--spacing-md)' }}>
-          Are you sure you want to delete this order?
-        </AxParagraph>
-        <AxParagraph style={{ color: 'var(--color-text-secondary)', fontSize: 'var(--font-size-sm)' }}>
-          This action cannot be undone.
-        </AxParagraph>
-      </AxDialog>
-    </PageContainer>
+    <OrderListingPageRender
+      orders={orders}
+      loading={loading}
+      error={error}
+      statusFilter={statusFilter}
+      filteredOrders={filteredOrders}
+      deleteDialogOpen={deleteDialogOpen}
+      submitting={submitting}
+      selectedOrder={selectedOrder}
+      onNavigateToOrderEntry={onNavigateToOrderEntry}
+      onEditOrder={onEditOrder}
+      onViewOrder={onViewOrder}
+      onNavigateBack={onNavigateBack}
+      onStatusFilterChange={setStatusFilter}
+      onDeleteClick={handleDeleteClick}
+      onDeleteConfirm={handleDelete}
+      onDeleteCancel={handleDeleteCancel}
+      getCustomerName={getCustomerName}
+      formatDate={formatDate}
+      getStatusColor={getStatusColor}
+      getStatusBackgroundColor={getStatusBackgroundColor}
+      getStatusLabel={getStatusLabel}
+    />
   );
 }
 

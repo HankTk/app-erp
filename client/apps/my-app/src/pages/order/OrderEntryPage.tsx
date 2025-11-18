@@ -1,15 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
 import { useWebSocket } from '../../hooks/useWebSocket';
-import {
-  AxCard,
-  AxHeading3,
-  AxParagraph,
-  AxButton,
-  AxListbox,
-  AxInput,
-  AxFormGroup,
-  AxLabel,
-} from '@ui/components';
 import { useI18n } from '../../i18n/I18nProvider';
 import { fetchCustomers, Customer } from '../../api/customerApi';
 import { fetchAddressesByCustomerId } from '../../api/addressApi';
@@ -27,11 +17,7 @@ import {
   getNextInvoiceNumber,
   Order,
 } from '../../api/orderApi';
-import styled from '@emotion/styled';
 import { OrderStep, EntrySubStep } from './types';
-import { debugProps } from '../../utils/emotionCache';
-
-const COMPONENT_NAME = 'OrderEntryPage';
 import { OrderEntryStepPage } from './OrderEntryStepPage';
 import { OrderApprovalStepPage } from './OrderApprovalStepPage';
 import { OrderConfirmationStepPage } from './OrderConfirmationStepPage';
@@ -39,124 +25,9 @@ import { OrderShippingInstructionStepPage } from './OrderShippingInstructionStep
 import { OrderShippingStepPage } from './OrderShippingStepPage';
 import { OrderInvoicingStepPage } from './OrderInvoicingStepPage';
 import { OrderHistoryStepPage } from './OrderHistoryStepPage';
-
-const PageContainer = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-md);
-  height: 100%;
-  width: 100%;
-  min-height: 0;
-  overflow-y: auto;
-  overflow-x: hidden;
-  padding: var(--spacing-lg);
-  box-sizing: border-box;
-  flex: 1;
-`;
-
-const HeaderCard = styled(AxCard)`
-  flex-shrink: 0;
-  padding: var(--spacing-md) var(--spacing-lg) !important;
-`;
-
-const HeaderSection = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  gap: var(--spacing-lg);
-  margin-bottom: var(--spacing-md);
-`;
-
-const HeaderLeft = styled.div`
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-md);
-  flex: 1;
-`;
-
-const HeaderRight = styled.div`
-  display: flex;
-  align-items: flex-start;
-  gap: var(--spacing-md);
-`;
-
-const ContentCard = styled(AxCard)`
-  display: flex;
-  flex-direction: column;
-  overflow: visible;
-  flex-shrink: 0;
-`;
-
-const StepIndicator = styled.div`
-  display: flex;
-  gap: var(--spacing-sm);
-  margin-bottom: var(--spacing-lg);
-  padding-bottom: var(--spacing-md);
-  border-bottom: 2px solid var(--color-border-default);
-  flex-shrink: 0;
-  align-items: center;
-  position: relative;
-  width: 100%;
-`;
-
-const StepScrollContainer = styled.div`
-  display: flex;
-  gap: var(--spacing-sm);
-  flex: 1 1 auto;
-  overflow-x: auto;
-  overflow-y: hidden;
-  scrollbar-width: thin;
-  align-items: center;
-  &::-webkit-scrollbar {
-    height: 6px;
-  }
-  &::-webkit-scrollbar-thumb {
-    background-color: var(--color-border-default);
-    border-radius: 3px;
-  }
-`;
-
-const HistoryStepContainer = styled.div`
-  flex-shrink: 0;
-  margin-left: var(--spacing-sm);
-`;
-
-const Step = styled.div<{ $active: boolean; $completed: boolean }>`
-  flex: none;
-  padding: var(--spacing-sm) var(--spacing-md);
-  text-align: center;
-  border-radius: var(--radius-md);
-  white-space: nowrap;
-  font-size: var(--font-size-sm);
-  background-color: ${props => 
-    props.$active ? 'var(--color-primary)' : 
-    props.$completed ? 'var(--color-success)' : 
-    'var(--color-background-secondary)'};
-  color: ${props => 
-    props.$active || props.$completed ? 'var(--color-text-inverse)' : 
-    'var(--color-text-secondary)'};
-  font-weight: ${props => props.$active ? 'var(--font-weight-bold)' : 'var(--font-weight-normal)'};
-  cursor: ${props => props.$completed ? 'pointer' : 'not-allowed'};
-  opacity: ${props => !props.$completed && !props.$active ? 0.5 : 1};
-  transition: all var(--transition-base);
-`;
-
-const StepContent = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-lg);
-  overflow: visible;
-`;
-
-const ButtonGroup = styled.div`
-  display: flex;
-  gap: var(--spacing-sm);
-  justify-content: flex-end;
-  margin-top: var(--spacing-lg);
-  padding-top: var(--spacing-md);
-  border-top: 2px solid var(--color-border-default);
-  flex-shrink: 0;
-`;
+import { OrderEntryPageRender } from './OrderEntryPage.render';
+import { PageContainer, ContentCard } from './OrderEntryPage.styles';
+import { AxParagraph } from '@ui/components';
 
 
 
@@ -498,8 +369,20 @@ export function OrderEntryPage(props: OrderEntryPageProps = {}) {
         console.log('Order created with ID:', created.id);
         setOrder(created);
       } catch (err) {
-        console.error('Error initializing order:', err);
-        alert('Failed to initialize order. Please refresh the page and try again.');
+        // Only log non-404 errors (404 is expected when order doesn't exist)
+        if (err instanceof Error) {
+          const is404 = err.message.includes('404') || err.message.includes('HTTP 404');
+          if (!is404) {
+            console.error('Error initializing order:', err);
+            alert('Failed to initialize order. Please refresh the page and try again.');
+          } else {
+            // For 404, just set order to null - user can create a new order
+            setOrder(null);
+          }
+        } else {
+          console.error('Error initializing order:', err);
+          alert('Failed to initialize order. Please refresh the page and try again.');
+        }
       } finally {
         setLoading(false);
         isCreatingOrderRef.current = false;
@@ -1929,384 +1812,38 @@ export function OrderEntryPage(props: OrderEntryPageProps = {}) {
   };
 
   return (
-    <PageContainer {...debugProps(COMPONENT_NAME, 'PageContainer')}>
-      <HeaderCard padding="large" {...debugProps(COMPONENT_NAME, 'HeaderCard')}>
-        <HeaderSection {...debugProps(COMPONENT_NAME, 'HeaderSection')}>
-          <HeaderLeft {...debugProps(COMPONENT_NAME, 'HeaderLeft')}>
-            {onNavigateBack && (
-              <AxButton 
-                variant="secondary" 
-                onClick={handleNavigateBack}
-                style={{ minWidth: 'auto', padding: 'var(--spacing-sm) var(--spacing-md)' }}
-              >
-                {l10n('orderEntry.back')}
-              </AxButton>
-            )}
-            <div style={{ flex: 1 }}>
-              <AxHeading3 style={{ marginBottom: 'var(--spacing-xs)' }}>
-                {title || l10n('orderEntry.title')}
-              </AxHeading3>
-              <AxParagraph style={{ color: 'var(--color-text-secondary)' }}>
-                {subtitle || l10n('orderEntry.subtitle')}
-              </AxParagraph>
-            </div>
-          </HeaderLeft>
-          <HeaderRight {...debugProps(COMPONENT_NAME, 'HeaderRight')}>
-            <div style={{ display: 'flex', gap: 'var(--spacing-md)', flexWrap: 'wrap', alignItems: 'flex-start' }}>
-              {order?.orderNumber && (
-                <div style={{ 
-                  padding: 'var(--spacing-md)', 
-                  backgroundColor: 'var(--color-background-secondary)', 
-                  borderRadius: 'var(--radius-md)',
-                  minWidth: '150px'
-                }}>
-                  <AxParagraph style={{ fontWeight: 'var(--font-weight-bold)', marginBottom: 'var(--spacing-xs)', fontSize: 'var(--font-size-sm)' }}>
-                    {l10n('orderEntry.confirmation.orderNumber')}
-                  </AxParagraph>
-                  <AxParagraph style={{ fontSize: 'var(--font-size-sm)' }}>
-                    {order.orderNumber}
-                  </AxParagraph>
-                </div>
-              )}
-              {selectedCustomer && (
-                <div style={{ 
-                  padding: 'var(--spacing-md)', 
-                  backgroundColor: 'var(--color-background-secondary)', 
-                  borderRadius: 'var(--radius-md)',
-                  minWidth: '200px'
-                }}>
-                  <AxParagraph style={{ fontWeight: 'var(--font-weight-bold)', marginBottom: 'var(--spacing-xs)', fontSize: 'var(--font-size-sm)' }}>
-                    {l10n('orderEntry.customer')}
-                  </AxParagraph>
-                  <AxParagraph style={{ fontSize: 'var(--font-size-sm)' }}>
-                    {selectedCustomer.companyName || `${selectedCustomer.lastName} ${selectedCustomer.firstName}` || selectedCustomer.email}
-                  </AxParagraph>
-                  {selectedCustomer.email && (
-                    <AxParagraph style={{ fontSize: 'var(--font-size-sm)', color: 'var(--color-text-secondary)', marginTop: 'var(--spacing-xs)' }}>
-                      {selectedCustomer.email}
-                    </AxParagraph>
-                  )}
-                </div>
-              )}
-              {(() => {
-                const shippingAddress = addresses.find(a => a.id === order?.shippingAddressId);
-                const billingAddress = addresses.find(a => a.id === order?.billingAddressId);
-                if (shippingAddress || billingAddress) {
-                  return (
-                    <>
-                      {shippingAddress && (
-                        <div style={{ 
-                          padding: 'var(--spacing-md)', 
-                          backgroundColor: 'var(--color-background-secondary)', 
-                          borderRadius: 'var(--radius-md)',
-                          minWidth: '200px',
-                          maxWidth: '250px'
-                        }}>
-                          <AxParagraph style={{ fontWeight: 'var(--font-weight-bold)', marginBottom: 'var(--spacing-xs)', fontSize: 'var(--font-size-sm)' }}>
-                            {l10n('orderEntry.shippingAddress')}
-                          </AxParagraph>
-                          <AxParagraph style={{ fontSize: 'var(--font-size-sm)', lineHeight: 'var(--line-height-tight)' }}>
-                            {shippingAddress.streetAddress1}
-                            {shippingAddress.streetAddress2 && `, ${shippingAddress.streetAddress2}`}
-                            <br />
-                            {shippingAddress.city}, {shippingAddress.state} {shippingAddress.postalCode}
-                            {shippingAddress.country && (
-                              <>
-                                <br />
-                                {shippingAddress.country}
-                              </>
-                            )}
-                          </AxParagraph>
-                        </div>
-                      )}
-                      {billingAddress && (
-                        <div style={{ 
-                          padding: 'var(--spacing-md)', 
-                          backgroundColor: 'var(--color-background-secondary)', 
-                          borderRadius: 'var(--radius-md)',
-                          minWidth: '200px',
-                          maxWidth: '250px'
-                        }}>
-                          <AxParagraph style={{ fontWeight: 'var(--font-weight-bold)', marginBottom: 'var(--spacing-xs)', fontSize: 'var(--font-size-sm)' }}>
-                            {l10n('orderEntry.billingAddress')}
-                          </AxParagraph>
-                          <AxParagraph style={{ fontSize: 'var(--font-size-sm)', lineHeight: 'var(--line-height-tight)' }}>
-                            {billingAddress.streetAddress1}
-                            {billingAddress.streetAddress2 && `, ${billingAddress.streetAddress2}`}
-                            <br />
-                            {billingAddress.city}, {billingAddress.state} {billingAddress.postalCode}
-                            {billingAddress.country && (
-                              <>
-                                <br />
-                                {billingAddress.country}
-                              </>
-                            )}
-                          </AxParagraph>
-                        </div>
-                      )}
-                    </>
-                  );
-                }
-                return null;
-              })()}
-              {order?.id && (
-                <>
-                  <div style={{ 
-                    padding: 'var(--spacing-md)', 
-                    backgroundColor: 'var(--color-background-secondary)', 
-                    borderRadius: 'var(--radius-md)',
-                    minWidth: '200px'
-                  }}>
-                    <AxParagraph style={{ fontWeight: 'var(--font-weight-bold)', marginBottom: 'var(--spacing-xs)', fontSize: 'var(--font-size-sm)' }}>
-                      {l10n('orderEntry.orderStatus')}
-                    </AxParagraph>
-                    <AxListbox
-                      key={`status-${order.id}-${order.status || 'null'}`}
-                      options={statusOptions}
-                      value={order?.status || null}
-                      onChange={(value) => {
-                        if (value) {
-                          handleStatusChange(value);
-                        }
-                      }}
-                      placeholder={l10n('orderEntry.selectStatus')}
-                      fullWidth
-                      disabled={loading || !order?.id || readOnly}
-                    />
-                  </div>
-                </>
-              )}
-            </div>
-          </HeaderRight>
-        </HeaderSection>
-      </HeaderCard>
-
-      <ContentCard padding="large" {...debugProps(COMPONENT_NAME, 'ContentCard')}>
-        <StepIndicator {...debugProps(COMPONENT_NAME, 'StepIndicator')}>
-          <StepScrollContainer {...debugProps(COMPONENT_NAME, 'StepScrollContainer')}>
-            {steps
-              .filter(step => {
-                // In read-only mode, only show completed steps (except history)
-                if (readOnly) {
-                  return step.key !== 'history' && isStepCompleted(step.key);
-                }
-                // In edit mode, show all steps except history
-                return step.key !== 'history';
-              })
-              .map((step, index) => {
-                const isActive = currentStep === step.key;
-                const isCompleted = isStepCompleted(step.key);
-                // Calculate the original step number for display
-                const originalIndex = steps.findIndex(s => s.key === step.key);
-                return (
-                  <Step
-                    key={step.key}
-                    $active={isActive}
-                    $completed={isCompleted}
-                    {...debugProps(COMPONENT_NAME, 'Step')}
-                    onClick={() => {
-                      if (readOnly) {
-                        // In read-only mode, only allow access to completed steps
-                        if (isCompleted) {
-                          setCurrentStep(step.key);
-                          if (step.key === 'entry') {
-                            setCurrentEntrySubStep('review');
-                          }
-                        }
-                      } else {
-                        // In edit mode, allow access to completed or active steps
-                        if (isCompleted || isActive) {
-                          setCurrentStep(step.key);
-                          if (step.key === 'entry') {
-                            setCurrentEntrySubStep('review');
-                          }
-                        }
-                      }
-                    }}
-                    title={step.description}
-                  >
-                    {originalIndex + 1}. {step.label}
-                  </Step>
-                );
-              })}
-          </StepScrollContainer>
-          <HistoryStepContainer {...debugProps(COMPONENT_NAME, 'HistoryStepContainer')}>
-            {(() => {
-              const historyStep = steps.find(s => s.key === 'history');
-              if (!historyStep) return null;
-              const isActive = currentStep === 'history';
-              const isCompleted = isStepCompleted('history');
-              return (
-                <Step
-                  key="history"
-                  $active={isActive}
-                  $completed={isCompleted}
-                  {...debugProps(COMPONENT_NAME, 'Step')}
-                  onClick={() => {
-                    setCurrentStep('history');
-                  }}
-                  title={historyStep.description}
-                >
-                  {historyStep.label}
-                </Step>
-              );
-            })()}
-          </HistoryStepContainer>
-        </StepIndicator>
-
-        <StepContent {...debugProps(COMPONENT_NAME, 'StepContent')}>
-          {renderStepContent()}
-        </StepContent>
-
-        {!readOnly && (
-          <ButtonGroup {...debugProps(COMPONENT_NAME, 'ButtonGroup')}>
-            <AxButton
-              variant="secondary"
-              onClick={handlePrevious}
-              disabled={(currentStep === 'entry' && currentEntrySubStep === 'customer') || submitting}
-            >
-              {l10n('orderEntry.previous')}
-            </AxButton>
-            {currentStep === 'entry' && currentEntrySubStep === 'review' ? (
-              <AxButton
-                variant="primary"
-                onClick={handleCompleteEntry}
-                disabled={!canProceedToNext() || submitting}
-              >
-                {submitting ? l10n('orderEntry.saving') : (orderIdToEdit ? l10n('orderEntry.saveOrder') : l10n('orderEntry.completeOrder'))}
-              </AxButton>
-            ) : currentStep === 'approval' ? (
-              <AxButton
-                variant="primary"
-                onClick={handleApproveOrder}
-                disabled={!canProceedToNext() || submitting}
-              >
-                {submitting ? l10n('orderEntry.approving') : l10n('orderEntry.approveOrder')}
-              </AxButton>
-            ) : currentStep === 'confirmation' ? (
-              <AxButton
-                variant="primary"
-                onClick={handleConfirmOrder}
-                disabled={!canProceedToNext() || submitting}
-              >
-                {submitting ? l10n('orderEntry.confirming') : l10n('orderEntry.confirmOrder')}
-              </AxButton>
-            ) : currentStep === 'shipping_instruction' ? (
-              <AxButton
-                variant="primary"
-                onClick={handleShippingInstruction}
-                disabled={!canProceedToNext() || submitting}
-              >
-                {submitting ? l10n('orderEntry.submitting') : l10n('orderEntry.submitShippingInstruction')}
-              </AxButton>
-            ) : currentStep === 'shipping' ? (
-              <AxButton
-                variant="primary"
-                onClick={handleShipOrder}
-                disabled={!canProceedToNext() || submitting}
-              >
-                {submitting ? l10n('orderEntry.shipping') : l10n('orderEntry.shipOrder')}
-              </AxButton>
-            ) : currentStep === 'invoicing' ? (
-              <AxButton
-                variant="primary"
-                onClick={handleInvoiceOrder}
-                disabled={!canProceedToNext() || submitting}
-              >
-                {submitting ? l10n('orderEntry.invoicing') : l10n('orderEntry.createInvoice')}
-              </AxButton>
-            ) : currentStep === 'history' ? (
-              <AxButton
-                variant="secondary"
-                onClick={() => {
-                  if (onNavigateToOrders) {
-                    onNavigateToOrders();
-                  } else {
-                    handlePrevious();
-                  }
-                }}
-                disabled={submitting}
-              >
-                {onNavigateToOrders ? l10n('orderEntry.backToOrders') : l10n('orderEntry.previous')}
-              </AxButton>
-            ) : (
-              <AxButton
-                variant="primary"
-                onClick={handleNext}
-                disabled={!canProceedToNext() || submitting}
-              >
-                {l10n('orderEntry.next')}
-              </AxButton>
-            )}
-          </ButtonGroup>
-        )}
-        {readOnly && currentStep === 'history' && (
-          <ButtonGroup {...debugProps(COMPONENT_NAME, 'ButtonGroup')}>
-            <AxButton
-              variant="secondary"
-              onClick={() => {
-                if (onNavigateToOrders) {
-                  onNavigateToOrders();
-                } else if (onNavigateBack) {
-                  onNavigateBack();
-                }
-              }}
-            >
-              {onNavigateToOrders ? l10n('orderEntry.backToOrders') : l10n('orderEntry.previous')}
-            </AxButton>
-          </ButtonGroup>
-        )}
-        {readOnly && currentStep !== 'history' && (
-          <ButtonGroup {...debugProps(COMPONENT_NAME, 'ButtonGroup')}>
-            <AxButton
-              variant="secondary"
-              onClick={() => {
-                // Find previous completed step
-                const currentIndex = steps.findIndex(s => s.key === currentStep);
-                for (let i = currentIndex - 1; i >= 0; i--) {
-                  if (isStepCompleted(steps[i].key)) {
-                    setCurrentStep(steps[i].key);
-                    if (steps[i].key === 'entry') {
-                      setCurrentEntrySubStep('review');
-                    }
-                    return;
-                  }
-                }
-              }}
-              disabled={(() => {
-                const currentIndex = steps.findIndex(s => s.key === currentStep);
-                return currentIndex === 0 || !steps.slice(0, currentIndex).some(s => isStepCompleted(s.key));
-              })()}
-            >
-              {l10n('orderEntry.previous')}
-            </AxButton>
-            <AxButton
-              variant="primary"
-              onClick={() => {
-                // Find next completed step (excluding history)
-                const currentIndex = steps.findIndex(s => s.key === currentStep);
-                for (let i = currentIndex + 1; i < steps.length; i++) {
-                  if (steps[i].key !== 'history' && isStepCompleted(steps[i].key)) {
-                    setCurrentStep(steps[i].key);
-                    if (steps[i].key === 'entry') {
-                      setCurrentEntrySubStep('review');
-                    }
-                    return;
-                  }
-                }
-              }}
-              disabled={(() => {
-                const currentIndex = steps.findIndex(s => s.key === currentStep);
-                const remainingSteps = steps.slice(currentIndex + 1).filter(s => s.key !== 'history');
-                return remainingSteps.length === 0 || !remainingSteps.some(s => isStepCompleted(s.key));
-              })()}
-            >
-              {l10n('orderEntry.next')}
-            </AxButton>
-          </ButtonGroup>
-        )}
-      </ContentCard>
-    </PageContainer>
+    <OrderEntryPageRender
+      order={order}
+      customers={customers}
+      addresses={addresses}
+      loading={loading}
+      submitting={submitting}
+      readOnly={readOnly}
+      title={title}
+      subtitle={subtitle}
+      currentStep={currentStep}
+      currentEntrySubStep={currentEntrySubStep}
+      steps={steps}
+      statusOptions={statusOptions}
+      onNavigateBack={onNavigateBack}
+      onNavigateToOrders={onNavigateToOrders}
+      renderStepContent={renderStepContent}
+      isStepCompleted={isStepCompleted}
+      canProceedToNext={canProceedToNext}
+      handleNavigateBack={handleNavigateBack}
+      handlePrevious={handlePrevious}
+      handleNext={handleNext}
+      handleCompleteEntry={handleCompleteEntry}
+      handleApproveOrder={handleApproveOrder}
+      handleConfirmOrder={handleConfirmOrder}
+      handleShippingInstruction={handleShippingInstruction}
+      handleShipOrder={handleShipOrder}
+      handleInvoiceOrder={handleInvoiceOrder}
+      setCurrentStep={setCurrentStep}
+      setCurrentEntrySubStep={setCurrentEntrySubStep}
+      onStatusChange={handleStatusChange}
+      orderIdToEdit={orderIdToEdit}
+      l10n={l10n}
+    />
   );
 }
-
