@@ -36,6 +36,7 @@ export interface OrderEntryStepProps extends OrderStepProps {
   onSetQuantity: (quantity: number) => void;
   onSetShippingId: (id: string | null) => void;
   onSetBillingId: (id: string | null) => void;
+  onAddressesRefresh?: () => Promise<void>;
 }
 
 export interface OrderApprovalStepProps extends OrderStepProps {

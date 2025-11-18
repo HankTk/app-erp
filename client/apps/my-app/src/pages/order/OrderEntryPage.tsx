@@ -12,8 +12,9 @@ import {
 } from '@ui/components';
 import { useI18n } from '../../i18n/I18nProvider';
 import { fetchCustomers, Customer } from '../../api/customerApi';
-import { fetchAddressesByCustomerId, Address } from '../../api/addressApi';
+import { fetchAddressesByCustomerId } from '../../api/addressApi';
 import { fetchActiveProducts, Product } from '../../api/productApi';
+import { CustomerEditDialog } from '../../components/CustomerEditDialog';
 import {
   createOrder,
   updateOrder,
@@ -192,6 +193,7 @@ export function OrderEntryPage(props: OrderEntryPageProps = {}) {
   // Shipping address state
   const [shippingId, setShippingId] = useState<string | null>(null);
   const [billingId, setBillingId] = useState<string | null>(null);
+  const [customerDialogOpen, setCustomerDialogOpen] = useState(false);
 
   // Approval state
   const [approvalNotes, setApprovalNotes] = useState<string>('');
@@ -579,8 +581,37 @@ export function OrderEntryPage(props: OrderEntryPageProps = {}) {
     }
   };
 
-  const handleShippingInfo = async (shippingAddressId: string, billingAddressId: string) => {
-    if (!order) return;
+  const handleShippingInfo = async (shippingAddressId: string, billingAddressId: string, retryCount = 0) => {
+    if (!order) {
+      console.warn('Cannot update shipping info: order is missing');
+      return;
+    }
+    
+    // Prevent infinite recursion
+    if (retryCount > 1) {
+      console.error('Too many retries for shipping info update');
+      alert('Failed to update shipping information after multiple attempts. Please refresh the page.');
+      return;
+    }
+    
+    // If order doesn't have an ID, create it first
+    if (!order.id) {
+      try {
+        await handleCreateOrder();
+        // Wait a bit for state to update, then retry
+        await new Promise(resolve => setTimeout(resolve, 100));
+        // After creation, retry the update
+        const currentOrder = orderRef.current;
+        if (currentOrder?.id) {
+          return handleShippingInfo(shippingAddressId, billingAddressId, retryCount + 1);
+        }
+      } catch (err) {
+        console.error('Error creating order before updating shipping info:', err);
+        alert('Failed to create order. Please try again.');
+        return;
+      }
+    }
+    
     try {
       setLoading(true);
       const updated = await updateOrder(order.id!, {
@@ -591,7 +622,35 @@ export function OrderEntryPage(props: OrderEntryPageProps = {}) {
       setOrder(updated);
     } catch (err) {
       console.error('Error updating shipping info:', err);
-      alert('Failed to update shipping information');
+      const errorMessage = err instanceof Error ? err.message : 'Failed to update shipping information';
+      if (errorMessage.includes('404') || errorMessage.includes('Not Found')) {
+        console.error('Order not found in backend. Order ID:', order.id);
+        // Try to recreate the order if it was lost (only once)
+        if (retryCount === 0) {
+          try {
+            console.log('Attempting to recreate order...');
+            await handleCreateOrder();
+            // Wait a bit for state to update
+            await new Promise(resolve => setTimeout(resolve, 100));
+            // Retry the update after recreation
+            const currentOrder = orderRef.current;
+            if (currentOrder?.id) {
+              const retryUpdated = await updateOrder(currentOrder.id, {
+                ...currentOrder,
+                shippingAddressId,
+                billingAddressId,
+              });
+              setOrder(retryUpdated);
+              return;
+            }
+          } catch (recreateErr) {
+            console.error('Failed to recreate order:', recreateErr);
+          }
+        }
+        alert('Order not found. Please refresh the page and try again.');
+      } else {
+        alert(`Failed to update shipping information: ${errorMessage}`);
+      }
     } finally {
       setLoading(false);
     }
@@ -1135,6 +1194,30 @@ export function OrderEntryPage(props: OrderEntryPageProps = {}) {
     );
   };
 
+  const handleCustomerUpdated = async () => {
+    // Refresh addresses by reloading from API
+    if (order?.customerId) {
+      try {
+        const refreshedAddresses = await fetchAddressesByCustomerId(order.customerId);
+        setAddresses(refreshedAddresses);
+      } catch (err) {
+        console.error('Error refreshing addresses:', err);
+      }
+    }
+  };
+
+  const handleAddressesUpdated = async () => {
+    // Refresh addresses when addresses are updated in customer dialog
+    if (order?.customerId) {
+      try {
+        const refreshedAddresses = await fetchAddressesByCustomerId(order.customerId);
+        setAddresses(refreshedAddresses);
+      } catch (err) {
+        console.error('Error refreshing addresses:', err);
+      }
+    }
+  };
+
   const renderShippingAddressStep = () => {
     // Show all addresses for both shipping and billing (same address can be used for both)
     const allAddresses = addresses;
@@ -1151,44 +1234,98 @@ export function OrderEntryPage(props: OrderEntryPageProps = {}) {
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--spacing-md)' }}>
           <AxFormGroup>
             <AxLabel>Shipping Address</AxLabel>
-            <AxListbox
-              options={addressOptions}
-              value={shippingId}
-              onChange={(value) => {
-                setShippingId(value);
-                if (value && billingId) {
-                  handleShippingInfo(value, billingId);
-                }
-              }}
-              placeholder="Select shipping address"
-              fullWidth
-              disabled={loading || addressOptions.length === 0}
-            />
+            <div style={{ display: 'flex', gap: 'var(--spacing-sm)', alignItems: 'flex-start' }}>
+              <div style={{ flex: 1 }}>
+                <AxListbox
+                  options={addressOptions}
+                  value={shippingId}
+                  onChange={(value) => {
+                    setShippingId(value);
+                    if (value && billingId) {
+                      handleShippingInfo(value, billingId);
+                    }
+                  }}
+                  placeholder="Select shipping address"
+                  fullWidth
+                  disabled={loading || addressOptions.length === 0}
+                />
+              </div>
+              <AxButton
+                onClick={() => {
+                  setCustomerDialogOpen(true);
+                }}
+                disabled={loading || !order?.customerId}
+                title="Edit customer and manage addresses"
+                style={{ 
+                  width: '44px',
+                  height: '44px',
+                  minWidth: '44px',
+                  padding: 0,
+                  whiteSpace: 'nowrap', 
+                  flexShrink: 0, 
+                  overflow: 'visible', 
+                  textOverflow: 'clip',
+                  backgroundColor: 'var(--color-background-secondary)',
+                  color: 'var(--color-text-primary)',
+                  border: '2px solid var(--color-border-default)',
+                  alignSelf: 'flex-start'
+                }}
+              >
+                ...
+              </AxButton>
+            </div>
             {addressOptions.length === 0 && (
               <AxParagraph style={{ marginTop: 'var(--spacing-xs)', color: 'var(--color-text-secondary)', fontSize: 'var(--font-size-sm)' }}>
-                No addresses found for this customer. Please add addresses in the customer management page.
+                No addresses found for this customer. Click ... to create a new address.
               </AxParagraph>
             )}
           </AxFormGroup>
 
           <AxFormGroup>
             <AxLabel>Billing Address</AxLabel>
-            <AxListbox
-              options={addressOptions}
-              value={billingId}
-              onChange={(value) => {
-                setBillingId(value);
-                if (value && shippingId) {
-                  handleShippingInfo(shippingId, value);
-                }
-              }}
-              placeholder="Select billing address (can be same as shipping)"
-              fullWidth
-              disabled={loading || addressOptions.length === 0}
-            />
+            <div style={{ display: 'flex', gap: 'var(--spacing-sm)', alignItems: 'flex-start' }}>
+              <div style={{ flex: 1 }}>
+                <AxListbox
+                  options={addressOptions}
+                  value={billingId}
+                  onChange={(value) => {
+                    setBillingId(value);
+                    if (value && shippingId) {
+                      handleShippingInfo(shippingId, value);
+                    }
+                  }}
+                  placeholder="Select billing address (can be same as shipping)"
+                  fullWidth
+                  disabled={loading || addressOptions.length === 0}
+                />
+              </div>
+              <AxButton
+                onClick={() => {
+                  setCustomerDialogOpen(true);
+                }}
+                disabled={loading || !order?.customerId}
+                title="Edit customer and manage addresses"
+                style={{ 
+                  width: '44px',
+                  height: '44px',
+                  minWidth: '44px',
+                  padding: 0,
+                  whiteSpace: 'nowrap', 
+                  flexShrink: 0, 
+                  overflow: 'visible', 
+                  textOverflow: 'clip',
+                  backgroundColor: 'var(--color-background-secondary)',
+                  color: 'var(--color-text-primary)',
+                  border: '2px solid var(--color-border-default)',
+                  alignSelf: 'flex-start'
+                }}
+              >
+                ...
+              </AxButton>
+            </div>
             {addressOptions.length === 0 && (
               <AxParagraph style={{ marginTop: 'var(--spacing-xs)', color: 'var(--color-text-secondary)', fontSize: 'var(--font-size-sm)' }}>
-                No addresses found for this customer. Please add addresses in the customer management page.
+                No addresses found for this customer. Click ... to create a new address.
               </AxParagraph>
             )}
           </AxFormGroup>
@@ -1196,6 +1333,17 @@ export function OrderEntryPage(props: OrderEntryPageProps = {}) {
         <AxParagraph style={{ marginTop: 'var(--spacing-xs)', color: 'var(--color-text-secondary)', fontSize: 'var(--font-size-sm)' }}>
           You can select the same address for both shipping and billing.
         </AxParagraph>
+        {order?.customerId && (
+          <CustomerEditDialog
+            open={customerDialogOpen}
+            onClose={() => {
+              setCustomerDialogOpen(false);
+            }}
+            customerId={order.customerId}
+            onCustomerUpdated={handleCustomerUpdated}
+            onAddressesUpdated={handleAddressesUpdated}
+          />
+        )}
       </div>
     );
   };
@@ -1583,6 +1731,11 @@ export function OrderEntryPage(props: OrderEntryPageProps = {}) {
             onSetQuantity={setQuantity}
             onSetShippingId={setShippingId}
             onSetBillingId={setBillingId}
+            onAddressesRefresh={async () => {
+              if (order?.customerId) {
+                await loadAddresses(order.customerId);
+              }
+            }}
           />
         );
       case 'approval':

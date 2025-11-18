@@ -39,6 +39,7 @@ export interface PurchaseOrderEntryStepProps extends PurchaseOrderStepProps {
   onSetShippingId: (id: string | null) => void;
   onSetBillingId: (id: string | null) => void;
   onSetExpectedDeliveryDate: (date: string) => void;
+  onAddressesRefresh?: () => Promise<void>;
 }
 
 export interface PurchaseOrderApprovalStepProps extends PurchaseOrderStepProps {

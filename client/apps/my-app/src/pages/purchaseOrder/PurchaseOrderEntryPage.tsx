@@ -929,6 +929,11 @@ export function PurchaseOrderEntryPage(props: PurchaseOrderEntryPageProps = {}) 
             onSetShippingId={setShippingId}
             onSetBillingId={setBillingId}
             onSetExpectedDeliveryDate={setExpectedDeliveryDate}
+            onAddressesRefresh={async () => {
+              if (po?.supplierId) {
+                await loadAddresses(po.supplierId);
+              }
+            }}
           />
         );
       case 'approval':

@@ -19,6 +19,7 @@ import { fetchAddresses, deleteAddress, Address } from '../api/addressApi';
 import { fetchVendorById, updateVendor, Vendor } from '../api/vendorApi';
 import styled from '@emotion/styled';
 import { debugProps } from '../utils/emotionCache';
+import { AddressFormDialog } from './AddressFormDialog';
 
 const COMPONENT_NAME = 'VendorAddressAssociation';
 
@@ -52,6 +53,7 @@ export function VendorAddressAssociation({ vendorId, onAddressesUpdated }: Vendo
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [addressToDelete, setAddressToDelete] = useState<Address | null>(null);
   const [deleting, setDeleting] = useState(false);
+  const [addressDialogOpen, setAddressDialogOpen] = useState(false);
 
   useEffect(() => {
     loadData();
@@ -92,6 +94,39 @@ export function VendorAddressAssociation({ vendorId, onAddressesUpdated }: Vendo
       console.error('Error loading data:', err);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleAddressCreated = async (address: Address) => {
+    // Reload data to include the new address
+    await loadData();
+    // Automatically associate the new address with the vendor
+    if (address.id && vendor) {
+      try {
+        setLoading(true);
+        let addressIds = getVendorAddressIds(vendor);
+        if (!addressIds.includes(address.id)) {
+          addressIds = [...addressIds, address.id];
+          await updateVendor(vendorId, {
+            ...vendor,
+            addressIds: addressIds,
+            jsonData: {
+              ...(vendor.jsonData || {}),
+              addressIds: addressIds,
+            },
+          });
+          await loadData();
+        }
+      } catch (err) {
+        console.error('Error associating new address:', err);
+        alert('Address created but failed to associate with vendor');
+      } finally {
+        setLoading(false);
+      }
+    }
+    setAddressDialogOpen(false);
+    if (onAddressesUpdated) {
+      onAddressesUpdated();
     }
   };
 
@@ -236,6 +271,27 @@ export function VendorAddressAssociation({ vendorId, onAddressesUpdated }: Vendo
                 />
               </div>
               <AxButton
+                onClick={() => setAddressDialogOpen(true)}
+                disabled={loading}
+                title="Create new address"
+                style={{ 
+                  width: '44px',
+                  height: '44px',
+                  minWidth: '44px',
+                  padding: 0,
+                  whiteSpace: 'nowrap', 
+                  flexShrink: 0, 
+                  overflow: 'visible', 
+                  textOverflow: 'clip',
+                  backgroundColor: 'var(--color-background-secondary)',
+                  color: 'var(--color-text-primary)',
+                  border: '2px solid var(--color-border-default)',
+                  alignSelf: 'flex-start'
+                }}
+              >
+                ...
+              </AxButton>
+              <AxButton
                 variant="primary"
                 onClick={handleAssociateAddress}
                 disabled={!selectedAddressId || loading || addressOptions.length === 0}
@@ -245,7 +301,7 @@ export function VendorAddressAssociation({ vendorId, onAddressesUpdated }: Vendo
             </div>
             {addressOptions.length === 0 && (
               <AxParagraph style={{ marginTop: 'var(--spacing-xs)', color: 'var(--color-text-secondary)', fontSize: 'var(--font-size-sm)' }}>
-                No addresses available to associate. Create addresses from the Addresses menu.
+                No addresses available to associate. Click ... to create a new address.
               </AxParagraph>
             )}
           </AxFormGroup>
@@ -371,6 +427,13 @@ export function VendorAddressAssociation({ vendorId, onAddressesUpdated }: Vendo
           This action cannot be undone. The address will be permanently deleted.
         </AxParagraph>
       </AxDialog>
+
+      <AddressFormDialog
+        open={addressDialogOpen}
+        onClose={() => setAddressDialogOpen(false)}
+        onAddressCreated={handleAddressCreated}
+        vendorId={vendorId}
+      />
     </Container>
   );
 }

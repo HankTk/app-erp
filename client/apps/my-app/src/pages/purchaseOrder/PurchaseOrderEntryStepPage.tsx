@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import {
   AxHeading3,
   AxParagraph,
@@ -16,6 +17,7 @@ import {
 import styled from '@emotion/styled';
 import { PurchaseOrderEntryStepProps, EntrySubStep } from './types';
 import { useI18n } from '../../i18n/I18nProvider';
+import { VendorEditDialog } from '../../components/VendorEditDialog';
 
 const StepContent = styled.div`
   display: flex;
@@ -87,10 +89,12 @@ export function PurchaseOrderEntryStepPage(props: PurchaseOrderEntryStepProps) {
     onSetShippingId,
     onSetBillingId,
     onSetExpectedDeliveryDate,
+    onAddressesRefresh,
     loading = false,
     readOnly = false,
   } = props;
   const { t } = useI18n();
+  const [vendorDialogOpen, setVendorDialogOpen] = useState(false);
 
   const isSubStepCompleted = (subStep: EntrySubStep) => {
     if (!po) return false;
@@ -297,6 +301,18 @@ export function PurchaseOrderEntryStepPage(props: PurchaseOrderEntryStepProps) {
     );
   };
 
+  const handleVendorUpdated = async () => {
+    // Vendor updated - trigger address refresh
+    await handleAddressesUpdated();
+  };
+
+  const handleAddressesUpdated = async () => {
+    // Addresses updated in vendor dialog - refresh addresses from parent
+    if (onAddressesRefresh) {
+      await onAddressesRefresh();
+    }
+  };
+
   const renderShippingStep = () => {
     const addressOptions = addresses.map(a => ({
       value: a.id!,
@@ -310,19 +326,46 @@ export function PurchaseOrderEntryStepPage(props: PurchaseOrderEntryStepProps) {
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--spacing-sm)' }}>
           <AxFormGroup>
             <AxLabel>{t('purchaseOrderEntry.shippingAddress')}</AxLabel>
-            <AxListbox
-              options={addressOptions}
-              value={shippingId}
-              onChange={async value => {
-                onSetShippingId(value);
-                if (value && billingId) {
-                  await onShippingInfoUpdate(value, billingId);
-                }
-              }}
-              placeholder={t('purchaseOrderEntry.selectShippingAddress')}
-              fullWidth
-              disabled={loading || addressOptions.length === 0 || readOnly}
-            />
+            <div style={{ display: 'flex', gap: 'var(--spacing-sm)', alignItems: 'flex-start' }}>
+              <div style={{ flex: 1 }}>
+                <AxListbox
+                  options={addressOptions}
+                  value={shippingId}
+                  onChange={async value => {
+                    onSetShippingId(value);
+                    if (value && billingId) {
+                      await onShippingInfoUpdate(value, billingId);
+                    }
+                  }}
+                  placeholder={t('purchaseOrderEntry.selectShippingAddress')}
+                  fullWidth
+                  disabled={loading || addressOptions.length === 0 || readOnly}
+                />
+              </div>
+              <AxButton
+                onClick={() => {
+                  setVendorDialogOpen(true);
+                }}
+                disabled={loading || readOnly || !po?.supplierId}
+                title="Edit vendor and manage addresses"
+                style={{ 
+                  width: '44px',
+                  height: '44px',
+                  minWidth: '44px',
+                  padding: 0,
+                  whiteSpace: 'nowrap', 
+                  flexShrink: 0, 
+                  overflow: 'visible', 
+                  textOverflow: 'clip',
+                  backgroundColor: 'var(--color-background-secondary)',
+                  color: 'var(--color-text-primary)',
+                  border: '2px solid var(--color-border-default)',
+                  alignSelf: 'flex-start'
+                }}
+              >
+                ...
+              </AxButton>
+            </div>
             {addressOptions.length === 0 && (
               <AxParagraph
                 style={{
@@ -331,26 +374,53 @@ export function PurchaseOrderEntryStepPage(props: PurchaseOrderEntryStepProps) {
                   fontSize: 'var(--font-size-sm)',
                 }}
               >
-                {t('purchaseOrderEntry.noAddresses')}
+                {t('purchaseOrderEntry.noAddresses')} Click ... to create a new address.
               </AxParagraph>
             )}
           </AxFormGroup>
 
           <AxFormGroup>
             <AxLabel>{t('purchaseOrderEntry.billingAddress')}</AxLabel>
-            <AxListbox
-              options={addressOptions}
-              value={billingId}
-              onChange={async value => {
-                onSetBillingId(value);
-                if (value && shippingId) {
-                  await onShippingInfoUpdate(shippingId, value);
-                }
-              }}
-              placeholder={t('purchaseOrderEntry.selectBillingAddress')}
-              fullWidth
-              disabled={loading || addressOptions.length === 0 || readOnly}
-            />
+            <div style={{ display: 'flex', gap: 'var(--spacing-sm)', alignItems: 'flex-start' }}>
+              <div style={{ flex: 1 }}>
+                <AxListbox
+                  options={addressOptions}
+                  value={billingId}
+                  onChange={async value => {
+                    onSetBillingId(value);
+                    if (value && shippingId) {
+                      await onShippingInfoUpdate(shippingId, value);
+                    }
+                  }}
+                  placeholder={t('purchaseOrderEntry.selectBillingAddress')}
+                  fullWidth
+                  disabled={loading || addressOptions.length === 0 || readOnly}
+                />
+              </div>
+              <AxButton
+                onClick={() => {
+                  setVendorDialogOpen(true);
+                }}
+                disabled={loading || readOnly || !po?.supplierId}
+                title="Edit vendor and manage addresses"
+                style={{ 
+                  width: '44px',
+                  height: '44px',
+                  minWidth: '44px',
+                  padding: 0,
+                  whiteSpace: 'nowrap', 
+                  flexShrink: 0, 
+                  overflow: 'visible', 
+                  textOverflow: 'clip',
+                  backgroundColor: 'var(--color-background-secondary)',
+                  color: 'var(--color-text-primary)',
+                  border: '2px solid var(--color-border-default)',
+                  alignSelf: 'flex-start'
+                }}
+              >
+                ...
+              </AxButton>
+            </div>
             {addressOptions.length === 0 && (
               <AxParagraph
                 style={{
@@ -359,7 +429,7 @@ export function PurchaseOrderEntryStepPage(props: PurchaseOrderEntryStepProps) {
                   fontSize: 'var(--font-size-sm)',
                 }}
               >
-                {t('purchaseOrderEntry.noAddresses')}
+                {t('purchaseOrderEntry.noAddresses')} Click ... to create a new address.
               </AxParagraph>
             )}
           </AxFormGroup>
@@ -373,6 +443,17 @@ export function PurchaseOrderEntryStepPage(props: PurchaseOrderEntryStepProps) {
         >
           {t('purchaseOrderEntry.sameAddressNote')}
         </AxParagraph>
+        {po?.supplierId && (
+          <VendorEditDialog
+            open={vendorDialogOpen}
+            onClose={() => {
+              setVendorDialogOpen(false);
+            }}
+            vendorId={po.supplierId}
+            onVendorUpdated={handleVendorUpdated}
+            onAddressesUpdated={handleAddressesUpdated}
+          />
+        )}
       </div>
     );
   };

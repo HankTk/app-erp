@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import {
   AxHeading3,
   AxParagraph,
@@ -16,6 +17,7 @@ import {
 import styled from '@emotion/styled';
 import { OrderEntryStepProps, EntrySubStep } from './types';
 import { useI18n } from '../../i18n/I18nProvider';
+import { CustomerEditDialog } from '../../components/CustomerEditDialog';
 
 const StepContent = styled.div`
   display: flex;
@@ -84,10 +86,12 @@ export function OrderEntryStepPage(props: OrderEntryStepProps) {
     onSetQuantity,
     onSetShippingId,
     onSetBillingId,
+    onAddressesRefresh,
     loading = false,
     readOnly = false,
   } = props;
   const { t } = useI18n();
+  const [customerDialogOpen, setCustomerDialogOpen] = useState(false);
 
   const isSubStepCompleted = (subStep: EntrySubStep) => {
     if (!order) return false;
@@ -295,6 +299,18 @@ export function OrderEntryStepPage(props: OrderEntryStepProps) {
     );
   };
 
+  const handleCustomerUpdated = async () => {
+    // Customer updated - trigger address refresh
+    await handleAddressesUpdated();
+  };
+
+  const handleAddressesUpdated = async () => {
+    // Addresses updated in customer dialog - refresh addresses from parent
+    if (onAddressesRefresh) {
+      await onAddressesRefresh();
+    }
+  };
+
   const renderShippingStep = () => {
     const addressOptions = addresses.map(a => ({
       value: a.id!,
@@ -308,19 +324,48 @@ export function OrderEntryStepPage(props: OrderEntryStepProps) {
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--spacing-md)' }}>
           <AxFormGroup>
             <AxLabel>{t('orderEntry.shippingAddress')}</AxLabel>
-            <AxListbox
-              options={addressOptions}
-              value={shippingId}
-              onChange={async value => {
-                onSetShippingId(value);
-                if (value && billingId) {
-                  await onShippingInfoUpdate(value, billingId);
-                }
-              }}
-              placeholder="Select shipping address"
-              fullWidth
-              disabled={loading || addressOptions.length === 0 || readOnly}
-            />
+            <div style={{ display: 'flex', gap: 'var(--spacing-sm)', alignItems: 'flex-start' }}>
+              <div style={{ flex: 1 }}>
+                <AxListbox
+                  options={addressOptions}
+                  value={shippingId}
+                  onChange={async value => {
+                    onSetShippingId(value);
+                    // Update shipping info if we have at least one address
+                    // Use billingId if available, otherwise use shippingId for both
+                    if (value) {
+                      await onShippingInfoUpdate(value, billingId || value);
+                    }
+                  }}
+                  placeholder="Select shipping address"
+                  fullWidth
+                  disabled={loading || addressOptions.length === 0 || readOnly}
+                />
+              </div>
+              <AxButton
+                onClick={() => {
+                  setCustomerDialogOpen(true);
+                }}
+                disabled={loading || readOnly || !order?.customerId}
+                title="Edit customer and manage addresses"
+                style={{ 
+                  width: '44px',
+                  height: '44px',
+                  minWidth: '44px',
+                  padding: 0,
+                  whiteSpace: 'nowrap', 
+                  flexShrink: 0, 
+                  overflow: 'visible', 
+                  textOverflow: 'clip',
+                  backgroundColor: 'var(--color-background-secondary)',
+                  color: 'var(--color-text-primary)',
+                  border: '2px solid var(--color-border-default)',
+                  alignSelf: 'flex-start'
+                }}
+              >
+                ...
+              </AxButton>
+            </div>
             {addressOptions.length === 0 && (
               <AxParagraph
                 style={{
@@ -329,26 +374,55 @@ export function OrderEntryStepPage(props: OrderEntryStepProps) {
                   fontSize: 'var(--font-size-sm)',
                 }}
               >
-                No addresses found for this customer. Please add addresses in the customer management page.
+                No addresses found for this customer. Click ... to create a new address.
               </AxParagraph>
             )}
           </AxFormGroup>
 
           <AxFormGroup>
             <AxLabel>{t('orderEntry.billingAddress')}</AxLabel>
-            <AxListbox
-              options={addressOptions}
-              value={billingId}
-              onChange={async value => {
-                onSetBillingId(value);
-                if (value && shippingId) {
-                  await onShippingInfoUpdate(shippingId, value);
-                }
-              }}
-              placeholder="Select billing address (can be same as shipping)"
-              fullWidth
-              disabled={loading || addressOptions.length === 0 || readOnly}
-            />
+            <div style={{ display: 'flex', gap: 'var(--spacing-sm)', alignItems: 'flex-start' }}>
+              <div style={{ flex: 1 }}>
+                <AxListbox
+                  options={addressOptions}
+                  value={billingId}
+                  onChange={async value => {
+                    onSetBillingId(value);
+                    // Update shipping info if we have at least one address
+                    // Use shippingId if available, otherwise use billingId for both
+                    if (value) {
+                      await onShippingInfoUpdate(shippingId || value, value);
+                    }
+                  }}
+                  placeholder="Select billing address (can be same as shipping)"
+                  fullWidth
+                  disabled={loading || addressOptions.length === 0 || readOnly}
+                />
+              </div>
+              <AxButton
+                onClick={() => {
+                  setCustomerDialogOpen(true);
+                }}
+                disabled={loading || readOnly || !order?.customerId}
+                title="Edit customer and manage addresses"
+                style={{ 
+                  width: '44px',
+                  height: '44px',
+                  minWidth: '44px',
+                  padding: 0,
+                  whiteSpace: 'nowrap', 
+                  flexShrink: 0, 
+                  overflow: 'visible', 
+                  textOverflow: 'clip',
+                  backgroundColor: 'var(--color-background-secondary)',
+                  color: 'var(--color-text-primary)',
+                  border: '2px solid var(--color-border-default)',
+                  alignSelf: 'flex-start'
+                }}
+              >
+                ...
+              </AxButton>
+            </div>
             {addressOptions.length === 0 && (
               <AxParagraph
                 style={{
@@ -357,7 +431,7 @@ export function OrderEntryStepPage(props: OrderEntryStepProps) {
                   fontSize: 'var(--font-size-sm)',
                 }}
               >
-                No addresses found for this customer. Please add addresses in the customer management page.
+                No addresses found for this customer. Click ... to create a new address.
               </AxParagraph>
             )}
           </AxFormGroup>
@@ -371,6 +445,17 @@ export function OrderEntryStepPage(props: OrderEntryStepProps) {
         >
           You can select the same address for both shipping and billing.
         </AxParagraph>
+        {order?.customerId && (
+          <CustomerEditDialog
+            open={customerDialogOpen}
+            onClose={() => {
+              setCustomerDialogOpen(false);
+            }}
+            customerId={order.customerId}
+            onCustomerUpdated={handleCustomerUpdated}
+            onAddressesUpdated={handleAddressesUpdated}
+          />
+        )}
       </div>
     );
   };
