@@ -78,7 +78,7 @@ interface DrawerProps
 
 export function Drawer({ isOpen, onToggle, theme, onThemeChange }: DrawerProps)
 {
-  const { t, language, setLanguage } = useI18n();
+  const { l10n, language, setLanguage } = useI18n();
 
   return (
     <>
@@ -86,18 +86,18 @@ export function Drawer({ isOpen, onToggle, theme, onThemeChange }: DrawerProps)
       <AxDrawer $isOpen={isOpen} {...debugProps(COMPONENT_NAME, 'AxDrawer')}>
         <AxDrawerHeader {...debugProps(COMPONENT_NAME, 'AxDrawerHeader')}>
           <AxDrawerTitleWrapper {...debugProps(COMPONENT_NAME, 'AxDrawerTitleWrapper')}>
-            <AxDrawerTitle {...debugProps(COMPONENT_NAME, 'AxDrawerTitle')}>{t('app.settings')}</AxDrawerTitle>
+            <AxDrawerTitle {...debugProps(COMPONENT_NAME, 'AxDrawerTitle')}>{l10n('app.settings')}</AxDrawerTitle>
           </AxDrawerTitleWrapper>
         </AxDrawerHeader>
         <AxDrawerContent {...debugProps(COMPONENT_NAME, 'AxDrawerContent')}>
           <AxDrawerSection {...debugProps(COMPONENT_NAME, 'AxDrawerSection')}>
-            <AxParagraph>{t('app.theme')}</AxParagraph>
+            <AxParagraph>{l10n('app.theme')}</AxParagraph>
             <AxButton onClick={onThemeChange} variant="secondary" fullWidth>
-              {theme === 'light' ? t('app.switchToDark') : t('app.switchToLight')}
+              {theme === 'light' ? l10n('app.switchToDark') : l10n('app.switchToLight')}
             </AxButton>
           </AxDrawerSection>
           <AxDrawerSection {...debugProps(COMPONENT_NAME, 'AxDrawerSection')}>
-            <AxParagraph>{t('app.language')}</AxParagraph>
+            <AxParagraph>{l10n('app.language')}</AxParagraph>
             <AxLanguageButtons {...debugProps(COMPONENT_NAME, 'AxLanguageButtons')}>
               <AxButton
                 onClick={() => setLanguage('en')}

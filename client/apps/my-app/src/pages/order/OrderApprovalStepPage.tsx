@@ -14,13 +14,13 @@ export function OrderApprovalStepPage(props: OrderApprovalStepProps) {
     onPriceApproveChange,
     readOnly = false,
   } = props;
-  const { t } = useI18n();
+  const { l10n } = useI18n();
 
   return (
     <div>
-      <AxHeading3 style={{ marginBottom: 'var(--spacing-md)' }}>{t('orderEntry.approval.title')}</AxHeading3>
+      <AxHeading3 style={{ marginBottom: 'var(--spacing-md)' }}>{l10n('orderEntry.approval.title')}</AxHeading3>
       <AxParagraph style={{ marginBottom: 'var(--spacing-lg)', color: 'var(--color-text-secondary)' }}>
-        {t('orderEntry.approval.description')}
+        {l10n('orderEntry.approval.description')}
       </AxParagraph>
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-md)' }}>
@@ -33,7 +33,7 @@ export function OrderApprovalStepPage(props: OrderApprovalStepProps) {
               disabled={readOnly}
               style={{ marginRight: 'var(--spacing-xs)' }}
             />
-            {t('orderEntry.approval.creditCheck')}
+            {l10n('orderEntry.approval.creditCheck')}
           </AxLabel>
         </AxFormGroup>
 
@@ -46,7 +46,7 @@ export function OrderApprovalStepPage(props: OrderApprovalStepProps) {
               disabled={readOnly}
               style={{ marginRight: 'var(--spacing-xs)' }}
             />
-            {t('orderEntry.approval.inventoryConfirmed')}
+            {l10n('orderEntry.approval.inventoryConfirmed')}
           </AxLabel>
         </AxFormGroup>
 
@@ -59,12 +59,12 @@ export function OrderApprovalStepPage(props: OrderApprovalStepProps) {
               disabled={readOnly}
               style={{ marginRight: 'var(--spacing-xs)' }}
             />
-            {t('orderEntry.approval.priceApproved')}
+            {l10n('orderEntry.approval.priceApproved')}
           </AxLabel>
         </AxFormGroup>
 
         <AxFormGroup>
-          <AxLabel>{t('orderEntry.approval.notes')}</AxLabel>
+          <AxLabel>{l10n('orderEntry.approval.notes')}</AxLabel>
           <textarea
             value={approvalNotes}
             onChange={e => onApprovalNotesChange(e.target.value)}
@@ -77,7 +77,7 @@ export function OrderApprovalStepPage(props: OrderApprovalStepProps) {
               border: '1px solid var(--color-border-default)',
               fontFamily: 'inherit',
             }}
-            placeholder={t('orderEntry.approval.notesPlaceholder')}
+            placeholder={l10n('orderEntry.approval.notesPlaceholder')}
           />
         </AxFormGroup>
       </div>

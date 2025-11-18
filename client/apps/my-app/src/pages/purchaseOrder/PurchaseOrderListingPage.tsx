@@ -78,7 +78,7 @@ interface PurchaseOrderListingPageProps {
 }
 
 export function PurchaseOrderListingPage({ onNavigateToPOEntry, onEditPO, onViewPO, onNavigateBack }: PurchaseOrderListingPageProps = {} as PurchaseOrderListingPageProps) {
-  const { t } = useI18n();
+  const { l10n } = useI18n();
   const [pos, setPOs] = useState<PurchaseOrder[]>([]);
   const [suppliers, setSuppliers] = useState<Vendor[]>([]);
   const [addresses, setAddresses] = useState<Address[]>([]);
@@ -210,33 +210,33 @@ export function PurchaseOrderListingPage({ onNavigateToPOEntry, onEditPO, onView
   const getStatusLabel = (status?: string) => {
     switch (status) {
       case 'DRAFT':
-        return t('purchaseOrder.status.draft');
+        return l10n('purchaseOrder.status.draft');
       case 'PENDING_APPROVAL':
-        return t('purchaseOrder.status.pendingApproval');
+        return l10n('purchaseOrder.status.pendingApproval');
       case 'APPROVED':
-        return t('purchaseOrder.status.approved');
+        return l10n('purchaseOrder.status.approved');
       case 'RECEIVED':
-        return t('purchaseOrder.status.received');
+        return l10n('purchaseOrder.status.received');
       case 'INVOICED':
-        return t('purchaseOrder.status.invoiced');
+        return l10n('purchaseOrder.status.invoiced');
       case 'PAID':
-        return t('purchaseOrder.status.paid');
+        return l10n('purchaseOrder.status.paid');
       case 'CANCELLED':
-        return t('purchaseOrder.status.cancelled');
+        return l10n('purchaseOrder.status.cancelled');
       default:
         return status || 'N/A';
     }
   };
 
   const statusOptions = [
-    { value: '', label: t('purchaseOrder.filter.all') },
-    { value: 'DRAFT', label: t('purchaseOrder.status.draft') },
-    { value: 'PENDING_APPROVAL', label: t('purchaseOrder.status.pendingApproval') },
-    { value: 'APPROVED', label: t('purchaseOrder.status.approved') },
-    { value: 'RECEIVED', label: t('purchaseOrder.status.received') },
-    { value: 'INVOICED', label: t('purchaseOrder.status.invoiced') },
-    { value: 'PAID', label: t('purchaseOrder.status.paid') },
-    { value: 'CANCELLED', label: t('purchaseOrder.status.cancelled') },
+    { value: '', label: l10n('purchaseOrder.filter.all') },
+    { value: 'DRAFT', label: l10n('purchaseOrder.status.draft') },
+    { value: 'PENDING_APPROVAL', label: l10n('purchaseOrder.status.pendingApproval') },
+    { value: 'APPROVED', label: l10n('purchaseOrder.status.approved') },
+    { value: 'RECEIVED', label: l10n('purchaseOrder.status.received') },
+    { value: 'INVOICED', label: l10n('purchaseOrder.status.invoiced') },
+    { value: 'PAID', label: l10n('purchaseOrder.status.paid') },
+    { value: 'CANCELLED', label: l10n('purchaseOrder.status.cancelled') },
   ];
 
   if (loading) {
@@ -251,15 +251,15 @@ export function PurchaseOrderListingPage({ onNavigateToPOEntry, onEditPO, onView
                   onClick={onNavigateBack}
                   style={{ minWidth: 'auto', padding: 'var(--spacing-sm) var(--spacing-md)' }}
                 >
-                  {t('purchaseOrder.back')}
+                  {l10n('purchaseOrder.back')}
                 </AxButton>
               )}
               <div>
                 <AxHeading3 style={{ marginBottom: 'var(--spacing-xs)' }}>
-                  {t('module.purchaseOrder')}
+                  {l10n('module.purchaseOrder')}
                 </AxHeading3>
                 <AxParagraph style={{ color: 'var(--color-text-secondary)' }}>
-                  {t('purchaseOrder.subtitle')}
+                  {l10n('purchaseOrder.subtitle')}
                 </AxParagraph>
               </div>
             </HeaderLeft>
@@ -269,7 +269,7 @@ export function PurchaseOrderListingPage({ onNavigateToPOEntry, onEditPO, onView
         </HeaderCard>
         <TableCard padding="large" {...debugProps(COMPONENT_NAME, 'TableCard')}>
           <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '200px' }}>
-            <AxParagraph>{t('purchaseOrder.loading')}</AxParagraph>
+            <AxParagraph>{l10n('purchaseOrder.loading')}</AxParagraph>
           </div>
         </TableCard>
       </PageContainer>
@@ -288,15 +288,15 @@ export function PurchaseOrderListingPage({ onNavigateToPOEntry, onEditPO, onView
                   onClick={onNavigateBack}
                   style={{ minWidth: 'auto', padding: 'var(--spacing-sm) var(--spacing-md)' }}
                 >
-                  {t('purchaseOrder.back')}
+                  {l10n('purchaseOrder.back')}
                 </AxButton>
               )}
               <div>
                 <AxHeading3 style={{ marginBottom: 'var(--spacing-xs)' }}>
-                  {t('module.purchaseOrder')}
+                  {l10n('module.purchaseOrder')}
                 </AxHeading3>
                 <AxParagraph style={{ color: 'var(--color-text-secondary)' }}>
-                  {t('purchaseOrder.subtitle')}
+                  {l10n('purchaseOrder.subtitle')}
                 </AxParagraph>
               </div>
             </HeaderLeft>
@@ -309,7 +309,7 @@ export function PurchaseOrderListingPage({ onNavigateToPOEntry, onEditPO, onView
             <AxParagraph style={{ color: 'var(--color-error)' }}>Error: {error}</AxParagraph>
             {error.includes('404') && (
               <AxParagraph style={{ color: 'var(--color-text-secondary)', fontSize: 'var(--font-size-sm)', textAlign: 'center' }}>
-                {t('purchaseOrder.error.serverRestart')}
+                {l10n('purchaseOrder.error.serverRestart')}
               </AxParagraph>
             )}
             <AxButton variant="secondary" onClick={() => window.location.reload()}>
@@ -332,15 +332,15 @@ export function PurchaseOrderListingPage({ onNavigateToPOEntry, onEditPO, onView
                 onClick={onNavigateBack}
                 style={{ minWidth: 'auto', padding: 'var(--spacing-sm) var(--spacing-md)' }}
               >
-                {t('purchaseOrder.back')}
+                {l10n('purchaseOrder.back')}
               </AxButton>
             )}
             <div>
               <AxHeading3 style={{ marginBottom: 'var(--spacing-xs)' }}>
-                {t('module.purchaseOrder')}
+                {l10n('module.purchaseOrder')}
               </AxHeading3>
               <AxParagraph style={{ color: 'var(--color-text-secondary)' }}>
-                {t('purchaseOrder.subtitle')}
+                {l10n('purchaseOrder.subtitle')}
               </AxParagraph>
             </div>
           </HeaderLeft>
@@ -350,12 +350,12 @@ export function PurchaseOrderListingPage({ onNavigateToPOEntry, onEditPO, onView
                 value={statusFilter}
                 onChange={(value: string | null) => setStatusFilter(value)}
                 options={statusOptions}
-                placeholder={t('purchaseOrder.filter.placeholder')}
+                placeholder={l10n('purchaseOrder.filter.placeholder')}
               />
             </AxFormGroup>
             {onNavigateToPOEntry && (
               <AxButton variant="primary" onClick={onNavigateToPOEntry}>
-                {t('purchaseOrder.createOrder')}
+                {l10n('purchaseOrder.createOrder')}
               </AxButton>
             )}
           </HeaderRight>
@@ -366,19 +366,19 @@ export function PurchaseOrderListingPage({ onNavigateToPOEntry, onEditPO, onView
         <div style={{ flex: 1, overflow: 'auto', minHeight: 0, height: 0, maxHeight: '100%' }}>
           {filteredPOs.length === 0 ? (
             <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '200px' }}>
-              <AxParagraph>{t('purchaseOrder.noData')}</AxParagraph>
+              <AxParagraph>{l10n('purchaseOrder.noData')}</AxParagraph>
             </div>
           ) : (
-            <AxTable fullWidth>
+            <AxTable fullWidth stickyHeader>
               <AxTableHead>
                 <AxTableRow>
-                  <AxTableHeader>{t('purchaseOrder.orderNumber')}</AxTableHeader>
-                  <AxTableHeader>{t('purchaseOrder.supplier')}</AxTableHeader>
-                  <AxTableHeader>{t('purchaseOrder.status')}</AxTableHeader>
-                  <AxTableHeader>{t('purchaseOrder.orderDate')}</AxTableHeader>
-                  <AxTableHeader>{t('purchaseOrder.expectedDeliveryDate')}</AxTableHeader>
-                  <AxTableHeader align="right">{t('purchaseOrder.total')}</AxTableHeader>
-                  <AxTableHeader align="center">{t('purchaseOrder.actions')}</AxTableHeader>
+                  <AxTableHeader>{l10n('purchaseOrder.orderNumber')}</AxTableHeader>
+                  <AxTableHeader>{l10n('purchaseOrder.supplier')}</AxTableHeader>
+                  <AxTableHeader>{l10n('purchaseOrder.status')}</AxTableHeader>
+                  <AxTableHeader>{l10n('purchaseOrder.orderDate')}</AxTableHeader>
+                  <AxTableHeader>{l10n('purchaseOrder.expectedDeliveryDate')}</AxTableHeader>
+                  <AxTableHeader align="right">{l10n('purchaseOrder.total')}</AxTableHeader>
+                  <AxTableHeader align="center">{l10n('purchaseOrder.actions')}</AxTableHeader>
                 </AxTableRow>
               </AxTableHead>
               <AxTableBody>
@@ -409,16 +409,16 @@ export function PurchaseOrderListingPage({ onNavigateToPOEntry, onEditPO, onView
                       <div style={{ display: 'flex', gap: 'var(--spacing-xs)', justifyContent: 'center' }}>
                         {onViewPO && (
                           <AxButton variant="secondary" size="small" onClick={() => handleView(po)}>
-                            {t('purchaseOrder.view')}
+                            {l10n('purchaseOrder.view')}
                           </AxButton>
                         )}
                         {onEditPO && (
                           <AxButton variant="secondary" size="small" onClick={() => handleEdit(po)}>
-                            {t('purchaseOrder.edit')}
+                            {l10n('purchaseOrder.edit')}
                           </AxButton>
                         )}
                         <AxButton variant="danger" size="small" onClick={() => handleDeleteClick(po)}>
-                          {t('purchaseOrder.delete')}
+                          {l10n('purchaseOrder.delete')}
                         </AxButton>
                       </div>
                     </AxTableCell>
@@ -436,9 +436,9 @@ export function PurchaseOrderListingPage({ onNavigateToPOEntry, onEditPO, onView
           setDeleteDialogOpen(false);
           setSelectedPO(null);
         }}
-        title={t('purchaseOrder.deleteConfirm')}
+        title={l10n('purchaseOrder.deleteConfirm')}
       >
-        <AxParagraph>{t('purchaseOrder.deleteMessage')}</AxParagraph>
+        <AxParagraph>{l10n('purchaseOrder.deleteMessage')}</AxParagraph>
         <div style={{ display: 'flex', gap: 'var(--spacing-md)', justifyContent: 'flex-end', marginTop: 'var(--spacing-lg)' }}>
           <AxButton
             variant="secondary"
@@ -447,10 +447,10 @@ export function PurchaseOrderListingPage({ onNavigateToPOEntry, onEditPO, onView
               setSelectedPO(null);
             }}
           >
-            {t('purchaseOrder.cancel')}
+            {l10n('purchaseOrder.cancel')}
           </AxButton>
           <AxButton variant="danger" onClick={handleDelete} disabled={submitting}>
-            {submitting ? t('purchaseOrder.deleting') : t('purchaseOrder.confirm')}
+            {submitting ? l10n('purchaseOrder.deleting') : l10n('purchaseOrder.confirm')}
           </AxButton>
         </div>
       </AxDialog>

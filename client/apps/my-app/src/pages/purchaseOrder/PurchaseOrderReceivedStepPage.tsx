@@ -8,23 +8,22 @@ export function PurchaseOrderReceivedStepPage(props: PurchaseOrderReceivedStepPr
     onReceivedDateChange,
     readOnly = false,
   } = props;
-  const { t } = useI18n();
+  const { l10n } = useI18n();
 
   return (
     <div>
-      <AxHeading3 style={{ marginBottom: 'var(--spacing-md)' }}>{t('purchaseOrderEntry.received.title')}</AxHeading3>
+      <AxHeading3 style={{ marginBottom: 'var(--spacing-md)' }}>{l10n('purchaseOrderEntry.received.title')}</AxHeading3>
       <AxParagraph style={{ marginBottom: 'var(--spacing-lg)', color: 'var(--color-text-secondary)' }}>
-        {t('purchaseOrderEntry.received.description')}
+        {l10n('purchaseOrderEntry.received.description')}
       </AxParagraph>
 
       <AxFormGroup>
-        <AxLabel>{t('purchaseOrderEntry.received.date')}</AxLabel>
+        <AxLabel>{l10n('purchaseOrderEntry.received.date')}</AxLabel>
         <AxInput
           type="date"
           value={receivedDate}
           onChange={e => onReceivedDateChange(e.target.value)}
           disabled={readOnly}
-          fullWidth
         />
       </AxFormGroup>
     </div>

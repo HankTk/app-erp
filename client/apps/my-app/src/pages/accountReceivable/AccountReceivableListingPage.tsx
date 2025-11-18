@@ -294,7 +294,7 @@ export function AccountReceivableListingPage({ onViewInvoice, onNavigateBack }: 
               <AxParagraph>No invoices found</AxParagraph>
             </div>
           ) : (
-            <AxTable fullWidth>
+            <AxTable fullWidth stickyHeader>
               <AxTableHead>
                 <AxTableRow>
                   <AxTableHeader>Invoice Number</AxTableHeader>

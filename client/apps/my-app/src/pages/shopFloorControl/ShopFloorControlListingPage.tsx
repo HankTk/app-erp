@@ -103,7 +103,7 @@ interface ShopFloorControlListingPageProps {
 }
 
 export function ShopFloorControlListingPage({ onProcessRMA, onNavigateBack }: ShopFloorControlListingPageProps = {} as ShopFloorControlListingPageProps) {
-  const { t } = useI18n();
+  const { l10n } = useI18n();
   const [sfcs, setSfcs] = useState<SFC[]>([]);
   const [rmas, setRmas] = useState<RMA[]>([]);
   const [customers, setCustomers] = useState<Customer[]>([]);

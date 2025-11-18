@@ -84,7 +84,7 @@ interface GeneralLedgerDetailPageProps {
 
 export function GeneralLedgerDetailPage(props: GeneralLedgerDetailPageProps = {}) {
   const { orderId, onNavigateBack } = props;
-  const { t } = useI18n();
+  const { l10n } = useI18n();
   const [order, setOrder] = useState<Order | null>(null);
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [products, setProducts] = useState<Product[]>([]);
@@ -134,7 +134,7 @@ export function GeneralLedgerDetailPage(props: GeneralLedgerDetailPageProps = {}
             <AxParagraph>Order not found</AxParagraph>
             {onNavigateBack && (
               <AxButton variant="secondary" onClick={onNavigateBack}>
-                {t('generalLedger.back')}
+                {l10n('generalLedger.back')}
               </AxButton>
             )}
           </div>
@@ -181,15 +181,15 @@ export function GeneralLedgerDetailPage(props: GeneralLedgerDetailPageProps = {}
                 onClick={onNavigateBack}
                 style={{ minWidth: 'auto', padding: 'var(--spacing-sm) var(--spacing-md)' }}
               >
-                {t('generalLedger.back')}
+                {l10n('generalLedger.back')}
               </AxButton>
             )}
             <div style={{ flex: 1 }}>
               <AxHeading3 style={{ marginBottom: 'var(--spacing-xs)' }}>
-                {t('module.generalLedger')}
+                {l10n('module.generalLedger')}
               </AxHeading3>
               <AxParagraph style={{ color: 'var(--color-text-secondary)' }}>
-                {t('generalLedger.subtitle')}
+                {l10n('generalLedger.subtitle')}
               </AxParagraph>
             </div>
           </HeaderLeft>
@@ -198,40 +198,40 @@ export function GeneralLedgerDetailPage(props: GeneralLedgerDetailPageProps = {}
 
       <ContentCard padding="large" {...debugProps(COMPONENT_NAME, 'ContentCard')}>
         <AxHeading3 style={{ marginBottom: 'var(--spacing-md)' }}>
-          {t('generalLedger.detail.title')}
+          {l10n('generalLedger.detail.title')}
         </AxHeading3>
 
         <InfoSection {...debugProps(COMPONENT_NAME, 'InfoSection')}>
           <InfoRow>
             <AxParagraph style={{ fontWeight: 'var(--font-weight-bold)' }}>
-              {t('generalLedger.detail.orderNumber')}
+              {l10n('generalLedger.detail.orderNumber')}
             </AxParagraph>
             <AxParagraph>{order.orderNumber || 'N/A'}</AxParagraph>
           </InfoRow>
           {order.invoiceNumber && (
             <InfoRow>
               <AxParagraph style={{ fontWeight: 'var(--font-weight-bold)' }}>
-                {t('generalLedger.detail.invoiceNumber')}
+                {l10n('generalLedger.detail.invoiceNumber')}
               </AxParagraph>
               <AxParagraph>{order.invoiceNumber}</AxParagraph>
             </InfoRow>
           )}
           <InfoRow>
             <AxParagraph style={{ fontWeight: 'var(--font-weight-bold)' }}>
-              {t('generalLedger.detail.customer')}
+              {l10n('generalLedger.detail.customer')}
             </AxParagraph>
             <AxParagraph>{customerName}</AxParagraph>
           </InfoRow>
           <InfoRow>
             <AxParagraph style={{ fontWeight: 'var(--font-weight-bold)' }}>
-              {t('generalLedger.detail.orderDate')}
+              {l10n('generalLedger.detail.orderDate')}
             </AxParagraph>
             <AxParagraph>{formatDate(order.orderDate)}</AxParagraph>
           </InfoRow>
           {order.shipDate && (
             <InfoRow>
               <AxParagraph style={{ fontWeight: 'var(--font-weight-bold)' }}>
-                {t('generalLedger.detail.shipDate')}
+                {l10n('generalLedger.detail.shipDate')}
               </AxParagraph>
               <AxParagraph>{formatDate(order.shipDate)}</AxParagraph>
             </InfoRow>
@@ -239,7 +239,7 @@ export function GeneralLedgerDetailPage(props: GeneralLedgerDetailPageProps = {}
           {order.invoiceDate && (
             <InfoRow>
               <AxParagraph style={{ fontWeight: 'var(--font-weight-bold)' }}>
-                {t('generalLedger.detail.invoiceDate')}
+                {l10n('generalLedger.detail.invoiceDate')}
               </AxParagraph>
               <AxParagraph>{formatDate(order.invoiceDate)}</AxParagraph>
             </InfoRow>
@@ -249,7 +249,7 @@ export function GeneralLedgerDetailPage(props: GeneralLedgerDetailPageProps = {}
         {order.items && order.items.length > 0 && (
           <>
             <AxHeading3 style={{ marginBottom: 'var(--spacing-md)' }}>
-              {t('generalLedger.detail.items')}
+              {l10n('generalLedger.detail.items')}
             </AxHeading3>
             <AxTable fullWidth style={{ marginBottom: 'var(--spacing-lg)' }}>
               <AxTableHead>
@@ -285,19 +285,19 @@ export function GeneralLedgerDetailPage(props: GeneralLedgerDetailPageProps = {}
 
         <InfoSection>
           <AxHeading3 style={{ marginBottom: 'var(--spacing-md)' }}>
-            {t('generalLedger.detail.financialSummary')}
+            {l10n('generalLedger.detail.financialSummary')}
           </AxHeading3>
           
           <InfoRow>
             <AxParagraph style={{ fontWeight: 'var(--font-weight-bold)' }}>
-              {t('generalLedger.detail.totalQuantity')}
+              {l10n('generalLedger.detail.totalQuantity')}
             </AxParagraph>
             <AxParagraph>{totalQuantity}</AxParagraph>
           </InfoRow>
           
           <InfoRow>
             <AxParagraph style={{ fontWeight: 'var(--font-weight-bold)', color: 'var(--color-success)' }}>
-              {t('generalLedger.detail.revenue')}
+              {l10n('generalLedger.detail.revenue')}
             </AxParagraph>
             <AxParagraph style={{ fontSize: 'var(--font-size-lg)', fontWeight: 'var(--font-weight-bold)', color: 'var(--color-success)' }}>
               ${revenue.toFixed(2)}
@@ -306,7 +306,7 @@ export function GeneralLedgerDetailPage(props: GeneralLedgerDetailPageProps = {}
           
           <InfoRow>
             <AxParagraph style={{ fontWeight: 'var(--font-weight-bold)', color: 'var(--color-error)' }}>
-              {t('generalLedger.detail.productCost')}
+              {l10n('generalLedger.detail.productCost')}
             </AxParagraph>
             <AxParagraph style={{ color: 'var(--color-error)' }}>
               ${productCost.toFixed(2)}
@@ -315,7 +315,7 @@ export function GeneralLedgerDetailPage(props: GeneralLedgerDetailPageProps = {}
           
           <InfoRow>
             <AxParagraph style={{ fontWeight: 'var(--font-weight-bold)', color: 'var(--color-error)' }}>
-              {t('generalLedger.detail.shippingCost')}
+              {l10n('generalLedger.detail.shippingCost')}
             </AxParagraph>
             <AxParagraph style={{ color: 'var(--color-error)' }}>
               ${shippingCost.toFixed(2)}
@@ -324,7 +324,7 @@ export function GeneralLedgerDetailPage(props: GeneralLedgerDetailPageProps = {}
           
           <InfoRow>
             <AxParagraph style={{ fontWeight: 'var(--font-weight-bold)', color: 'var(--color-error)' }}>
-              {t('generalLedger.detail.totalCost')}
+              {l10n('generalLedger.detail.totalCost')}
             </AxParagraph>
             <AxParagraph style={{ fontSize: 'var(--font-size-lg)', fontWeight: 'var(--font-weight-bold)', color: 'var(--color-error)' }}>
               ${totalCost.toFixed(2)}
@@ -333,7 +333,7 @@ export function GeneralLedgerDetailPage(props: GeneralLedgerDetailPageProps = {}
           
           <InfoRow>
             <AxParagraph style={{ fontWeight: 'var(--font-weight-bold)' }}>
-              {t('generalLedger.detail.netIncome')}
+              {l10n('generalLedger.detail.netIncome')}
             </AxParagraph>
             <AxParagraph style={{ 
               fontSize: 'var(--font-size-lg)', 
@@ -347,7 +347,7 @@ export function GeneralLedgerDetailPage(props: GeneralLedgerDetailPageProps = {}
           {paymentAmount > 0 && (
             <InfoRow>
               <AxParagraph style={{ fontWeight: 'var(--font-weight-bold)', color: 'var(--color-primary)' }}>
-                {t('generalLedger.detail.paymentReceived')}
+                {l10n('generalLedger.detail.paymentReceived')}
               </AxParagraph>
               <AxParagraph style={{ fontSize: 'var(--font-size-lg)', fontWeight: 'var(--font-weight-bold)', color: 'var(--color-primary)' }}>
                 ${paymentAmount.toFixed(2)}

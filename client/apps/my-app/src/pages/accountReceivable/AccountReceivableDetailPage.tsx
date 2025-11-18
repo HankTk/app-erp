@@ -155,7 +155,7 @@ interface HistoryRecord {
 
 export function AccountReceivableDetailPage(props: AccountReceivableDetailPageProps = {}) {
   const { invoiceId, onNavigateBack } = props;
-  const { t } = useI18n();
+  const { l10n } = useI18n();
   const [currentStep, setCurrentStep] = useState<AccountReceivableStep>('invoice');
   const [order, setOrder] = useState<Order | null>(null);
   const [customers, setCustomers] = useState<Customer[]>([]);
@@ -328,34 +328,34 @@ export function AccountReceivableDetailPage(props: AccountReceivableDetailPagePr
     return (
       <StepContent {...debugProps(COMPONENT_NAME, 'StepContent')}>
         <AxHeading3 style={{ marginBottom: 'var(--spacing-sm)' }}>
-          {t('accountsReceivable.invoice.title')}
+          {l10n('accountsReceivable.invoice.title')}
         </AxHeading3>
         <AxParagraph style={{ marginBottom: 'var(--spacing-md)', color: 'var(--color-text-secondary)' }}>
-          {t('accountsReceivable.invoice.description')}
+          {l10n('accountsReceivable.invoice.description')}
         </AxParagraph>
 
         <InfoSection {...debugProps(COMPONENT_NAME, 'InfoSection')}>
           <InfoRow>
             <AxParagraph style={{ fontWeight: 'var(--font-weight-bold)' }}>
-              {t('accountsReceivable.invoice.invoiceNumber')}
+              {l10n('accountsReceivable.invoice.invoiceNumber')}
             </AxParagraph>
             <AxParagraph>{order.invoiceNumber || 'N/A'}</AxParagraph>
           </InfoRow>
           <InfoRow>
             <AxParagraph style={{ fontWeight: 'var(--font-weight-bold)' }}>
-              {t('accountsReceivable.invoice.invoiceDate')}
+              {l10n('accountsReceivable.invoice.invoiceDate')}
             </AxParagraph>
             <AxParagraph>{formatDate(order.invoiceDate)}</AxParagraph>
           </InfoRow>
           <InfoRow>
             <AxParagraph style={{ fontWeight: 'var(--font-weight-bold)' }}>
-              {t('accountsReceivable.invoice.orderNumber')}
+              {l10n('accountsReceivable.invoice.orderNumber')}
             </AxParagraph>
             <AxParagraph>{order.orderNumber || 'N/A'}</AxParagraph>
           </InfoRow>
           <InfoRow>
             <AxParagraph style={{ fontWeight: 'var(--font-weight-bold)' }}>
-              {t('accountsReceivable.invoice.customer')}
+              {l10n('accountsReceivable.invoice.customer')}
             </AxParagraph>
             <AxParagraph>
               {selectedCustomer ? (selectedCustomer.companyName || `${selectedCustomer.lastName} ${selectedCustomer.firstName}` || selectedCustomer.email) : 'N/A'}
@@ -389,25 +389,25 @@ export function AccountReceivableDetailPage(props: AccountReceivableDetailPagePr
         <InfoSection>
           <InfoRow>
             <AxParagraph style={{ fontWeight: 'var(--font-weight-bold)' }}>
-              {t('accountsReceivable.invoice.subtotal')}
+              {l10n('accountsReceivable.invoice.subtotal')}
             </AxParagraph>
             <AxParagraph>${order.subtotal?.toFixed(2) || '0.00'}</AxParagraph>
           </InfoRow>
           <InfoRow>
             <AxParagraph style={{ fontWeight: 'var(--font-weight-bold)' }}>
-              {t('accountsReceivable.invoice.tax')}
+              {l10n('accountsReceivable.invoice.tax')}
             </AxParagraph>
             <AxParagraph>${order.tax?.toFixed(2) || '0.00'}</AxParagraph>
           </InfoRow>
           <InfoRow>
             <AxParagraph style={{ fontWeight: 'var(--font-weight-bold)' }}>
-              {t('accountsReceivable.invoice.shipping')}
+              {l10n('accountsReceivable.invoice.shipping')}
             </AxParagraph>
             <AxParagraph>${order.shippingCost?.toFixed(2) || '0.00'}</AxParagraph>
           </InfoRow>
           <InfoRow>
             <AxParagraph style={{ fontWeight: 'var(--font-weight-bold)', fontSize: 'var(--font-size-lg)' }}>
-              {t('accountsReceivable.invoice.total')}
+              {l10n('accountsReceivable.invoice.total')}
             </AxParagraph>
             <AxParagraph style={{ fontSize: 'var(--font-size-lg)', fontWeight: 'var(--font-weight-bold)' }}>
               ${order.total?.toFixed(2) || '0.00'}
@@ -424,55 +424,54 @@ export function AccountReceivableDetailPage(props: AccountReceivableDetailPagePr
     return (
       <StepContent {...debugProps(COMPONENT_NAME, 'StepContent')}>
         <AxHeading3 style={{ marginBottom: 'var(--spacing-sm)' }}>
-          {t('accountsReceivable.payment.title')}
+          {l10n('accountsReceivable.payment.title')}
         </AxHeading3>
         <AxParagraph style={{ marginBottom: 'var(--spacing-md)', color: 'var(--color-text-secondary)' }}>
-          {t('accountsReceivable.payment.description')}
+          {l10n('accountsReceivable.payment.description')}
         </AxParagraph>
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-xsm)' }}>
           <AxFormGroup>
-            <AxLabel>{t('accountsReceivable.payment.paymentAmount')}</AxLabel>
+            <AxLabel>{l10n('accountsReceivable.payment.paymentAmount')}</AxLabel>
             <AxInput
               type="number"
               value={paymentAmount || ''}
               onChange={e => setPaymentAmount(parseFloat(e.target.value) || 0)}
               placeholder="0.00"
-              fullWidth
+              style={{ width: '220px' }}
             />
           </AxFormGroup>
 
           <AxFormGroup>
-            <AxLabel>{t('accountsReceivable.payment.paymentDate')}</AxLabel>
+            <AxLabel>{l10n('accountsReceivable.payment.paymentDate')}</AxLabel>
             <AxInput
               type="date"
               value={paymentDate}
               onChange={e => setPaymentDate(e.target.value)}
-              fullWidth
             />
           </AxFormGroup>
 
           <AxFormGroup>
-            <AxLabel>{t('accountsReceivable.payment.paymentMethod')}</AxLabel>
+            <AxLabel>{l10n('accountsReceivable.payment.paymentMethod')}</AxLabel>
             <AxListbox
               options={[
-                { value: 'BANK_TRANSFER', label: t('accountsReceivable.payment.method.bankTransfer') },
-                { value: 'CREDIT_CARD', label: t('accountsReceivable.payment.method.creditCard') },
-                { value: 'CASH', label: t('accountsReceivable.payment.method.cash') },
-                { value: 'CHECK', label: t('accountsReceivable.payment.method.check') },
-                { value: 'OTHER', label: t('accountsReceivable.payment.method.other') },
+                { value: 'BANK_TRANSFER', label: l10n('accountsReceivable.payment.method.bankTransfer') },
+                { value: 'CREDIT_CARD', label: l10n('accountsReceivable.payment.method.creditCard') },
+                { value: 'CASH', label: l10n('accountsReceivable.payment.method.cash') },
+                { value: 'CHECK', label: l10n('accountsReceivable.payment.method.check') },
+                { value: 'OTHER', label: l10n('accountsReceivable.payment.method.other') },
               ]}
               value={paymentMethod}
               onChange={setPaymentMethod}
-              placeholder={t('accountsReceivable.payment.paymentMethodPlaceholder')}
-              fullWidth
+              placeholder={l10n('accountsReceivable.payment.paymentMethodPlaceholder')}
+              style={{ width: '220px' }}
             />
           </AxFormGroup>
 
           <InfoSection {...debugProps(COMPONENT_NAME, 'InfoSection')}>
             <InfoRow>
               <AxParagraph style={{ fontWeight: 'var(--font-weight-bold)' }}>
-                {t('accountsReceivable.payment.invoiceAmount')}
+                {l10n('accountsReceivable.payment.invoiceAmount')}
               </AxParagraph>
               <AxParagraph style={{ fontSize: 'var(--font-size-lg)' }}>
                 ${order.total?.toFixed(2) || '0.00'}
@@ -481,7 +480,7 @@ export function AccountReceivableDetailPage(props: AccountReceivableDetailPagePr
             {paymentAmount > 0 && (
               <InfoRow>
                 <AxParagraph style={{ fontWeight: 'var(--font-weight-bold)' }}>
-                  {t('accountsReceivable.payment.paidAmount')}
+                  {l10n('accountsReceivable.payment.paidAmount')}
                 </AxParagraph>
                 <AxParagraph style={{ fontSize: 'var(--font-size-lg)' }}>
                   ${paymentAmount.toFixed(2)}
@@ -493,7 +492,7 @@ export function AccountReceivableDetailPage(props: AccountReceivableDetailPagePr
                 fontWeight: 'var(--font-weight-bold)',
                 color: outstandingAmount > 0 ? 'var(--color-warning)' : 'var(--color-success)'
               }}>
-                {t('accountsReceivable.payment.outstanding')}
+                {l10n('accountsReceivable.payment.outstanding')}
               </AxParagraph>
               <AxParagraph style={{ 
                 fontSize: 'var(--font-size-lg)',
@@ -511,14 +510,14 @@ export function AccountReceivableDetailPage(props: AccountReceivableDetailPagePr
             variant="secondary"
             onClick={() => setCurrentStep('invoice')}
           >
-            {t('accountsReceivable.previous')}
+            {l10n('accountsReceivable.previous')}
           </AxButton>
           <AxButton
             variant="primary"
             onClick={handlePayment}
             disabled={submitting || !paymentAmount || !paymentDate || !paymentMethod}
           >
-            {submitting ? t('accountsReceivable.payment.processing') : t('accountsReceivable.payment.record')}
+            {submitting ? l10n('accountsReceivable.payment.processing') : l10n('accountsReceivable.payment.record')}
           </AxButton>
         </ButtonGroup>
       </StepContent>
@@ -527,9 +526,9 @@ export function AccountReceivableDetailPage(props: AccountReceivableDetailPagePr
 
   const getStepLabel = (step: string): string => {
     const stepLabels: Record<string, string> = {
-      'invoicing': t('accountsReceivable.history.step.invoicing'),
-      'payment': t('accountsReceivable.history.step.payment'),
-      'status_change': t('accountsReceivable.history.step.statusChange'),
+      'invoicing': l10n('accountsReceivable.history.step.invoicing'),
+      'payment': l10n('accountsReceivable.history.step.payment'),
+      'status_change': l10n('accountsReceivable.history.step.statusChange'),
     };
     return stepLabels[step] || step;
   };
@@ -537,21 +536,21 @@ export function AccountReceivableDetailPage(props: AccountReceivableDetailPagePr
   const getStatusLabel = (status?: string): string => {
     if (!status) return 'N/A';
     const statusMap: Record<string, string> = {
-      'INVOICED': t('accountsReceivable.history.status.invoiced'),
-      'PAID': t('accountsReceivable.history.status.paid'),
+      'INVOICED': l10n('accountsReceivable.history.status.invoiced'),
+      'PAID': l10n('accountsReceivable.history.status.paid'),
     };
     return statusMap[status] || status;
   };
 
   const getDataKeyLabel = (key: string): string => {
     const keyMap: Record<string, string> = {
-      'invoiceNumber': t('accountsReceivable.history.data.invoiceNumber'),
-      'invoiceDate': t('accountsReceivable.history.data.invoiceDate'),
-      'paymentAmount': t('accountsReceivable.history.data.paymentAmount'),
-      'paymentDate': t('accountsReceivable.history.data.paymentDate'),
-      'paymentMethod': t('accountsReceivable.history.data.paymentMethod'),
-      'oldStatus': t('accountsReceivable.history.data.oldStatus'),
-      'newStatus': t('accountsReceivable.history.data.newStatus'),
+      'invoiceNumber': l10n('accountsReceivable.history.data.invoiceNumber'),
+      'invoiceDate': l10n('accountsReceivable.history.data.invoiceDate'),
+      'paymentAmount': l10n('accountsReceivable.history.data.paymentAmount'),
+      'paymentDate': l10n('accountsReceivable.history.data.paymentDate'),
+      'paymentMethod': l10n('accountsReceivable.history.data.paymentMethod'),
+      'oldStatus': l10n('accountsReceivable.history.data.oldStatus'),
+      'newStatus': l10n('accountsReceivable.history.data.newStatus'),
     };
     return keyMap[key] || key;
   };
@@ -562,11 +561,11 @@ export function AccountReceivableDetailPage(props: AccountReceivableDetailPagePr
     }
     if (key === 'paymentMethod') {
       const methodMap: Record<string, string> = {
-        'BANK_TRANSFER': t('accountsReceivable.payment.method.bankTransfer'),
-        'CREDIT_CARD': t('accountsReceivable.payment.method.creditCard'),
-        'CASH': t('accountsReceivable.payment.method.cash'),
-        'CHECK': t('accountsReceivable.payment.method.check'),
-        'OTHER': t('accountsReceivable.payment.method.other'),
+        'BANK_TRANSFER': l10n('accountsReceivable.payment.method.bankTransfer'),
+        'CREDIT_CARD': l10n('accountsReceivable.payment.method.creditCard'),
+        'CASH': l10n('accountsReceivable.payment.method.cash'),
+        'CHECK': l10n('accountsReceivable.payment.method.check'),
+        'OTHER': l10n('accountsReceivable.payment.method.other'),
       };
       return methodMap[String(value)] || String(value);
     }
@@ -585,15 +584,15 @@ export function AccountReceivableDetailPage(props: AccountReceivableDetailPagePr
     return (
       <StepContent {...debugProps(COMPONENT_NAME, 'StepContent')}>
         <AxHeading3 style={{ marginBottom: 'var(--spacing-sm)' }}>
-          {t('accountsReceivable.history.title')}
+          {l10n('accountsReceivable.history.title')}
         </AxHeading3>
         <AxParagraph style={{ marginBottom: 'var(--spacing-md)', color: 'var(--color-text-secondary)' }}>
-          {t('accountsReceivable.history.description')}
+          {l10n('accountsReceivable.history.description')}
         </AxParagraph>
 
         {historyRecords.length === 0 ? (
           <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '200px' }}>
-            <AxParagraph>{t('accountsReceivable.history.empty')}</AxParagraph>
+            <AxParagraph>{l10n('accountsReceivable.history.empty')}</AxParagraph>
           </div>
         ) : (
           <div style={{ maxHeight: 'calc(100vh - 400px)', overflowY: 'auto', overflowX: 'hidden' }}>
@@ -637,7 +636,7 @@ export function AccountReceivableDetailPage(props: AccountReceivableDetailPagePr
             variant="secondary"
             onClick={() => setCurrentStep('payment')}
           >
-            {t('accountsReceivable.previous')}
+            {l10n('accountsReceivable.previous')}
           </AxButton>
         </ButtonGroup>
       </StepContent>
@@ -664,7 +663,7 @@ export function AccountReceivableDetailPage(props: AccountReceivableDetailPagePr
             <AxParagraph>Invoice not found</AxParagraph>
             {onNavigateBack && (
               <AxButton variant="secondary" onClick={onNavigateBack}>
-                {t('accountsReceivable.back')}
+                {l10n('accountsReceivable.back')}
               </AxButton>
             )}
           </div>
@@ -688,15 +687,15 @@ export function AccountReceivableDetailPage(props: AccountReceivableDetailPagePr
                 onClick={onNavigateBack}
                 style={{ minWidth: 'auto', padding: 'var(--spacing-sm) var(--spacing-md)' }}
               >
-                {t('accountsReceivable.back')}
+                {l10n('accountsReceivable.back')}
               </AxButton>
             )}
             <div style={{ flex: 1 }}>
               <AxHeading3 style={{ marginBottom: 'var(--spacing-xs)' }}>
-                {t('module.accountsReceivable')}
+                {l10n('module.accountsReceivable')}
               </AxHeading3>
               <AxParagraph style={{ color: 'var(--color-text-secondary)' }}>
-                {t('accountsReceivable.subtitle')}
+                {l10n('accountsReceivable.subtitle')}
               </AxParagraph>
             </div>
           </HeaderLeft>
@@ -709,7 +708,7 @@ export function AccountReceivableDetailPage(props: AccountReceivableDetailPagePr
                   borderRadius: 'var(--radius-md)',
                 }}>
                   <AxParagraph style={{ fontSize: 'var(--font-size-sm)', color: 'var(--color-text-secondary)', marginBottom: 'var(--spacing-xs)' }}>
-                    {t('accountsReceivable.invoice.invoiceNumber')}
+                    {l10n('accountsReceivable.invoice.invoiceNumber')}
                   </AxParagraph>
                   <AxParagraph style={{ fontWeight: 'var(--font-weight-bold)' }}>
                     {order.invoiceNumber}
@@ -722,7 +721,7 @@ export function AccountReceivableDetailPage(props: AccountReceivableDetailPagePr
                 borderRadius: 'var(--radius-md)',
               }}>
                 <AxParagraph style={{ fontSize: 'var(--font-size-sm)', color: 'var(--color-text-secondary)', marginBottom: 'var(--spacing-xs)' }}>
-                  {t('accountsReceivable.customer')}
+                  {l10n('accountsReceivable.customer')}
                 </AxParagraph>
                 <AxParagraph style={{ fontWeight: 'var(--font-weight-bold)' }}>
                   {selectedCustomerName}
@@ -734,7 +733,7 @@ export function AccountReceivableDetailPage(props: AccountReceivableDetailPagePr
                 borderRadius: 'var(--radius-md)',
               }}>
                 <AxParagraph style={{ fontSize: 'var(--font-size-sm)', color: 'var(--color-text-secondary)', marginBottom: 'var(--spacing-xs)' }}>
-                  {t('accountsReceivable.total')}
+                  {l10n('accountsReceivable.total')}
                 </AxParagraph>
                 <AxParagraph style={{ fontWeight: 'var(--font-weight-bold)' }}>
                   ${order.total?.toFixed(2) || '0.00'}
@@ -746,7 +745,7 @@ export function AccountReceivableDetailPage(props: AccountReceivableDetailPagePr
                 borderRadius: 'var(--radius-md)',
               }}>
                 <AxParagraph style={{ fontSize: 'var(--font-size-sm)', color: 'var(--color-text-secondary)', marginBottom: 'var(--spacing-xs)' }}>
-                  {t('accountsReceivable.outstanding')}
+                  {l10n('accountsReceivable.outstanding')}
                 </AxParagraph>
                 <AxParagraph style={{ 
                   fontWeight: 'var(--font-weight-bold)',
@@ -768,7 +767,7 @@ export function AccountReceivableDetailPage(props: AccountReceivableDetailPagePr
             onClick={() => setCurrentStep('invoice')}
             {...debugProps(COMPONENT_NAME, 'Step')}
           >
-            {t('accountsReceivable.step.invoice')}
+            {l10n('accountsReceivable.step.invoice')}
           </Step>
           <Step
             $active={currentStep === 'payment'}
@@ -776,7 +775,7 @@ export function AccountReceivableDetailPage(props: AccountReceivableDetailPagePr
             onClick={() => setCurrentStep('payment')}
             {...debugProps(COMPONENT_NAME, 'Step')}
           >
-            {t('accountsReceivable.step.payment')}
+            {l10n('accountsReceivable.step.payment')}
           </Step>
           <Step
             $active={currentStep === 'history'}
@@ -784,7 +783,7 @@ export function AccountReceivableDetailPage(props: AccountReceivableDetailPagePr
             onClick={() => setCurrentStep('history')}
             {...debugProps(COMPONENT_NAME, 'Step')}
           >
-            {t('accountsReceivable.step.history')}
+            {l10n('accountsReceivable.step.history')}
           </Step>
         </StepIndicator>
 

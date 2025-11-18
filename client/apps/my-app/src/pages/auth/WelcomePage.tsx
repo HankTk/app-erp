@@ -136,14 +136,14 @@ interface WelcomePageProps {
 }
 
 export function WelcomePage({ user, onPageChange }: WelcomePageProps) {
-  const { t } = useI18n();
+  const { l10n } = useI18n();
   const userName = user.firstName || user.userid || 'User';
-  const welcomeMessage = t('welcome.message').replace('{name}', userName);
+  const welcomeMessage = l10n('welcome.message').replace('{name}', userName);
 
   return (
     <HeroContainer {...debugProps(COMPONENT_NAME, 'HeroContainer')}>
         <HeroContent {...debugProps(COMPONENT_NAME, 'HeroContent')}>
-        <HeroTitle {...debugProps(COMPONENT_NAME, 'HeroTitle')}>{t('welcome.title')}</HeroTitle>
+        <HeroTitle {...debugProps(COMPONENT_NAME, 'HeroTitle')}>{l10n('welcome.title')}</HeroTitle>
         <HeroSubtitle {...debugProps(COMPONENT_NAME, 'HeroSubtitle')}>{welcomeMessage}</HeroSubtitle>
         
         <MenuCardsGrid {...debugProps(COMPONENT_NAME, 'MenuCardsGrid')}>
@@ -159,9 +159,9 @@ export function WelcomePage({ user, onPageChange }: WelcomePageProps) {
               }}
               {...debugProps(COMPONENT_NAME, 'MenuCard')}
             >
-              <MenuCardTitle {...debugProps(COMPONENT_NAME, 'MenuCardTitle')}>{t(item.labelKey)}</MenuCardTitle>
+              <MenuCardTitle {...debugProps(COMPONENT_NAME, 'MenuCardTitle')}>{l10n(item.labelKey)}</MenuCardTitle>
               {item.subtitleKey && (
-                <MenuCardSubtitle {...debugProps(COMPONENT_NAME, 'MenuCardSubtitle')}>{t(item.subtitleKey)}</MenuCardSubtitle>
+                <MenuCardSubtitle {...debugProps(COMPONENT_NAME, 'MenuCardSubtitle')}>{l10n(item.subtitleKey)}</MenuCardSubtitle>
               )}
             </MenuCard>
           ))}

@@ -93,7 +93,7 @@ export function PurchaseOrderEntryStepPage(props: PurchaseOrderEntryStepProps) {
     loading = false,
     readOnly = false,
   } = props;
-  const { t } = useI18n();
+  const { l10n } = useI18n();
   const [vendorDialogOpen, setVendorDialogOpen] = useState(false);
 
   const isSubStepCompleted = (subStep: EntrySubStep) => {
@@ -123,14 +123,14 @@ export function PurchaseOrderEntryStepPage(props: PurchaseOrderEntryStepProps) {
 
     return (
       <div>
-        <AxHeading3 style={{ marginBottom: 'var(--spacing-sm)' }}>{t('purchaseOrderEntry.selectSupplier')}</AxHeading3>
+        <AxHeading3 style={{ marginBottom: 'var(--spacing-sm)' }}>{l10n('purchaseOrderEntry.selectSupplier')}</AxHeading3>
         {!po?.id && (
           <AxParagraph style={{ marginBottom: 'var(--spacing-sm)', color: 'var(--color-warning)' }}>
-            {t('purchaseOrderEntry.initializing')}
+            {l10n('purchaseOrderEntry.initializing')}
           </AxParagraph>
         )}
         <AxFormGroup>
-          <AxLabel>{t('purchaseOrderEntry.supplier')}</AxLabel>
+          <AxLabel>{l10n('purchaseOrderEntry.supplier')}</AxLabel>
           <AxListbox
             options={vendorOptions}
             value={po?.supplierId || null}
@@ -138,17 +138,17 @@ export function PurchaseOrderEntryStepPage(props: PurchaseOrderEntryStepProps) {
               if (value && po?.id) {
                 await onSupplierSelect(value);
               } else if (value && !po?.id) {
-                alert(t('purchaseOrderEntry.notReady'));
+                alert(l10n('purchaseOrderEntry.notReady'));
               }
             }}
-            placeholder={t('purchaseOrderEntry.selectSupplierPlaceholder')}
+            placeholder={l10n('purchaseOrderEntry.selectSupplierPlaceholder')}
             fullWidth
             disabled={loading || !po?.id || readOnly}
           />
         </AxFormGroup>
         {po?.supplierId && (
           <AxParagraph style={{ marginTop: 'var(--spacing-sm)', color: 'var(--color-text-secondary)' }}>
-            {t('purchaseOrderEntry.supplierSelected')}
+            {l10n('purchaseOrderEntry.supplierSelected')}
           </AxParagraph>
         )}
       </div>
@@ -163,7 +163,7 @@ export function PurchaseOrderEntryStepPage(props: PurchaseOrderEntryStepProps) {
 
     return (
       <div>
-        <AxHeading3 style={{ marginBottom: 'var(--spacing-sm)' }}>{t('purchaseOrderEntry.addProducts')}</AxHeading3>
+        <AxHeading3 style={{ marginBottom: 'var(--spacing-sm)' }}>{l10n('purchaseOrderEntry.addProducts')}</AxHeading3>
 
         <div
           style={{
@@ -175,12 +175,12 @@ export function PurchaseOrderEntryStepPage(props: PurchaseOrderEntryStepProps) {
         >
           <div style={{ flex: 1 }}>
             <AxFormGroup style={{ marginBottom: 0 }}>
-              <AxLabel>{t('purchaseOrderEntry.product')}</AxLabel>
+              <AxLabel>{l10n('purchaseOrderEntry.product')}</AxLabel>
               <AxListbox
                 options={productOptions}
                 value={selectedProduct}
                 onChange={onSetSelectedProduct}
-                placeholder={t('purchaseOrderEntry.selectProductPlaceholder')}
+                placeholder={l10n('purchaseOrderEntry.selectProductPlaceholder')}
                 fullWidth
                 disabled={loading || readOnly}
               />
@@ -188,7 +188,7 @@ export function PurchaseOrderEntryStepPage(props: PurchaseOrderEntryStepProps) {
           </div>
           <div style={{ width: '150px' }}>
             <AxFormGroup style={{ marginBottom: 0 }}>
-              <AxLabel>{t('purchaseOrderEntry.quantity')}</AxLabel>
+              <AxLabel>{l10n('purchaseOrderEntry.quantity')}</AxLabel>
               <AxInput
                 type="number"
                 min="1"
@@ -210,7 +210,7 @@ export function PurchaseOrderEntryStepPage(props: PurchaseOrderEntryStepProps) {
             }}
             disabled={!selectedProduct || loading || readOnly}
           >
-            {t('purchaseOrderEntry.add')}
+            {l10n('purchaseOrderEntry.add')}
           </AxButton>
         </div>
 
@@ -218,11 +218,11 @@ export function PurchaseOrderEntryStepPage(props: PurchaseOrderEntryStepProps) {
           <AxTable fullWidth>
             <AxTableHead>
               <AxTableRow>
-                <AxTableHeader>{t('purchaseOrderEntry.product')}</AxTableHeader>
-                <AxTableHeader>{t('purchaseOrderEntry.quantity')}</AxTableHeader>
-                <AxTableHeader align="right">{t('purchaseOrderEntry.unitPrice')}</AxTableHeader>
-                <AxTableHeader align="right">{t('purchaseOrderEntry.lineTotal')}</AxTableHeader>
-                <AxTableHeader align="center">{t('purchaseOrderEntry.actions')}</AxTableHeader>
+                <AxTableHeader>{l10n('purchaseOrderEntry.product')}</AxTableHeader>
+                <AxTableHeader>{l10n('purchaseOrderEntry.quantity')}</AxTableHeader>
+                <AxTableHeader align="right">{l10n('purchaseOrderEntry.unitPrice')}</AxTableHeader>
+                <AxTableHeader align="right">{l10n('purchaseOrderEntry.lineTotal')}</AxTableHeader>
+                <AxTableHeader align="center">{l10n('purchaseOrderEntry.actions')}</AxTableHeader>
               </AxTableRow>
             </AxTableHead>
             <AxTableBody>
@@ -260,7 +260,7 @@ export function PurchaseOrderEntryStepPage(props: PurchaseOrderEntryStepProps) {
                         onClick={() => onRemoveItem(item.id!)}
                         disabled={loading || readOnly}
                       >
-                        {t('purchaseOrderEntry.delete')}
+                        {l10n('purchaseOrderEntry.delete')}
                       </AxButton>
                     </AxTableCell>
                   </AxTableRow>
@@ -269,7 +269,7 @@ export function PurchaseOrderEntryStepPage(props: PurchaseOrderEntryStepProps) {
                 <AxTableRow>
                   <AxTableCell colSpan={5} align="center">
                     <AxParagraph style={{ color: 'var(--color-text-secondary)' }}>
-                      {t('purchaseOrderEntry.noProducts')}
+                      {l10n('purchaseOrderEntry.noProducts')}
                     </AxParagraph>
                   </AxTableCell>
                 </AxTableRow>
@@ -289,7 +289,7 @@ export function PurchaseOrderEntryStepPage(props: PurchaseOrderEntryStepProps) {
           >
             <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 'var(--spacing-sm)' }}>
               <AxParagraph>
-                <strong>{t('purchaseOrderEntry.subtotal')}:</strong>
+                <strong>{l10n('purchaseOrderEntry.subtotal')}:</strong>
               </AxParagraph>
               <AxParagraph>
                 <strong>${po.subtotal?.toFixed(2) || '0.00'}</strong>
@@ -321,11 +321,11 @@ export function PurchaseOrderEntryStepPage(props: PurchaseOrderEntryStepProps) {
 
     return (
       <div>
-        <AxHeading3 style={{ marginBottom: 'var(--spacing-sm)' }}>{t('purchaseOrderEntry.shippingInformation')}</AxHeading3>
+        <AxHeading3 style={{ marginBottom: 'var(--spacing-sm)' }}>{l10n('purchaseOrderEntry.shippingInformation')}</AxHeading3>
 
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--spacing-sm)' }}>
           <AxFormGroup>
-            <AxLabel>{t('purchaseOrderEntry.shippingAddress')}</AxLabel>
+            <AxLabel>{l10n('purchaseOrderEntry.shippingAddress')}</AxLabel>
             <div style={{ display: 'flex', gap: 'var(--spacing-sm)', alignItems: 'flex-start' }}>
               <div style={{ flex: 1 }}>
                 <AxListbox
@@ -337,7 +337,7 @@ export function PurchaseOrderEntryStepPage(props: PurchaseOrderEntryStepProps) {
                       await onShippingInfoUpdate(value, billingId);
                     }
                   }}
-                  placeholder={t('purchaseOrderEntry.selectShippingAddress')}
+                  placeholder={l10n('purchaseOrderEntry.selectShippingAddress')}
                   fullWidth
                   disabled={loading || addressOptions.length === 0 || readOnly}
                 />
@@ -374,13 +374,13 @@ export function PurchaseOrderEntryStepPage(props: PurchaseOrderEntryStepProps) {
                   fontSize: 'var(--font-size-sm)',
                 }}
               >
-                {t('purchaseOrderEntry.noAddresses')} Click ... to create a new address.
+                {l10n('purchaseOrderEntry.noAddresses')} Click ... to create a new address.
               </AxParagraph>
             )}
           </AxFormGroup>
 
           <AxFormGroup>
-            <AxLabel>{t('purchaseOrderEntry.billingAddress')}</AxLabel>
+            <AxLabel>{l10n('purchaseOrderEntry.billingAddress')}</AxLabel>
             <div style={{ display: 'flex', gap: 'var(--spacing-sm)', alignItems: 'flex-start' }}>
               <div style={{ flex: 1 }}>
                 <AxListbox
@@ -392,7 +392,7 @@ export function PurchaseOrderEntryStepPage(props: PurchaseOrderEntryStepProps) {
                       await onShippingInfoUpdate(shippingId, value);
                     }
                   }}
-                  placeholder={t('purchaseOrderEntry.selectBillingAddress')}
+                  placeholder={l10n('purchaseOrderEntry.selectBillingAddress')}
                   fullWidth
                   disabled={loading || addressOptions.length === 0 || readOnly}
                 />
@@ -429,7 +429,7 @@ export function PurchaseOrderEntryStepPage(props: PurchaseOrderEntryStepProps) {
                   fontSize: 'var(--font-size-sm)',
                 }}
               >
-                {t('purchaseOrderEntry.noAddresses')} Click ... to create a new address.
+                {l10n('purchaseOrderEntry.noAddresses')} Click ... to create a new address.
               </AxParagraph>
             )}
           </AxFormGroup>
@@ -441,7 +441,7 @@ export function PurchaseOrderEntryStepPage(props: PurchaseOrderEntryStepProps) {
             fontSize: 'var(--font-size-sm)',
           }}
         >
-          {t('purchaseOrderEntry.sameAddressNote')}
+          {l10n('purchaseOrderEntry.sameAddressNote')}
         </AxParagraph>
         {po?.supplierId && (
           <VendorEditDialog
@@ -461,11 +461,11 @@ export function PurchaseOrderEntryStepPage(props: PurchaseOrderEntryStepProps) {
   const renderReviewStep = () => {
     return (
       <div>
-        <AxHeading3 style={{ marginBottom: 'var(--spacing-sm)' }}>{t('purchaseOrderEntry.reviewOrder')}</AxHeading3>
+        <AxHeading3 style={{ marginBottom: 'var(--spacing-sm)' }}>{l10n('purchaseOrderEntry.reviewOrder')}</AxHeading3>
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-md)' }}>
           <AxFormGroup>
-            <AxLabel>{t('purchaseOrderEntry.expectedDeliveryDate')}</AxLabel>
+            <AxLabel>{l10n('purchaseOrderEntry.expectedDeliveryDate')}</AxLabel>
             <AxInput
               type="date"
               value={expectedDeliveryDate}
@@ -477,25 +477,24 @@ export function PurchaseOrderEntryStepPage(props: PurchaseOrderEntryStepProps) {
                 }
               }}
               disabled={loading || !po?.id || readOnly}
-              fullWidth
             />
             <AxParagraph style={{ marginTop: 'var(--spacing-xs)', color: 'var(--color-text-secondary)', fontSize: 'var(--font-size-sm)' }}>
-              {t('purchaseOrderEntry.expectedDeliveryDateDescription')}
+              {l10n('purchaseOrderEntry.expectedDeliveryDateDescription')}
             </AxParagraph>
           </AxFormGroup>
 
           <div>
             <AxParagraph style={{ fontWeight: 'var(--font-weight-bold)', marginBottom: 'var(--spacing-xs)' }}>
-              {t('purchaseOrderEntry.orderItems')}
+              {l10n('purchaseOrderEntry.orderItems')}
             </AxParagraph>
             <ItemsTable>
               <AxTable fullWidth>
                 <AxTableHead>
                   <AxTableRow>
-                    <AxTableHeader>{t('purchaseOrderEntry.product')}</AxTableHeader>
-                    <AxTableHeader>{t('purchaseOrderEntry.quantity')}</AxTableHeader>
-                    <AxTableHeader align="right">{t('purchaseOrderEntry.unitPrice')}</AxTableHeader>
-                    <AxTableHeader align="right">{t('purchaseOrderEntry.lineTotal')}</AxTableHeader>
+                    <AxTableHeader>{l10n('purchaseOrderEntry.product')}</AxTableHeader>
+                    <AxTableHeader>{l10n('purchaseOrderEntry.quantity')}</AxTableHeader>
+                    <AxTableHeader align="right">{l10n('purchaseOrderEntry.unitPrice')}</AxTableHeader>
+                    <AxTableHeader align="right">{l10n('purchaseOrderEntry.lineTotal')}</AxTableHeader>
                   </AxTableRow>
                 </AxTableHead>
                 <AxTableBody>
@@ -520,15 +519,15 @@ export function PurchaseOrderEntryStepPage(props: PurchaseOrderEntryStepProps) {
             }}
           >
             <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 'var(--spacing-xs)' }}>
-              <AxParagraph>{t('purchaseOrderEntry.subtotal')}:</AxParagraph>
+              <AxParagraph>{l10n('purchaseOrderEntry.subtotal')}:</AxParagraph>
               <AxParagraph>${po?.subtotal?.toFixed(2) || '0.00'}</AxParagraph>
             </div>
             <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 'var(--spacing-xs)' }}>
-              <AxParagraph>{t('purchaseOrderEntry.tax')}:</AxParagraph>
+              <AxParagraph>{l10n('purchaseOrderEntry.tax')}:</AxParagraph>
               <AxParagraph>${po?.tax?.toFixed(2) || '0.00'}</AxParagraph>
             </div>
             <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 'var(--spacing-xs)' }}>
-              <AxParagraph>{t('purchaseOrderEntry.shipping')}:</AxParagraph>
+              <AxParagraph>{l10n('purchaseOrderEntry.shipping')}:</AxParagraph>
               <AxParagraph>${po?.shippingCost?.toFixed(2) || '0.00'}</AxParagraph>
             </div>
             <div
@@ -539,7 +538,7 @@ export function PurchaseOrderEntryStepPage(props: PurchaseOrderEntryStepProps) {
                 borderTop: '2px solid var(--color-border-default)',
               }}
             >
-              <AxParagraph style={{ fontWeight: 'var(--font-weight-bold)' }}>{t('purchaseOrderEntry.total')}:</AxParagraph>
+              <AxParagraph style={{ fontWeight: 'var(--font-weight-bold)' }}>{l10n('purchaseOrderEntry.total')}:</AxParagraph>
               <AxParagraph style={{ fontWeight: 'var(--font-weight-bold)' }}>
                 ${po?.total?.toFixed(2) || '0.00'}
               </AxParagraph>

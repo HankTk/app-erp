@@ -355,7 +355,7 @@ export function RMAListingPage({ onNavigateToRMAEntry, onEditRMA, onViewRMA, onN
               <AxParagraph>No RMAs found</AxParagraph>
             </div>
           ) : (
-            <AxTable fullWidth>
+            <AxTable fullWidth stickyHeader>
               <AxTableHead>
                 <AxTableRow>
                   <AxTableHeader>RMA Number</AxTableHeader>

@@ -85,13 +85,13 @@ const menuItems = [
 
 export function Sidebar({ currentPage, onPageChange }: SidebarProps)
 {
-  const { t } = useI18n();
+  const { l10n } = useI18n();
 
   return (
     <AxSidebar>
       <AxSidebarHeader>
-        <AxSidebarTitle>{t('sidebar.title')}</AxSidebarTitle>
-        <AxSidebarSubtitle>{t('sidebar.subtitle')}</AxSidebarSubtitle>
+        <AxSidebarTitle>{l10n('sidebar.title')}</AxSidebarTitle>
+        <AxSidebarSubtitle>{l10n('sidebar.subtitle')}</AxSidebarSubtitle>
       </AxSidebarHeader>
       <AxMenuList>
         {menuItems.map((item) => (
@@ -101,7 +101,7 @@ export function Sidebar({ currentPage, onPageChange }: SidebarProps)
               onClick={() => onPageChange(item.id)}
               variant={currentPage === item.id ? 'primary' : 'secondary'}
             >
-              {t(item.labelKey)}
+              {l10n(item.labelKey)}
             </AxMenuButton>
           </AxMenuItem>
         ))}

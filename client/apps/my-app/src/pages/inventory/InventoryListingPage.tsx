@@ -91,7 +91,7 @@ interface InventoryWithDetails extends Inventory {
 }
 
 export function InventoryListingPage({ onNavigateBack }: InventoryListingPageProps = {}) {
-  const { t } = useI18n();
+  const { l10n } = useI18n();
   const [inventory, setInventory] = useState<InventoryWithDetails[]>([]);
   const [warehouses, setWarehouses] = useState<Warehouse[]>([]);
   const [products, setProducts] = useState<Product[]>([]);
@@ -203,7 +203,7 @@ export function InventoryListingPage({ onNavigateBack }: InventoryListingPagePro
   };
 
   const warehouseOptions = [
-    { value: 'all', label: t('inventory.allWarehouses') },
+    { value: 'all', label: l10n('inventory.allWarehouses') },
     ...warehouses.map((w) => ({
       value: w.id || '',
       label: `${w.warehouseCode} - ${w.warehouseName}`,
@@ -222,15 +222,15 @@ export function InventoryListingPage({ onNavigateBack }: InventoryListingPagePro
                   onClick={onNavigateBack}
                   style={{ minWidth: 'auto', padding: 'var(--spacing-sm) var(--spacing-md)' }}
                 >
-                  ← {t('common.back')}
+                  ← {l10n('common.back')}
                 </AxButton>
               )}
               <div>
                 <AxHeading3 style={{ marginBottom: 'var(--spacing-xs)' }}>
-                  {t('inventory.inventory')}
+                  {l10n('inventory.inventory')}
                 </AxHeading3>
                 <AxParagraph style={{ color: 'var(--color-text-secondary)' }}>
-                  {t('inventory.subtitle')}
+                  {l10n('inventory.subtitle')}
                 </AxParagraph>
               </div>
             </HeaderLeft>
@@ -247,7 +247,7 @@ export function InventoryListingPage({ onNavigateBack }: InventoryListingPagePro
         </HeaderCard>
         <TableCard padding="large" {...debugProps(COMPONENT_NAME, 'TableCard')}>
           <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '200px' }}>
-            <AxParagraph>{t('common.loading')}</AxParagraph>
+            <AxParagraph>{l10n('common.loading')}</AxParagraph>
           </div>
         </TableCard>
       </PageContainer>
@@ -266,15 +266,15 @@ export function InventoryListingPage({ onNavigateBack }: InventoryListingPagePro
                   onClick={onNavigateBack}
                   style={{ minWidth: 'auto', padding: 'var(--spacing-sm) var(--spacing-md)' }}
                 >
-                  ← {t('common.back')}
+                  ← {l10n('common.back')}
                 </AxButton>
               )}
               <div>
                 <AxHeading3 style={{ marginBottom: 'var(--spacing-xs)' }}>
-                  {t('inventory.inventory')}
+                  {l10n('inventory.inventory')}
                 </AxHeading3>
                 <AxParagraph style={{ color: 'var(--color-text-secondary)' }}>
-                  {t('inventory.subtitle')}
+                  {l10n('inventory.subtitle')}
                 </AxParagraph>
               </div>
             </HeaderLeft>
@@ -293,7 +293,7 @@ export function InventoryListingPage({ onNavigateBack }: InventoryListingPagePro
           <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '200px', flexDirection: 'column', gap: 'var(--spacing-md)' }}>
             <AxParagraph style={{ color: 'var(--color-error)' }}>Error: {error}</AxParagraph>
             <AxButton variant="secondary" onClick={loadData}>
-              {t('common.retry')}
+              {l10n('common.retry')}
             </AxButton>
           </div>
         </TableCard>
@@ -312,15 +312,15 @@ export function InventoryListingPage({ onNavigateBack }: InventoryListingPagePro
                 onClick={onNavigateBack}
                 style={{ minWidth: 'auto', padding: 'var(--spacing-sm) var(--spacing-md)' }}
               >
-                ← {t('common.back')}
+                ← {l10n('common.back')}
               </AxButton>
             )}
             <div>
               <AxHeading3 style={{ marginBottom: 'var(--spacing-xs)' }}>
-                {t('inventory.inventory')}
+                {l10n('inventory.inventory')}
               </AxHeading3>
               <AxParagraph style={{ color: 'var(--color-text-secondary)' }}>
-                {t('inventory.subtitle')}
+                {l10n('inventory.subtitle')}
               </AxParagraph>
             </div>
           </HeaderLeft>
@@ -340,19 +340,19 @@ export function InventoryListingPage({ onNavigateBack }: InventoryListingPagePro
         <AxTable fullWidth variant="bordered">
           <AxTableHead>
             <AxTableRow>
-              <AxTableHeader>{t('inventory.productCode')}</AxTableHeader>
-              <AxTableHeader>{t('inventory.productName')}</AxTableHeader>
-              <AxTableHeader>{t('inventory.warehouseCode')}</AxTableHeader>
-              <AxTableHeader>{t('inventory.warehouseName')}</AxTableHeader>
-              <AxTableHeader align="right" style={{ paddingRight: 'var(--spacing-xl)' }}>{t('inventory.quantity')}</AxTableHeader>
-              <AxTableHeader align="center" style={{ paddingLeft: 'var(--spacing-xl)' }}>{t('common.actions')}</AxTableHeader>
+              <AxTableHeader>{l10n('inventory.productCode')}</AxTableHeader>
+              <AxTableHeader>{l10n('inventory.productName')}</AxTableHeader>
+              <AxTableHeader>{l10n('inventory.warehouseCode')}</AxTableHeader>
+              <AxTableHeader>{l10n('inventory.warehouseName')}</AxTableHeader>
+              <AxTableHeader align="right" style={{ paddingRight: 'var(--spacing-xl)' }}>{l10n('inventory.quantity')}</AxTableHeader>
+              <AxTableHeader align="center" style={{ paddingLeft: 'var(--spacing-xl)' }}>{l10n('common.actions')}</AxTableHeader>
             </AxTableRow>
           </AxTableHead>
           <AxTableBody>
             {inventory.length === 0 ? (
               <AxTableRow>
                 <AxTableCell colSpan={6} align="center">
-                  {t('inventory.noInventory')}
+                  {l10n('inventory.noInventory')}
                 </AxTableCell>
               </AxTableRow>
             ) : (
@@ -384,7 +384,7 @@ export function InventoryListingPage({ onNavigateBack }: InventoryListingPagePro
                           onClick={() => handleAdjustInventory(item)}
                           disabled={adjusting === itemKey || (adjustQuantities[itemKey] || 0) === 0}
                         >
-                          {t('inventory.adjust')}
+                          {l10n('inventory.adjust')}
                         </AxButton>
                       </div>
                     </AxTableCell>

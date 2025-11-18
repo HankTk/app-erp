@@ -74,7 +74,7 @@ interface AccountPayableListingPageProps {
 }
 
 export function AccountPayableListingPage({ onViewInvoice, onNavigateBack }: AccountPayableListingPageProps = {} as AccountPayableListingPageProps) {
-  const { t } = useI18n();
+  const { l10n } = useI18n();
   const [invoices, setInvoices] = useState<PurchaseOrder[]>([]);
   const [suppliers, setSuppliers] = useState<Vendor[]>([]);
   const [loading, setLoading] = useState(true);
@@ -156,15 +156,15 @@ export function AccountPayableListingPage({ onViewInvoice, onNavigateBack }: Acc
                 onClick={onNavigateBack}
                 style={{ minWidth: 'auto', padding: 'var(--spacing-sm) var(--spacing-md)' }}
               >
-                {t('accountsPayable.back')}
+                {l10n('accountsPayable.back')}
               </AxButton>
             )}
             <div>
               <AxHeading3 style={{ marginBottom: 'var(--spacing-xs)' }}>
-                {t('module.accountsPayable')}
+                {l10n('module.accountsPayable')}
               </AxHeading3>
               <AxParagraph style={{ color: 'var(--color-text-secondary)' }}>
-                {t('accountsPayable.subtitle')}
+                {l10n('accountsPayable.subtitle')}
               </AxParagraph>
             </div>
           </HeaderLeft>
@@ -174,11 +174,11 @@ export function AccountPayableListingPage({ onViewInvoice, onNavigateBack }: Acc
                 value={statusFilter || ''}
                 onChange={(value: string | null) => setStatusFilter(value || null)}
                 options={[
-                  { value: '', label: t('accountsPayable.filter.all') },
-                  { value: 'INVOICED', label: t('accountsPayable.status.invoiced') },
-                  { value: 'PAID', label: t('accountsPayable.status.paid') },
+                  { value: '', label: l10n('accountsPayable.filter.all') },
+                  { value: 'INVOICED', label: l10n('accountsPayable.status.invoiced') },
+                  { value: 'PAID', label: l10n('accountsPayable.status.paid') },
                 ]}
-                placeholder={t('accountsPayable.filter.placeholder')}
+                placeholder={l10n('accountsPayable.filter.placeholder')}
               />
             </AxFormGroup>
           </HeaderRight>
@@ -195,26 +195,26 @@ export function AccountPayableListingPage({ onViewInvoice, onNavigateBack }: Acc
         <div style={{ flex: 1, overflow: 'auto', minHeight: 0, height: 0, maxHeight: '100%' }}>
           {loading ? (
             <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '200px' }}>
-              <AxParagraph>{t('accountsPayable.loading')}</AxParagraph>
+              <AxParagraph>{l10n('accountsPayable.loading')}</AxParagraph>
             </div>
           ) : filteredInvoices.length === 0 ? (
             <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '200px' }}>
-              <AxParagraph>{t('accountsPayable.noData')}</AxParagraph>
+              <AxParagraph>{l10n('accountsPayable.noData')}</AxParagraph>
             </div>
           ) : (
-            <AxTable fullWidth>
+            <AxTable fullWidth stickyHeader>
             <AxTableHead>
               <AxTableRow>
-                <AxTableHeader>{t('accountsPayable.invoiceNumber')}</AxTableHeader>
-                <AxTableHeader>{t('accountsPayable.orderNumber')}</AxTableHeader>
-                <AxTableHeader>{t('accountsPayable.supplier')}</AxTableHeader>
-                <AxTableHeader>{t('accountsPayable.invoiceDate')}</AxTableHeader>
-                <AxTableHeader>{t('accountsPayable.dueDate')}</AxTableHeader>
-                <AxTableHeader align="right">{t('accountsPayable.total')}</AxTableHeader>
-                <AxTableHeader align="right">{t('accountsPayable.paid')}</AxTableHeader>
-                <AxTableHeader align="right">{t('accountsPayable.outstanding')}</AxTableHeader>
-                <AxTableHeader>{t('accountsPayable.status')}</AxTableHeader>
-                <AxTableHeader>{t('accountsPayable.actions')}</AxTableHeader>
+                <AxTableHeader>{l10n('accountsPayable.invoiceNumber')}</AxTableHeader>
+                <AxTableHeader>{l10n('accountsPayable.orderNumber')}</AxTableHeader>
+                <AxTableHeader>{l10n('accountsPayable.supplier')}</AxTableHeader>
+                <AxTableHeader>{l10n('accountsPayable.invoiceDate')}</AxTableHeader>
+                <AxTableHeader>{l10n('accountsPayable.dueDate')}</AxTableHeader>
+                <AxTableHeader align="right">{l10n('accountsPayable.total')}</AxTableHeader>
+                <AxTableHeader align="right">{l10n('accountsPayable.paid')}</AxTableHeader>
+                <AxTableHeader align="right">{l10n('accountsPayable.outstanding')}</AxTableHeader>
+                <AxTableHeader>{l10n('accountsPayable.status')}</AxTableHeader>
+                <AxTableHeader>{l10n('accountsPayable.actions')}</AxTableHeader>
               </AxTableRow>
             </AxTableHead>
             <AxTableBody>
@@ -251,13 +251,13 @@ export function AccountPayableListingPage({ onViewInvoice, onNavigateBack }: Acc
                           fontWeight: 'var(--font-weight-medium)',
                         }}
                       >
-                        {invoice.status === 'PAID' ? t('accountsPayable.status.paid') : t('accountsPayable.status.invoiced')}
+                        {invoice.status === 'PAID' ? l10n('accountsPayable.status.paid') : l10n('accountsPayable.status.invoiced')}
                       </span>
                     </AxTableCell>
                     <AxTableCell>
                       {onViewInvoice && invoice.id && (
                         <AxButton variant="secondary" size="small" onClick={() => onViewInvoice(invoice.id!)}>
-                          {t('accountsPayable.view')}
+                          {l10n('accountsPayable.view')}
                         </AxButton>
                       )}
                     </AxTableCell>

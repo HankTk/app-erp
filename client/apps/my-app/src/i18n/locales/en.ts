@@ -106,7 +106,7 @@ export const en = {
   'generalLedger.detail.netIncome': 'Net Income',
   'generalLedger.detail.paymentReceived': 'Payment Received',
   
-  'module.rma': 'RMA',
+  'module.rma': 'Return Merchandise Authorization',
   'module.inventoryControl': 'Inventory Control',
   'module.generalLedger': 'General Ledger',
   'module.purchaseOrder': 'Purchase Order',

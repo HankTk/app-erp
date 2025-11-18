@@ -27,7 +27,7 @@ export function VendorEditDialog({
   onVendorUpdated,
   onAddressesUpdated,
 }: VendorEditDialogProps) {
-  const { t } = useI18n();
+  const { l10n } = useI18n();
   const [vendor, setVendor] = useState<Vendor | null>(null);
   const [addresses, setAddresses] = useState<Address[]>([]);
   const [formData, setFormData] = useState<Partial<Vendor>>({});
@@ -128,7 +128,7 @@ export function VendorEditDialog({
     <AxDialog
       open={open}
       onClose={handleClose}
-      title={t('vendor.editTitle')}
+      title={l10n('vendor.editTitle')}
       size="large"
       footer={
         <div style={{ display: 'flex', gap: 'var(--spacing-sm)', justifyContent: 'space-between' }}>
@@ -138,7 +138,7 @@ export function VendorEditDialog({
               onClick={() => setShowAddressManagement(true)}
               disabled={submitting}
             >
-              {t('vendor.manageAddresses')}
+              {l10n('vendor.manageAddresses')}
             </AxButton>
           </div>
           <div style={{ display: 'flex', gap: 'var(--spacing-sm)' }}>
@@ -147,14 +147,14 @@ export function VendorEditDialog({
               onClick={handleClose}
               disabled={submitting}
             >
-              {t('vendor.cancel')}
+              {l10n('vendor.cancel')}
             </AxButton>
             <AxButton 
               variant="primary" 
               onClick={handleSave}
               disabled={submitting}
             >
-              {submitting ? t('vendor.saving') : t('vendor.save')}
+              {submitting ? l10n('vendor.saving') : l10n('vendor.save')}
             </AxButton>
           </div>
         </div>
@@ -162,7 +162,7 @@ export function VendorEditDialog({
     >
       <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-lg)' }}>
         <AxFormGroup>
-          <AxLabel>{t('vendor.vendorNumber')}</AxLabel>
+          <AxLabel>{l10n('vendor.vendorNumber')}</AxLabel>
           <AxInput
             type="text"
             value={formData.vendorNumber || ''}
@@ -175,7 +175,7 @@ export function VendorEditDialog({
           />
         </AxFormGroup>
         <AxFormGroup>
-          <AxLabel>{t('vendor.companyName')}</AxLabel>
+          <AxLabel>{l10n('vendor.companyName')}</AxLabel>
           <AxInput
             type="text"
             value={formData.companyName || ''}
@@ -188,7 +188,7 @@ export function VendorEditDialog({
           />
         </AxFormGroup>
         <AxFormGroup>
-          <AxLabel>{t('vendor.firstName')}</AxLabel>
+          <AxLabel>{l10n('vendor.firstName')}</AxLabel>
           <AxInput
             type="text"
             value={formData.firstName || ''}
@@ -201,7 +201,7 @@ export function VendorEditDialog({
           />
         </AxFormGroup>
         <AxFormGroup>
-          <AxLabel>{t('vendor.lastName')}</AxLabel>
+          <AxLabel>{l10n('vendor.lastName')}</AxLabel>
           <AxInput
             type="text"
             value={formData.lastName || ''}
@@ -214,7 +214,7 @@ export function VendorEditDialog({
           />
         </AxFormGroup>
         <AxFormGroup>
-          <AxLabel>{t('vendor.email')}</AxLabel>
+          <AxLabel>{l10n('vendor.email')}</AxLabel>
           <AxInput
             type="email"
             value={formData.email || ''}
@@ -227,7 +227,7 @@ export function VendorEditDialog({
           />
         </AxFormGroup>
         <AxFormGroup>
-          <AxLabel>{t('vendor.phone')}</AxLabel>
+          <AxLabel>{l10n('vendor.phone')}</AxLabel>
           <AxInput
             type="tel"
             value={formData.phone || ''}
@@ -240,14 +240,14 @@ export function VendorEditDialog({
           />
         </AxFormGroup>
         <AxFormGroup>
-          <AxLabel>{t('vendor.associatedAddresses')}</AxLabel>
+          <AxLabel>{l10n('vendor.associatedAddresses')}</AxLabel>
           <div style={{ marginTop: 'var(--spacing-xs)' }}>
             {(() => {
               const vendorAddresses = getVendorAddresses(vendorId);
               if (vendorAddresses.length === 0) {
                 return (
                   <AxParagraph style={{ color: 'var(--color-text-secondary)', fontStyle: 'italic' }}>
-                    {t('vendor.noAddresses')}
+                    {l10n('vendor.noAddresses')}
                   </AxParagraph>
                 );
               }
@@ -288,7 +288,7 @@ export function VendorEditDialog({
               onAddressesUpdated();
             }
           }}
-          title={t('vendor.manageAddresses')}
+          title={l10n('vendor.manageAddresses')}
           size="large"
           footer={
             <div style={{ display: 'flex', gap: 'var(--spacing-sm)', justifyContent: 'flex-end' }}>
@@ -303,7 +303,7 @@ export function VendorEditDialog({
                   }
                 }}
               >
-                {t('vendor.close')}
+                {l10n('vendor.close')}
               </AxButton>
             </div>
           }

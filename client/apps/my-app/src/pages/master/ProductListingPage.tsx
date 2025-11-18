@@ -282,7 +282,7 @@ export function ProductListingPage({ onNavigateBack }: ProductListingPageProps =
               <AxParagraph>No products found</AxParagraph>
             </div>
           ) : (
-            <AxTable fullWidth>
+            <AxTable fullWidth stickyHeader>
               <AxTableHead>
                 <AxTableRow>
                   <AxTableHeader>Product Code</AxTableHeader>

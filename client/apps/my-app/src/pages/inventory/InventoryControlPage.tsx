@@ -115,7 +115,7 @@ interface InventoryControlPageProps {
 type View = 'menu' | 'warehouses' | 'inventory';
 
 export function InventoryControlPage({ onNavigateBack }: InventoryControlPageProps = {}) {
-  const { t } = useI18n();
+  const { l10n } = useI18n();
   const [currentView, setCurrentView] = useState<View>('menu');
 
   if (currentView === 'warehouses') {
@@ -145,15 +145,15 @@ export function InventoryControlPage({ onNavigateBack }: InventoryControlPagePro
                 onClick={onNavigateBack}
                 style={{ minWidth: 'auto', padding: 'var(--spacing-sm) var(--spacing-md)', marginTop: '2px' }}
               >
-                {t('common.back')}
+                {l10n('common.back')}
               </AxButton>
             )}
             <div>
               <AxHeading3 style={{ marginBottom: 'var(--spacing-xs)' }}>
-                {t('module.inventoryControl')}
+                {l10n('module.inventoryControl')}
               </AxHeading3>
               <AxParagraph style={{ color: 'var(--color-text-secondary)' }}>
-                {t('inventory.subtitle')}
+                {l10n('inventory.subtitle')}
               </AxParagraph>
             </div>
           </HeaderLeft>
@@ -169,16 +169,16 @@ export function InventoryControlPage({ onNavigateBack }: InventoryControlPagePro
             onClick={() => setCurrentView('warehouses')}
             {...debugProps(COMPONENT_NAME, 'MenuCard')}
           >
-            <MenuCardTitle {...debugProps(COMPONENT_NAME, 'MenuCardTitle')}>{t('inventory.warehouses')}</MenuCardTitle>
-            <MenuCardSubtitle {...debugProps(COMPONENT_NAME, 'MenuCardSubtitle')}>{t('inventory.warehousesDescription')}</MenuCardSubtitle>
+            <MenuCardTitle {...debugProps(COMPONENT_NAME, 'MenuCardTitle')}>{l10n('inventory.warehouses')}</MenuCardTitle>
+            <MenuCardSubtitle {...debugProps(COMPONENT_NAME, 'MenuCardSubtitle')}>{l10n('inventory.warehousesDescription')}</MenuCardSubtitle>
           </MenuCard>
           <MenuCard
             elevation={1}
             onClick={() => setCurrentView('inventory')}
             {...debugProps(COMPONENT_NAME, 'MenuCard')}
           >
-            <MenuCardTitle {...debugProps(COMPONENT_NAME, 'MenuCardTitle')}>{t('inventory.inventory')}</MenuCardTitle>
-            <MenuCardSubtitle {...debugProps(COMPONENT_NAME, 'MenuCardSubtitle')}>{t('inventory.inventoryDescription')}</MenuCardSubtitle>
+            <MenuCardTitle {...debugProps(COMPONENT_NAME, 'MenuCardTitle')}>{l10n('inventory.inventory')}</MenuCardTitle>
+            <MenuCardSubtitle {...debugProps(COMPONENT_NAME, 'MenuCardSubtitle')}>{l10n('inventory.inventoryDescription')}</MenuCardSubtitle>
           </MenuCard>
         </MenuCardsGrid>
       </CardsContainer>

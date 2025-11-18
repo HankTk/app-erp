@@ -165,7 +165,7 @@ interface PurchaseOrderEntryPageProps {
 
 export function PurchaseOrderEntryPage(props: PurchaseOrderEntryPageProps = {}) {
   const { onNavigateToPOs, poIdToEdit, onNavigateBack, readOnly = false, title, subtitle } = props;
-  const { t } = useI18n();
+  const { l10n } = useI18n();
   const [currentStep, setCurrentStep] = useState<PurchaseOrderStep>('entry');
   const [currentEntrySubStep, setCurrentEntrySubStep] = useState<EntrySubStep>('supplier');
   const [po, setPO] = useState<PurchaseOrder | null>(null);
@@ -199,11 +199,11 @@ export function PurchaseOrderEntryPage(props: PurchaseOrderEntryPageProps = {}) 
   const [invoiceDate, setInvoiceDate] = useState<string>('');
 
   const steps: { key: PurchaseOrderStep; label: string; description: string }[] = [
-    { key: 'entry', label: t('purchaseOrderEntry.step.entry'), description: t('purchaseOrderEntry.step.entry') },
-    { key: 'approval', label: t('purchaseOrderEntry.step.approval'), description: t('purchaseOrderEntry.step.approval') },
-    { key: 'received', label: t('purchaseOrderEntry.step.received'), description: t('purchaseOrderEntry.step.received') },
-    { key: 'invoicing', label: t('purchaseOrderEntry.step.invoicing'), description: t('purchaseOrderEntry.step.invoicing') },
-    { key: 'history', label: t('purchaseOrderEntry.step.history'), description: t('purchaseOrderEntry.step.history') },
+    { key: 'entry', label: l10n('purchaseOrderEntry.step.entry'), description: l10n('purchaseOrderEntry.step.entry') },
+    { key: 'approval', label: l10n('purchaseOrderEntry.step.approval'), description: l10n('purchaseOrderEntry.step.approval') },
+    { key: 'received', label: l10n('purchaseOrderEntry.step.received'), description: l10n('purchaseOrderEntry.step.received') },
+    { key: 'invoicing', label: l10n('purchaseOrderEntry.step.invoicing'), description: l10n('purchaseOrderEntry.step.invoicing') },
+    { key: 'history', label: l10n('purchaseOrderEntry.step.history'), description: l10n('purchaseOrderEntry.step.history') },
   ];
 
   const entrySubSteps: { key: EntrySubStep; label: string }[] = [
@@ -590,18 +590,18 @@ export function PurchaseOrderEntryPage(props: PurchaseOrderEntryPageProps = {}) 
         status: 'PENDING_APPROVAL',
       });
       setPO(updated);
-      await addHistoryRecord('entry', t('purchaseOrderEntry.history.step.entry'), undefined, 'PENDING_APPROVAL', {
+      await addHistoryRecord('entry', l10n('purchaseOrderEntry.history.step.entry'), undefined, 'PENDING_APPROVAL', {
         supplierId: updated.supplierId,
         itemCount: updated.items?.length || 0,
         total: updated.total,
       }, updated);
-      alert(t('purchaseOrderEntry.submittedForApproval'));
+      alert(l10n('purchaseOrderEntry.submittedForApproval'));
       if (onNavigateToPOs) {
         onNavigateToPOs();
       }
     } catch (err) {
       console.error('Error completing entry:', err);
-      alert(t('purchaseOrderEntry.failedToComplete'));
+      alert(l10n('purchaseOrderEntry.failedToComplete'));
     } finally {
       setSubmitting(false);
     }
@@ -621,11 +621,11 @@ export function PurchaseOrderEntryPage(props: PurchaseOrderEntryPageProps = {}) 
         jsonData,
       });
       setPO(updated);
-      await addHistoryRecord('approval', t('purchaseOrderEntry.history.step.approval'), approvalNotes, 'APPROVED', {}, updated);
+      await addHistoryRecord('approval', l10n('purchaseOrderEntry.history.step.approval'), approvalNotes, 'APPROVED', {}, updated);
       setCurrentStep('received');
     } catch (err) {
       console.error('Error approving PO:', err);
-      alert(t('purchaseOrderEntry.failedToApprove'));
+      alert(l10n('purchaseOrderEntry.failedToApprove'));
     } finally {
       setSubmitting(false);
     }
@@ -644,13 +644,13 @@ export function PurchaseOrderEntryPage(props: PurchaseOrderEntryPageProps = {}) 
         jsonData,
       });
       setPO(updated);
-      await addHistoryRecord('received', t('purchaseOrderEntry.history.step.received'), undefined, 'RECEIVED', {
+      await addHistoryRecord('received', l10n('purchaseOrderEntry.history.step.received'), undefined, 'RECEIVED', {
         receivedDate,
       }, updated);
       setCurrentStep('invoicing');
     } catch (err) {
       console.error('Error receiving PO:', err);
-      alert(t('purchaseOrderEntry.failedToReceive'));
+      alert(l10n('purchaseOrderEntry.failedToReceive'));
     } finally {
       setSubmitting(false);
     }
@@ -672,7 +672,7 @@ export function PurchaseOrderEntryPage(props: PurchaseOrderEntryPageProps = {}) 
         jsonData,
       });
       setPO(updated);
-      await addHistoryRecord('invoicing', t('purchaseOrderEntry.history.step.invoicing'), undefined, 'INVOICED', {
+      await addHistoryRecord('invoicing', l10n('purchaseOrderEntry.history.step.invoicing'), undefined, 'INVOICED', {
         invoiceNumber,
         invoiceDate,
         total: updated.total,
@@ -680,7 +680,7 @@ export function PurchaseOrderEntryPage(props: PurchaseOrderEntryPageProps = {}) 
       setCurrentStep('history');
     } catch (err) {
       console.error('Error invoicing PO:', err);
-      alert(t('purchaseOrderEntry.failedToInvoice'));
+      alert(l10n('purchaseOrderEntry.failedToInvoice'));
     } finally {
       setSubmitting(false);
     }
@@ -886,7 +886,7 @@ export function PurchaseOrderEntryPage(props: PurchaseOrderEntryPageProps = {}) 
         notes: updatedNotes,
       });
       setPO(updated);
-      await addHistoryRecord('note', t('purchaseOrderEntry.history.step.note'), note, undefined, undefined, updated);
+      await addHistoryRecord('note', l10n('purchaseOrderEntry.history.step.note'), note, undefined, undefined, updated);
     } catch (err) {
       console.error('Error adding note:', err);
       throw err;
@@ -1016,12 +1016,12 @@ export function PurchaseOrderEntryPage(props: PurchaseOrderEntryPageProps = {}) 
                 onClick={handleNavigateBack}
                 style={{ minWidth: 'auto', padding: 'var(--spacing-sm) var(--spacing-md)' }}
               >
-                {t('purchaseOrderEntry.back')}
+                {l10n('purchaseOrderEntry.back')}
               </AxButton>
             )}
             <div>
               <AxHeading3 style={{ marginBottom: 'var(--spacing-xs)' }}>
-                {title || t('purchaseOrderEntry.title')}
+                {title || l10n('purchaseOrderEntry.title')}
               </AxHeading3>
               {subtitle && (
                 <AxParagraph style={{ color: 'var(--color-text-secondary)' }}>
@@ -1046,7 +1046,7 @@ export function PurchaseOrderEntryPage(props: PurchaseOrderEntryPageProps = {}) 
                         maxWidth: '250px'
                       }}>
                         <AxParagraph style={{ fontWeight: 'var(--font-weight-bold)', marginBottom: 'var(--spacing-xs)', fontSize: 'var(--font-size-sm)' }}>
-                          {t('purchaseOrderEntry.shippingAddress')}
+                          {l10n('purchaseOrderEntry.shippingAddress')}
                         </AxParagraph>
                         <AxParagraph style={{ fontSize: 'var(--font-size-sm)', lineHeight: 'var(--line-height-tight)' }}>
                           {shippingAddress.streetAddress1}
@@ -1071,7 +1071,7 @@ export function PurchaseOrderEntryPage(props: PurchaseOrderEntryPageProps = {}) 
                         maxWidth: '250px'
                       }}>
                         <AxParagraph style={{ fontWeight: 'var(--font-weight-bold)', marginBottom: 'var(--spacing-xs)', fontSize: 'var(--font-size-sm)' }}>
-                          {t('purchaseOrderEntry.billingAddress')}
+                          {l10n('purchaseOrderEntry.billingAddress')}
                         </AxParagraph>
                         <AxParagraph style={{ fontSize: 'var(--font-size-sm)', lineHeight: 'var(--line-height-tight)' }}>
                           {billingAddress.streetAddress1}
@@ -1101,18 +1101,18 @@ export function PurchaseOrderEntryPage(props: PurchaseOrderEntryPageProps = {}) 
                   minWidth: '200px'
                 }}>
                   <AxParagraph style={{ fontWeight: 'var(--font-weight-bold)', marginBottom: 'var(--spacing-xs)', fontSize: 'var(--font-size-sm)' }}>
-                    {t('purchaseOrderEntry.orderStatus')}
+                    {l10n('purchaseOrderEntry.orderStatus')}
                   </AxParagraph>
                   <AxListbox
                     key={`status-${po.id}-${po.status || 'null'}`}
                     options={[
-                      { value: 'DRAFT', label: t('purchaseOrder.status.draft') },
-                      { value: 'PENDING_APPROVAL', label: t('purchaseOrder.status.pendingApproval') },
-                      { value: 'APPROVED', label: t('purchaseOrder.status.approved') },
-                      { value: 'RECEIVED', label: t('purchaseOrder.status.received') },
-                      { value: 'INVOICED', label: t('purchaseOrder.status.invoiced') },
-                      { value: 'PAID', label: t('purchaseOrder.status.paid') },
-                      { value: 'CANCELLED', label: t('purchaseOrder.status.cancelled') },
+                      { value: 'DRAFT', label: l10n('purchaseOrder.status.draft') },
+                      { value: 'PENDING_APPROVAL', label: l10n('purchaseOrder.status.pendingApproval') },
+                      { value: 'APPROVED', label: l10n('purchaseOrder.status.approved') },
+                      { value: 'RECEIVED', label: l10n('purchaseOrder.status.received') },
+                      { value: 'INVOICED', label: l10n('purchaseOrder.status.invoiced') },
+                      { value: 'PAID', label: l10n('purchaseOrder.status.paid') },
+                      { value: 'CANCELLED', label: l10n('purchaseOrder.status.cancelled') },
                     ]}
                     value={po?.status || null}
                     onChange={(value: string | null) => {
@@ -1121,17 +1121,17 @@ export function PurchaseOrderEntryPage(props: PurchaseOrderEntryPageProps = {}) 
                         const updated = updatePurchaseOrder(po.id, { ...po, status: value as any });
                         updated.then((updatedPO) => {
                           setPO(updatedPO);
-                          addHistoryRecord('status_change', t('purchaseOrderEntry.history.step.statusChange'), undefined, value || undefined, {
+                          addHistoryRecord('status_change', l10n('purchaseOrderEntry.history.step.statusChange'), undefined, value || undefined, {
                             oldStatus,
                             newStatus: value,
                           }, updatedPO);
                         }).catch((err) => {
                           console.error('Error updating status:', err);
-                          alert(t('purchaseOrderEntry.failedToUpdateStatus'));
+                          alert(l10n('purchaseOrderEntry.failedToUpdateStatus'));
                         });
                       }
                     }}
-                    placeholder={t('purchaseOrderEntry.selectStatus')}
+                    placeholder={l10n('purchaseOrderEntry.selectStatus')}
                     fullWidth
                     disabled={loading || !po?.id || readOnly}
                   />
@@ -1221,7 +1221,7 @@ export function PurchaseOrderEntryPage(props: PurchaseOrderEntryPageProps = {}) 
               onClick={handlePrevious}
               disabled={(currentStep === 'entry' && currentEntrySubStep === 'supplier') || submitting}
             >
-              {t('purchaseOrderEntry.previous')}
+              {l10n('purchaseOrderEntry.previous')}
             </AxButton>
             {currentStep === 'entry' && currentEntrySubStep === 'review' ? (
               <AxButton
@@ -1229,7 +1229,7 @@ export function PurchaseOrderEntryPage(props: PurchaseOrderEntryPageProps = {}) 
                 onClick={handleCompleteEntry}
                 disabled={!canProceedToNext() || submitting}
               >
-                {submitting ? t('purchaseOrderEntry.saving') : (poIdToEdit ? t('purchaseOrderEntry.saveOrder') : t('purchaseOrderEntry.completeOrder'))}
+                {submitting ? l10n('purchaseOrderEntry.saving') : (poIdToEdit ? l10n('purchaseOrderEntry.saveOrder') : l10n('purchaseOrderEntry.completeOrder'))}
               </AxButton>
             ) : currentStep === 'approval' ? (
               <AxButton
@@ -1237,7 +1237,7 @@ export function PurchaseOrderEntryPage(props: PurchaseOrderEntryPageProps = {}) 
                 onClick={handleApprovePO}
                 disabled={!canProceedToNext() || submitting}
               >
-                {submitting ? t('purchaseOrderEntry.approving') : t('purchaseOrderEntry.approveOrder')}
+                {submitting ? l10n('purchaseOrderEntry.approving') : l10n('purchaseOrderEntry.approveOrder')}
               </AxButton>
             ) : currentStep === 'received' ? (
               <AxButton
@@ -1245,7 +1245,7 @@ export function PurchaseOrderEntryPage(props: PurchaseOrderEntryPageProps = {}) 
                 onClick={handleReceivePO}
                 disabled={!canProceedToNext() || submitting}
               >
-                {submitting ? t('purchaseOrderEntry.receiving') : t('purchaseOrderEntry.receiveOrder')}
+                {submitting ? l10n('purchaseOrderEntry.receiving') : l10n('purchaseOrderEntry.receiveOrder')}
               </AxButton>
             ) : currentStep === 'invoicing' ? (
               <AxButton
@@ -1253,7 +1253,7 @@ export function PurchaseOrderEntryPage(props: PurchaseOrderEntryPageProps = {}) 
                 onClick={handleInvoicePO}
                 disabled={!canProceedToNext() || submitting}
               >
-                {submitting ? t('purchaseOrderEntry.invoicing') : t('purchaseOrderEntry.createInvoice')}
+                {submitting ? l10n('purchaseOrderEntry.invoicing') : l10n('purchaseOrderEntry.createInvoice')}
               </AxButton>
             ) : currentStep === 'history' ? (
               <AxButton
@@ -1267,7 +1267,7 @@ export function PurchaseOrderEntryPage(props: PurchaseOrderEntryPageProps = {}) 
                 }}
                 disabled={submitting}
               >
-                {onNavigateToPOs ? t('purchaseOrderEntry.backToPOs') : t('purchaseOrderEntry.previous')}
+                {onNavigateToPOs ? l10n('purchaseOrderEntry.backToPOs') : l10n('purchaseOrderEntry.previous')}
               </AxButton>
             ) : (
               <AxButton
@@ -1275,7 +1275,7 @@ export function PurchaseOrderEntryPage(props: PurchaseOrderEntryPageProps = {}) 
                 onClick={handleNext}
                 disabled={!canProceedToNext() || submitting}
               >
-                {t('purchaseOrderEntry.next')}
+                {l10n('purchaseOrderEntry.next')}
               </AxButton>
             )}
           </ButtonGroup>
@@ -1292,7 +1292,7 @@ export function PurchaseOrderEntryPage(props: PurchaseOrderEntryPageProps = {}) 
                 }
               }}
             >
-              {onNavigateToPOs ? t('purchaseOrderEntry.backToPOs') : t('purchaseOrderEntry.previous')}
+              {onNavigateToPOs ? l10n('purchaseOrderEntry.backToPOs') : l10n('purchaseOrderEntry.previous')}
             </AxButton>
           </ButtonGroup>
         )}
@@ -1317,7 +1317,7 @@ export function PurchaseOrderEntryPage(props: PurchaseOrderEntryPageProps = {}) 
                 return currentIndex === 0 || !steps.slice(0, currentIndex).some(s => isStepCompleted(s.key));
               })()}
             >
-              {t('purchaseOrderEntry.previous')}
+              {l10n('purchaseOrderEntry.previous')}
             </AxButton>
             <AxButton
               variant="primary"
@@ -1339,7 +1339,7 @@ export function PurchaseOrderEntryPage(props: PurchaseOrderEntryPageProps = {}) 
                 return remainingSteps.length === 0 || !remainingSteps.some(s => isStepCompleted(s.key));
               })()}
             >
-              {t('purchaseOrderEntry.next')}
+              {l10n('purchaseOrderEntry.next')}
             </AxButton>
           </ButtonGroup>
         )}

@@ -365,7 +365,7 @@ export function CustomerListingPage({ onNavigateBack }: CustomerListingPageProps
               <AxParagraph>No customers found</AxParagraph>
             </div>
           ) : (
-            <AxTable fullWidth>
+            <AxTable fullWidth stickyHeader>
               <AxTableHead>
                 <AxTableRow>
                   <AxTableHeader>Customer Number</AxTableHeader>

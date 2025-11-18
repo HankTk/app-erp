@@ -25,14 +25,14 @@ const ItemsTable = styled.div`
 
 export function OrderConfirmationStepPage(props: OrderConfirmationStepProps) {
   const { order } = props;
-  const { t } = useI18n();
+  const { l10n } = useI18n();
 
   return (
     <StepContent>
       <div>
-        <AxHeading3 style={{ marginBottom: 'var(--spacing-md)' }}>{t('orderEntry.confirmation.title')}</AxHeading3>
+        <AxHeading3 style={{ marginBottom: 'var(--spacing-md)' }}>{l10n('orderEntry.confirmation.title')}</AxHeading3>
         <AxParagraph style={{ marginBottom: 'var(--spacing-lg)', color: 'var(--color-text-secondary)' }}>
-          {t('orderEntry.confirmation.description')}
+          {l10n('orderEntry.confirmation.description')}
         </AxParagraph>
       </div>
 
@@ -117,7 +117,7 @@ export function OrderConfirmationStepPage(props: OrderConfirmationStepProps) {
             borderRadius: 'var(--radius-md)',
           }}
         >
-          <AxParagraph>{t('orderEntry.confirmation.confirmMessage')}</AxParagraph>
+          <AxParagraph>{l10n('orderEntry.confirmation.confirmMessage')}</AxParagraph>
         </div>
       </div>
     </StepContent>

@@ -112,7 +112,7 @@ interface RMAEntryPageProps {
 
 export function RMAEntryPage(props: RMAEntryPageProps = {}) {
   const { onNavigateToRMAs, rmaIdToEdit, onNavigateBack, readOnly = false, onNavigateToShopFloorControl } = props;
-  const { t } = useI18n();
+  const { l10n } = useI18n();
   const [rma, setRma] = useState<RMA | null>(null);
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [orders, setOrders] = useState<Order[]>([]);
@@ -410,7 +410,7 @@ export function RMAEntryPage(props: RMAEntryPageProps = {}) {
                     value={selectedCustomerId}
                     onChange={handleCustomerSelect}
                     disabled={readOnly}
-                    fullWidth
+                    style={{ width: '100%', maxWidth: '220px' }}
                   />
                 </div>
                 <div style={{ 
@@ -440,7 +440,7 @@ export function RMAEntryPage(props: RMAEntryPageProps = {}) {
                     value={selectedOrderId}
                     onChange={handleOrderSelect}
                     disabled={readOnly}
-                    fullWidth
+                    style={{ width: '100%', maxWidth: '220px' }}
                   />
                 </div>
               </>

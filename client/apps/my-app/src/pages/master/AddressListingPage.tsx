@@ -297,7 +297,7 @@ export function AddressListingPage({ customerId, onAddressCreated, onClose, onNa
               <AxParagraph>No addresses found</AxParagraph>
             </div>
           ) : (
-            <AxTable fullWidth>
+            <AxTable fullWidth stickyHeader>
               <AxTableHead>
                 <AxTableRow>
                   <AxTableHeader>Type</AxTableHeader>

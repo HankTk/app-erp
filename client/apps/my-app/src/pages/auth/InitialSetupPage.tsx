@@ -97,7 +97,7 @@ interface InitialSetupPageProps {
 }
 
 export function InitialSetupPage({ onSetupComplete }: InitialSetupPageProps) {
-  const { t } = useI18n();
+  const { l10n } = useI18n();
   const [formData, setFormData] = useState<Record<string, any>>({
     role: 'admin', // Default to admin for first user
   });
@@ -145,8 +145,8 @@ export function InitialSetupPage({ onSetupComplete }: InitialSetupPageProps) {
       <SetupCard {...debugProps(COMPONENT_NAME, 'SetupCard')}>
         <SetupCardContent {...debugProps(COMPONENT_NAME, 'SetupCardContent')}>
           <TitleSection {...debugProps(COMPONENT_NAME, 'TitleSection')}>
-            <AxHeading3 style={{ marginBottom: 'var(--spacing-xs)' }}>{t('setup.title')}</AxHeading3>
-            <AxParagraph style={{ fontSize: 'var(--font-size-sm)' }}>{t('setup.subtitle')}</AxParagraph>
+            <AxHeading3 style={{ marginBottom: 'var(--spacing-xs)' }}>{l10n('setup.title')}</AxHeading3>
+            <AxParagraph style={{ fontSize: 'var(--font-size-sm)' }}>{l10n('setup.subtitle')}</AxParagraph>
           </TitleSection>
           <SetupForm onSubmit={handleSubmit} {...debugProps(COMPONENT_NAME, 'SetupForm')}>
             {/* Account Information Section */}
@@ -250,7 +250,7 @@ export function InitialSetupPage({ onSetupComplete }: InitialSetupPageProps) {
                 fullWidth
                 disabled={loading}
               >
-                {loading ? t('setup.creating') : t('setup.create')}
+                {loading ? l10n('setup.creating') : l10n('setup.create')}
               </AxButton>
               <AxButton
                 type="button"
@@ -258,7 +258,7 @@ export function InitialSetupPage({ onSetupComplete }: InitialSetupPageProps) {
                 fullWidth
                 disabled={loading}
                 onClick={async () => {
-                  if (confirm(t('setup.closeConfirm'))) {
+                  if (confirm(l10n('setup.closeConfirm'))) {
                     // Check if running in Electron
                     if (window.electronAPI) {
                       // Close Electron app
@@ -278,7 +278,7 @@ export function InitialSetupPage({ onSetupComplete }: InitialSetupPageProps) {
                   }
                 }}
               >
-                {t('setup.cancel')}
+                {l10n('setup.cancel')}
               </AxButton>
             </ButtonGroup>
         </SetupForm>

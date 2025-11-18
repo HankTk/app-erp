@@ -91,7 +91,7 @@ interface I18NProps {
 }
 
 export const I18N: React.FC<I18NProps> = ({ l10n }) => {
-  const { t } = useI18n();
-  return <>{t(l10n)}</>;
+  const { l10n: translate } = useI18n();
+  return <>{translate(l10n)}</>;
 };
 

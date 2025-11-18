@@ -551,7 +551,7 @@ export function UserListingPage({ onNoUsersRemaining, onNavigateBack }: UserList
               <AxParagraph>No users found</AxParagraph>
             </div>
           ) : (
-            <AxTable fullWidth>
+            <AxTable fullWidth stickyHeader>
               <AxTableHead>
                 <AxTableRow>
                   {columns.map((column) => (

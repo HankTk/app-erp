@@ -79,7 +79,7 @@ interface WarehouseListingPageProps {
 }
 
 export function WarehouseListingPage({ onNavigateBack }: WarehouseListingPageProps = {}) {
-  const { t } = useI18n();
+  const { l10n } = useI18n();
   const [warehouses, setWarehouses] = useState<Warehouse[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -179,28 +179,28 @@ export function WarehouseListingPage({ onNavigateBack }: WarehouseListingPagePro
                   onClick={onNavigateBack}
                   style={{ minWidth: 'auto', padding: 'var(--spacing-sm) var(--spacing-md)' }}
                 >
-                  ← {t('common.back')}
+                  ← {l10n('common.back')}
                 </AxButton>
               )}
               <div>
                 <AxHeading3 style={{ marginBottom: 'var(--spacing-xs)' }}>
-                  {t('inventory.warehouses')}
+                  {l10n('inventory.warehouses')}
                 </AxHeading3>
                 <AxParagraph style={{ color: 'var(--color-text-secondary)' }}>
-                  {t('inventory.warehousesSubtitle')}
+                  {l10n('inventory.warehousesSubtitle')}
                 </AxParagraph>
               </div>
             </HeaderLeft>
             <HeaderRight {...debugProps(COMPONENT_NAME, 'HeaderRight')}>
               <AxButton variant="primary" onClick={handleAdd}>
-                {t('common.add')}
+                {l10n('common.add')}
               </AxButton>
             </HeaderRight>
           </HeaderSection>
         </HeaderCard>
         <TableCard padding="large" {...debugProps(COMPONENT_NAME, 'TableCard')}>
           <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '200px' }}>
-            <AxParagraph>{t('common.loading')}</AxParagraph>
+            <AxParagraph>{l10n('common.loading')}</AxParagraph>
           </div>
         </TableCard>
       </PageContainer>
@@ -219,21 +219,21 @@ export function WarehouseListingPage({ onNavigateBack }: WarehouseListingPagePro
                   onClick={onNavigateBack}
                   style={{ minWidth: 'auto', padding: 'var(--spacing-sm) var(--spacing-md)' }}
                 >
-                  ← {t('common.back')}
+                  ← {l10n('common.back')}
                 </AxButton>
               )}
               <div>
                 <AxHeading3 style={{ marginBottom: 'var(--spacing-xs)' }}>
-                  {t('inventory.warehouses')}
+                  {l10n('inventory.warehouses')}
                 </AxHeading3>
                 <AxParagraph style={{ color: 'var(--color-text-secondary)' }}>
-                  {t('inventory.warehousesSubtitle')}
+                  {l10n('inventory.warehousesSubtitle')}
                 </AxParagraph>
               </div>
             </HeaderLeft>
             <HeaderRight {...debugProps(COMPONENT_NAME, 'HeaderRight')}>
               <AxButton variant="primary" onClick={handleAdd}>
-                {t('common.add')}
+                {l10n('common.add')}
               </AxButton>
             </HeaderRight>
           </HeaderSection>
@@ -242,7 +242,7 @@ export function WarehouseListingPage({ onNavigateBack }: WarehouseListingPagePro
           <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '200px', flexDirection: 'column', gap: 'var(--spacing-md)' }}>
             <AxParagraph style={{ color: 'var(--color-error)' }}>Error: {error}</AxParagraph>
             <AxButton variant="secondary" onClick={loadWarehouses}>
-              {t('common.retry')}
+              {l10n('common.retry')}
             </AxButton>
           </div>
         </TableCard>
@@ -261,21 +261,21 @@ export function WarehouseListingPage({ onNavigateBack }: WarehouseListingPagePro
                 onClick={onNavigateBack}
                 style={{ minWidth: 'auto', padding: 'var(--spacing-sm) var(--spacing-md)' }}
               >
-                ← {t('common.back')}
+                ← {l10n('common.back')}
               </AxButton>
             )}
             <div>
               <AxHeading3 style={{ marginBottom: 'var(--spacing-xs)' }}>
-                {t('inventory.warehouses')}
+                {l10n('inventory.warehouses')}
               </AxHeading3>
               <AxParagraph style={{ color: 'var(--color-text-secondary)' }}>
-                {t('inventory.warehousesSubtitle')}
+                {l10n('inventory.warehousesSubtitle')}
               </AxParagraph>
             </div>
           </HeaderLeft>
           <HeaderRight {...debugProps(COMPONENT_NAME, 'HeaderRight')}>
             <AxButton variant="primary" onClick={handleAdd}>
-              {t('common.add')}
+              {l10n('common.add')}
             </AxButton>
           </HeaderRight>
         </HeaderSection>
@@ -285,11 +285,11 @@ export function WarehouseListingPage({ onNavigateBack }: WarehouseListingPagePro
         <AxTable fullWidth variant="bordered">
           <AxTableHead>
             <AxTableRow>
-              <AxTableHeader>{t('inventory.warehouseCode')}</AxTableHeader>
-              <AxTableHeader>{t('inventory.warehouseName')}</AxTableHeader>
-              <AxTableHeader>{t('inventory.address')}</AxTableHeader>
-              <AxTableHeader>{t('common.status')}</AxTableHeader>
-              <AxTableHeader align="center">{t('common.actions')}</AxTableHeader>
+              <AxTableHeader>{l10n('inventory.warehouseCode')}</AxTableHeader>
+              <AxTableHeader>{l10n('inventory.warehouseName')}</AxTableHeader>
+              <AxTableHeader>{l10n('inventory.address')}</AxTableHeader>
+              <AxTableHeader>{l10n('common.status')}</AxTableHeader>
+              <AxTableHeader align="center">{l10n('common.actions')}</AxTableHeader>
             </AxTableRow>
           </AxTableHead>
           <AxTableBody>
@@ -300,9 +300,9 @@ export function WarehouseListingPage({ onNavigateBack }: WarehouseListingPagePro
                 <AxTableCell>{warehouse.address || '-'}</AxTableCell>
                 <AxTableCell>
                   {warehouse.active ? (
-                    <span style={{ color: 'var(--color-success)' }}>{t('common.active')}</span>
+                    <span style={{ color: 'var(--color-success)' }}>{l10n('common.active')}</span>
                   ) : (
-                    <span style={{ color: 'var(--color-text-secondary)' }}>{t('common.inactive')}</span>
+                    <span style={{ color: 'var(--color-text-secondary)' }}>{l10n('common.inactive')}</span>
                   )}
                 </AxTableCell>
                 <AxTableCell align="center">
@@ -312,14 +312,14 @@ export function WarehouseListingPage({ onNavigateBack }: WarehouseListingPagePro
                     onClick={() => handleEdit(warehouse)}
                     style={{ marginRight: 'var(--spacing-xs)' }}
                   >
-                    {t('common.edit')}
+                    {l10n('common.edit')}
                   </AxButton>
                   <AxButton
                     variant="danger"
                     size="small"
                     onClick={() => handleDelete(warehouse)}
                   >
-                    {t('common.delete')}
+                    {l10n('common.delete')}
                   </AxButton>
                 </AxTableCell>
               </AxTableRow>
@@ -335,7 +335,7 @@ export function WarehouseListingPage({ onNavigateBack }: WarehouseListingPagePro
           setSelectedWarehouse(null);
           setFormData({});
         }}
-        title={dialogMode === 'add' ? t('inventory.addWarehouse') : t('inventory.editWarehouse')}
+        title={dialogMode === 'add' ? l10n('inventory.addWarehouse') : l10n('inventory.editWarehouse')}
         size="large"
         footer={
           <div style={{ display: 'flex', gap: 'var(--spacing-sm)', justifyContent: 'flex-end' }}>
@@ -348,17 +348,17 @@ export function WarehouseListingPage({ onNavigateBack }: WarehouseListingPagePro
               }}
               disabled={submitting}
             >
-              {t('common.cancel')}
+              {l10n('common.cancel')}
             </AxButton>
             <AxButton variant="primary" onClick={handleSubmit} disabled={submitting}>
-              {submitting ? t('common.saving') || 'Saving...' : t('common.save')}
+              {submitting ? l10n('common.saving') || 'Saving...' : l10n('common.save')}
             </AxButton>
           </div>
         }
       >
         <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-lg)' }}>
           <AxFormGroup>
-            <AxLabel>{t('inventory.warehouseCode')} *</AxLabel>
+            <AxLabel>{l10n('inventory.warehouseCode')} *</AxLabel>
             <AxInput
               value={formData.warehouseCode || ''}
               onChange={(e) => setFormData({ ...formData, warehouseCode: e.target.value })}
@@ -367,7 +367,7 @@ export function WarehouseListingPage({ onNavigateBack }: WarehouseListingPagePro
             />
           </AxFormGroup>
           <AxFormGroup>
-            <AxLabel>{t('inventory.warehouseName')} *</AxLabel>
+            <AxLabel>{l10n('inventory.warehouseName')} *</AxLabel>
             <AxInput
               value={formData.warehouseName || ''}
               onChange={(e) => setFormData({ ...formData, warehouseName: e.target.value })}
@@ -376,7 +376,7 @@ export function WarehouseListingPage({ onNavigateBack }: WarehouseListingPagePro
             />
           </AxFormGroup>
           <AxFormGroup>
-            <AxLabel>{t('inventory.address')}</AxLabel>
+            <AxLabel>{l10n('inventory.address')}</AxLabel>
             <AxInput
               value={formData.address || ''}
               onChange={(e) => setFormData({ ...formData, address: e.target.value })}
@@ -385,7 +385,7 @@ export function WarehouseListingPage({ onNavigateBack }: WarehouseListingPagePro
             />
           </AxFormGroup>
           <AxFormGroup>
-            <AxLabel>{t('common.description')}</AxLabel>
+            <AxLabel>{l10n('common.description')}</AxLabel>
             <AxInput
               value={formData.description || ''}
               onChange={(e) => setFormData({ ...formData, description: e.target.value })}
@@ -395,7 +395,7 @@ export function WarehouseListingPage({ onNavigateBack }: WarehouseListingPagePro
           </AxFormGroup>
           <AxFormGroup>
             <AxCheckbox
-              label={t('common.active')}
+              label={l10n('common.active')}
               checked={formData.active ?? true}
               onChange={(e) => setFormData({ ...formData, active: e.target.checked })}
               disabled={submitting}
@@ -410,7 +410,7 @@ export function WarehouseListingPage({ onNavigateBack }: WarehouseListingPagePro
           setDeleteDialogOpen(false);
           setSelectedWarehouse(null);
         }}
-        title={t('common.confirmDelete')}
+        title={l10n('common.confirmDelete')}
         footer={
           <div style={{ display: 'flex', gap: 'var(--spacing-sm)', justifyContent: 'flex-end' }}>
             <AxButton
@@ -421,15 +421,15 @@ export function WarehouseListingPage({ onNavigateBack }: WarehouseListingPagePro
               }}
               disabled={submitting}
             >
-              {t('common.cancel')}
+              {l10n('common.cancel')}
             </AxButton>
             <AxButton variant="danger" onClick={handleDeleteConfirm} disabled={submitting}>
-              {submitting ? t('common.deleting') || 'Deleting...' : t('common.delete')}
+              {submitting ? l10n('common.deleting') || 'Deleting...' : l10n('common.delete')}
             </AxButton>
           </div>
         }
       >
-        <p>{t('inventory.confirmDeleteWarehouse', { name: selectedWarehouse?.warehouseName })}</p>
+        <p>{l10n('inventory.confirmDeleteWarehouse', { name: selectedWarehouse?.warehouseName })}</p>
       </AxDialog>
     </PageContainer>
   );

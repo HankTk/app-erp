@@ -111,7 +111,7 @@ interface MasterPageProps {
 }
 
 export function MasterPage({ onPageChange, onNavigateBack }: MasterPageProps) {
-  const { t } = useI18n();
+  const { l10n } = useI18n();
 
   return (
     <PageContainer {...debugProps(COMPONENT_NAME, 'PageContainer')}>
@@ -124,15 +124,15 @@ export function MasterPage({ onPageChange, onNavigateBack }: MasterPageProps) {
                 onClick={onNavigateBack}
                 style={{ minWidth: 'auto', padding: 'var(--spacing-sm) var(--spacing-md)' }}
               >
-                {t('master.back')}
+                {l10n('master.back')}
               </AxButton>
             )}
             <div>
               <AxHeading3 style={{ marginBottom: 'var(--spacing-xs)' }}>
-                {t('master.title')}
+                {l10n('master.title')}
               </AxHeading3>
               <AxParagraph style={{ color: 'var(--color-text-secondary)' }}>
-                {t('master.subtitle')}
+                {l10n('master.subtitle')}
               </AxParagraph>
             </div>
           </HeaderLeft>
@@ -150,7 +150,7 @@ export function MasterPage({ onPageChange, onNavigateBack }: MasterPageProps) {
               onClick={() => onPageChange(item.id)}
               {...debugProps(COMPONENT_NAME, 'MenuCard')}
             >
-              <MenuCardTitle {...debugProps(COMPONENT_NAME, 'MenuCardTitle')}>{t(item.labelKey)}</MenuCardTitle>
+              <MenuCardTitle {...debugProps(COMPONENT_NAME, 'MenuCardTitle')}>{l10n(item.labelKey)}</MenuCardTitle>
             </MenuCard>
           ))}
         </MenuCardsGrid>

@@ -155,7 +155,7 @@ interface HistoryRecord {
 
 export function AccountPayableDetailPage(props: AccountPayableDetailPageProps = {}) {
   const { invoiceId, onNavigateBack } = props;
-  const { t } = useI18n();
+  const { l10n } = useI18n();
   const [currentStep, setCurrentStep] = useState<AccountPayableStep>('invoice');
   const [po, setPO] = useState<PurchaseOrder | null>(null);
   const [suppliers, setSuppliers] = useState<Vendor[]>([]);
@@ -330,15 +330,15 @@ export function AccountPayableDetailPage(props: AccountPayableDetailPageProps = 
                   onClick={onNavigateBack}
                   style={{ minWidth: 'auto', padding: 'var(--spacing-sm) var(--spacing-md)' }}
                 >
-                  {t('accountsPayable.back')}
+                  {l10n('accountsPayable.back')}
                 </AxButton>
               )}
               <div>
                 <AxHeading3 style={{ marginBottom: 'var(--spacing-xs)' }}>
-                  {t('module.accountsPayable')}
+                  {l10n('module.accountsPayable')}
                 </AxHeading3>
                 <AxParagraph style={{ color: 'var(--color-text-secondary)' }}>
-                  {t('accountsPayable.subtitle')}
+                  {l10n('accountsPayable.subtitle')}
                 </AxParagraph>
               </div>
             </HeaderLeft>
@@ -347,7 +347,7 @@ export function AccountPayableDetailPage(props: AccountPayableDetailPageProps = 
           </HeaderSection>
         </HeaderCard>
         <ContentCard padding="large" {...debugProps(COMPONENT_NAME, 'ContentCard')}>
-          <AxParagraph>{t('accountsPayable.loading')}</AxParagraph>
+          <AxParagraph>{l10n('accountsPayable.loading')}</AxParagraph>
         </ContentCard>
       </PageContainer>
     );
@@ -365,15 +365,15 @@ export function AccountPayableDetailPage(props: AccountPayableDetailPageProps = 
                   onClick={onNavigateBack}
                   style={{ minWidth: 'auto', padding: 'var(--spacing-sm) var(--spacing-md)' }}
                 >
-                  {t('accountsPayable.back')}
+                  {l10n('accountsPayable.back')}
                 </AxButton>
               )}
               <div>
                 <AxHeading3 style={{ marginBottom: 'var(--spacing-xs)' }}>
-                  {t('module.accountsPayable')}
+                  {l10n('module.accountsPayable')}
                 </AxHeading3>
                 <AxParagraph style={{ color: 'var(--color-text-secondary)' }}>
-                  {t('accountsPayable.subtitle')}
+                  {l10n('accountsPayable.subtitle')}
                 </AxParagraph>
               </div>
             </HeaderLeft>
@@ -382,7 +382,7 @@ export function AccountPayableDetailPage(props: AccountPayableDetailPageProps = 
           </HeaderSection>
         </HeaderCard>
         <ContentCard padding="large" {...debugProps(COMPONENT_NAME, 'ContentCard')}>
-          <AxParagraph>{t('accountsPayable.notFound')}</AxParagraph>
+          <AxParagraph>{l10n('accountsPayable.notFound')}</AxParagraph>
         </ContentCard>
       </PageContainer>
     );
@@ -399,15 +399,15 @@ export function AccountPayableDetailPage(props: AccountPayableDetailPageProps = 
                 onClick={onNavigateBack}
                 style={{ minWidth: 'auto', padding: 'var(--spacing-sm) var(--spacing-md)' }}
               >
-                {t('accountsPayable.back')}
+                {l10n('accountsPayable.back')}
               </AxButton>
             )}
             <div>
               <AxHeading3 style={{ marginBottom: 'var(--spacing-xs)' }}>
-                {t('module.accountsPayable')}
+                {l10n('module.accountsPayable')}
               </AxHeading3>
               <AxParagraph style={{ color: 'var(--color-text-secondary)' }}>
-                {t('accountsPayable.subtitle')}
+                {l10n('accountsPayable.subtitle')}
               </AxParagraph>
             </div>
           </HeaderLeft>
@@ -424,7 +424,7 @@ export function AccountPayableDetailPage(props: AccountPayableDetailPageProps = 
             onClick={() => setCurrentStep('invoice')}
             {...debugProps(COMPONENT_NAME, 'Step')}
           >
-            {t('accountsPayable.step.invoice')}
+            {l10n('accountsPayable.step.invoice')}
           </Step>
           <Step
             $active={currentStep === 'payment'}
@@ -432,7 +432,7 @@ export function AccountPayableDetailPage(props: AccountPayableDetailPageProps = 
             onClick={() => setCurrentStep('payment')}
             {...debugProps(COMPONENT_NAME, 'Step')}
           >
-            {t('accountsPayable.step.payment')}
+            {l10n('accountsPayable.step.payment')}
           </Step>
           <Step
             $active={currentStep === 'history'}
@@ -440,7 +440,7 @@ export function AccountPayableDetailPage(props: AccountPayableDetailPageProps = 
             onClick={() => setCurrentStep('history')}
             {...debugProps(COMPONENT_NAME, 'Step')}
           >
-            {t('accountsPayable.step.history')}
+            {l10n('accountsPayable.step.history')}
           </Step>
         </StepIndicator>
 
@@ -448,41 +448,41 @@ export function AccountPayableDetailPage(props: AccountPayableDetailPageProps = 
           {currentStep === 'invoice' && (
             <>
               <div>
-                <AxHeading3>{t('accountsPayable.invoice.title')}</AxHeading3>
-                <AxParagraph>{t('accountsPayable.invoice.description')}</AxParagraph>
+                <AxHeading3>{l10n('accountsPayable.invoice.title')}</AxHeading3>
+                <AxParagraph>{l10n('accountsPayable.invoice.description')}</AxParagraph>
               </div>
               <InfoSection {...debugProps(COMPONENT_NAME, 'InfoSection')}>
                 <InfoRow>
-                  <AxLabel>{t('accountsPayable.invoice.invoiceNumber')}</AxLabel>
+                  <AxLabel>{l10n('accountsPayable.invoice.invoiceNumber')}</AxLabel>
                   <AxParagraph>{po.invoiceNumber || 'N/A'}</AxParagraph>
                 </InfoRow>
                 <InfoRow>
-                  <AxLabel>{t('accountsPayable.invoice.orderNumber')}</AxLabel>
+                  <AxLabel>{l10n('accountsPayable.invoice.orderNumber')}</AxLabel>
                   <AxParagraph>{po.orderNumber || po.id?.substring(0, 8) || 'N/A'}</AxParagraph>
                 </InfoRow>
                 <InfoRow>
-                  <AxLabel>{t('accountsPayable.invoice.supplier')}</AxLabel>
+                  <AxLabel>{l10n('accountsPayable.invoice.supplier')}</AxLabel>
                   <AxParagraph>
                     {selectedSupplier ? (selectedSupplier.companyName || `${selectedSupplier.lastName} ${selectedSupplier.firstName}` || selectedSupplier.email) : po.supplierId || 'N/A'}
                   </AxParagraph>
                 </InfoRow>
                 <InfoRow>
-                  <AxLabel>{t('accountsPayable.invoice.invoiceDate')}</AxLabel>
+                  <AxLabel>{l10n('accountsPayable.invoice.invoiceDate')}</AxLabel>
                   <AxParagraph>{formatDate(po.invoiceDate)}</AxParagraph>
                 </InfoRow>
               </InfoSection>
 
               {po.items && po.items.length > 0 && (
                 <div>
-                  <AxHeading3 style={{ marginBottom: 'var(--spacing-sm)' }}>{t('accountsPayable.invoice.items')}</AxHeading3>
+                  <AxHeading3 style={{ marginBottom: 'var(--spacing-sm)' }}>{l10n('accountsPayable.invoice.items')}</AxHeading3>
                   <ItemsTable>
                     <AxTable fullWidth>
                       <AxTableHead>
                         <AxTableRow>
-                          <AxTableHeader>{t('accountsPayable.invoice.product')}</AxTableHeader>
-                          <AxTableHeader>{t('accountsPayable.invoice.quantity')}</AxTableHeader>
-                          <AxTableHeader align="right">{t('accountsPayable.invoice.unitPrice')}</AxTableHeader>
-                          <AxTableHeader align="right">{t('accountsPayable.invoice.lineTotal')}</AxTableHeader>
+                          <AxTableHeader>{l10n('accountsPayable.invoice.product')}</AxTableHeader>
+                          <AxTableHeader>{l10n('accountsPayable.invoice.quantity')}</AxTableHeader>
+                          <AxTableHeader align="right">{l10n('accountsPayable.invoice.unitPrice')}</AxTableHeader>
+                          <AxTableHeader align="right">{l10n('accountsPayable.invoice.lineTotal')}</AxTableHeader>
                         </AxTableRow>
                       </AxTableHead>
                       <AxTableBody>
@@ -502,19 +502,19 @@ export function AccountPayableDetailPage(props: AccountPayableDetailPageProps = 
 
               <InfoSection>
                 <InfoRow>
-                  <AxLabel>{t('accountsPayable.invoice.subtotal')}</AxLabel>
+                  <AxLabel>{l10n('accountsPayable.invoice.subtotal')}</AxLabel>
                   <AxParagraph>${po.subtotal?.toFixed(2) || '0.00'}</AxParagraph>
                 </InfoRow>
                 <InfoRow>
-                  <AxLabel>{t('accountsPayable.invoice.tax')}</AxLabel>
+                  <AxLabel>{l10n('accountsPayable.invoice.tax')}</AxLabel>
                   <AxParagraph>${po.tax?.toFixed(2) || '0.00'}</AxParagraph>
                 </InfoRow>
                 <InfoRow>
-                  <AxLabel>{t('accountsPayable.invoice.shipping')}</AxLabel>
+                  <AxLabel>{l10n('accountsPayable.invoice.shipping')}</AxLabel>
                   <AxParagraph>${po.shippingCost?.toFixed(2) || '0.00'}</AxParagraph>
                 </InfoRow>
                 <InfoRow>
-                  <AxLabel style={{ fontWeight: 'var(--font-weight-bold)' }}>{t('accountsPayable.invoice.total')}</AxLabel>
+                  <AxLabel style={{ fontWeight: 'var(--font-weight-bold)' }}>{l10n('accountsPayable.invoice.total')}</AxLabel>
                   <AxParagraph style={{ fontWeight: 'var(--font-weight-bold)' }}>${po.total?.toFixed(2) || '0.00'}</AxParagraph>
                 </InfoRow>
               </InfoSection>
@@ -525,16 +525,16 @@ export function AccountPayableDetailPage(props: AccountPayableDetailPageProps = 
             <>
               <div>
                 <AxHeading3 style={{ marginBottom: 'var(--spacing-sm)' }}>
-                  {t('accountsPayable.payment.title')}
+                  {l10n('accountsPayable.payment.title')}
                 </AxHeading3>
                 <AxParagraph style={{ marginBottom: 'var(--spacing-md)', color: 'var(--color-text-secondary)' }}>
-                  {t('accountsPayable.payment.description')}
+                  {l10n('accountsPayable.payment.description')}
                 </AxParagraph>
               </div>
 
               <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-xsm)' }}>
                 <AxFormGroup>
-                  <AxLabel>{t('accountsPayable.payment.paymentAmount')}</AxLabel>
+                  <AxLabel>{l10n('accountsPayable.payment.paymentAmount')}</AxLabel>
                   <AxInput
                     type="number"
                     value={paymentAmount || ''}
@@ -542,41 +542,40 @@ export function AccountPayableDetailPage(props: AccountPayableDetailPageProps = 
                     placeholder="0.00"
                     min="0"
                     step="0.01"
-                    fullWidth
+                    style={{ width: '220px' }}
                   />
                 </AxFormGroup>
 
                 <AxFormGroup>
-                  <AxLabel>{t('accountsPayable.payment.paymentDate')}</AxLabel>
+                  <AxLabel>{l10n('accountsPayable.payment.paymentDate')}</AxLabel>
                   <AxInput
                     type="date"
                     value={paymentDate}
                     onChange={(e) => setPaymentDate(e.target.value)}
-                    fullWidth
                   />
                 </AxFormGroup>
 
                 <AxFormGroup>
-                  <AxLabel>{t('accountsPayable.payment.paymentMethod')}</AxLabel>
+                  <AxLabel>{l10n('accountsPayable.payment.paymentMethod')}</AxLabel>
                   <AxListbox
                     value={paymentMethod}
                     onChange={(value) => setPaymentMethod(value)}
                     options={[
-                      { value: 'BANK_TRANSFER', label: t('accountsPayable.payment.method.bankTransfer') },
-                      { value: 'CREDIT_CARD', label: t('accountsPayable.payment.method.creditCard') },
-                      { value: 'CASH', label: t('accountsPayable.payment.method.cash') },
-                      { value: 'CHECK', label: t('accountsPayable.payment.method.check') },
-                      { value: 'OTHER', label: t('accountsPayable.payment.method.other') },
+                      { value: 'BANK_TRANSFER', label: l10n('accountsPayable.payment.method.bankTransfer') },
+                      { value: 'CREDIT_CARD', label: l10n('accountsPayable.payment.method.creditCard') },
+                      { value: 'CASH', label: l10n('accountsPayable.payment.method.cash') },
+                      { value: 'CHECK', label: l10n('accountsPayable.payment.method.check') },
+                      { value: 'OTHER', label: l10n('accountsPayable.payment.method.other') },
                     ]}
-                    placeholder={t('accountsPayable.payment.paymentMethodPlaceholder')}
-                    fullWidth
+                    placeholder={l10n('accountsPayable.payment.paymentMethodPlaceholder')}
+                    style={{ width: '220px' }}
                   />
                 </AxFormGroup>
 
                 <InfoSection>
                   <InfoRow>
                     <AxParagraph style={{ fontWeight: 'var(--font-weight-bold)' }}>
-                      {t('accountsPayable.payment.invoiceAmount')}
+                      {l10n('accountsPayable.payment.invoiceAmount')}
                     </AxParagraph>
                     <AxParagraph style={{ fontSize: 'var(--font-size-lg)' }}>
                       ${po.total?.toFixed(2) || '0.00'}
@@ -585,7 +584,7 @@ export function AccountPayableDetailPage(props: AccountPayableDetailPageProps = 
                   {paymentAmount > 0 && (
                     <InfoRow>
                       <AxParagraph style={{ fontWeight: 'var(--font-weight-bold)' }}>
-                        {t('accountsPayable.payment.paidAmount')}
+                        {l10n('accountsPayable.payment.paidAmount')}
                       </AxParagraph>
                       <AxParagraph style={{ fontSize: 'var(--font-size-lg)' }}>
                         ${paymentAmount.toFixed(2)}
@@ -597,7 +596,7 @@ export function AccountPayableDetailPage(props: AccountPayableDetailPageProps = 
                       fontWeight: 'var(--font-weight-bold)',
                       color: outstandingAmount > 0 ? 'var(--color-warning)' : 'var(--color-success)'
                     }}>
-                      {t('accountsPayable.payment.outstanding')}
+                      {l10n('accountsPayable.payment.outstanding')}
                     </AxParagraph>
                     <AxParagraph style={{ 
                       fontSize: 'var(--font-size-lg)',
@@ -617,7 +616,7 @@ export function AccountPayableDetailPage(props: AccountPayableDetailPageProps = 
                   onClick={handlePayment} 
                   disabled={submitting || !paymentAmount || !paymentDate || !paymentMethod}
                 >
-                  {submitting ? t('accountsPayable.payment.processing') : t('accountsPayable.payment.record')}
+                  {submitting ? l10n('accountsPayable.payment.processing') : l10n('accountsPayable.payment.record')}
                 </AxButton>
               </ButtonGroup>
             </>
@@ -626,20 +625,20 @@ export function AccountPayableDetailPage(props: AccountPayableDetailPageProps = 
           {currentStep === 'history' && (
             <>
               <div>
-                <AxHeading3>{t('accountsPayable.history.title')}</AxHeading3>
-                <AxParagraph>{t('accountsPayable.history.description')}</AxParagraph>
+                <AxHeading3>{l10n('accountsPayable.history.title')}</AxHeading3>
+                <AxParagraph>{l10n('accountsPayable.history.description')}</AxParagraph>
               </div>
               {getHistoryRecords().length === 0 ? (
-                <AxParagraph>{t('accountsPayable.history.empty')}</AxParagraph>
+                <AxParagraph>{l10n('accountsPayable.history.empty')}</AxParagraph>
               ) : (
                 <ItemsTable>
                   <AxTable fullWidth>
                     <AxTableHead>
                       <AxTableRow>
-                        <AxTableHeader>{t('accountsPayable.history.timestamp')}</AxTableHeader>
-                        <AxTableHeader>{t('accountsPayable.history.step')}</AxTableHeader>
-                        <AxTableHeader>{t('accountsPayable.history.status')}</AxTableHeader>
-                        <AxTableHeader>{t('accountsPayable.history.note')}</AxTableHeader>
+                        <AxTableHeader>{l10n('accountsPayable.history.timestamp')}</AxTableHeader>
+                        <AxTableHeader>{l10n('accountsPayable.history.step')}</AxTableHeader>
+                        <AxTableHeader>{l10n('accountsPayable.history.status')}</AxTableHeader>
+                        <AxTableHeader>{l10n('accountsPayable.history.note')}</AxTableHeader>
                       </AxTableRow>
                     </AxTableHead>
                     <AxTableBody>
@@ -647,14 +646,14 @@ export function AccountPayableDetailPage(props: AccountPayableDetailPageProps = 
                         <AxTableRow key={index}>
                           <AxTableCell>{formatDateTime(record.timestamp)}</AxTableCell>
                           <AxTableCell>
-                            {record.step === 'invoicing' ? t('accountsPayable.history.step.invoicing') :
-                             record.step === 'payment' ? t('accountsPayable.history.step.payment') :
-                             record.step === 'status_change' ? t('accountsPayable.history.step.statusChange') :
+                            {record.step === 'invoicing' ? l10n('accountsPayable.history.step.invoicing') :
+                             record.step === 'payment' ? l10n('accountsPayable.history.step.payment') :
+                             record.step === 'status_change' ? l10n('accountsPayable.history.step.statusChange') :
                              record.step}
                           </AxTableCell>
                           <AxTableCell>
-                            {record.status === 'INVOICED' ? t('accountsPayable.history.status.invoiced') :
-                             record.status === 'PAID' ? t('accountsPayable.history.status.paid') :
+                            {record.status === 'INVOICED' ? l10n('accountsPayable.history.status.invoiced') :
+                             record.status === 'PAID' ? l10n('accountsPayable.history.status.paid') :
                              record.status}
                           </AxTableCell>
                           <AxTableCell>{record.note || '-'}</AxTableCell>

@@ -136,7 +136,7 @@ interface ShopFloorControlPageProps {
 }
 
 export function ShopFloorControlPage({ rmaId, onNavigateBack, backButtonLabel = '← Back' }: ShopFloorControlPageProps) {
-  const { t } = useI18n();
+  const { l10n } = useI18n();
   const [rma, setRma] = useState<RMA | null>(null);
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);

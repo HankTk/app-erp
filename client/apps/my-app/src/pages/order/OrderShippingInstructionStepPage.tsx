@@ -10,29 +10,28 @@ export function OrderShippingInstructionStepPage(props: OrderShippingInstruction
     onRequestedShipDateChange,
     readOnly = false,
   } = props;
-  const { t } = useI18n();
+  const { l10n } = useI18n();
 
   return (
     <div>
-      <AxHeading3 style={{ marginBottom: 'var(--spacing-md)' }}>{t('orderEntry.shippingInstruction.title')}</AxHeading3>
+      <AxHeading3 style={{ marginBottom: 'var(--spacing-md)' }}>{l10n('orderEntry.shippingInstruction.title')}</AxHeading3>
       <AxParagraph style={{ marginBottom: 'var(--spacing-lg)', color: 'var(--color-text-secondary)' }}>
-        {t('orderEntry.shippingInstruction.description')}
+        {l10n('orderEntry.shippingInstruction.description')}
       </AxParagraph>
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-md)' }}>
         <AxFormGroup>
-          <AxLabel>{t('orderEntry.shippingInstruction.requestedShipDate')}</AxLabel>
+          <AxLabel>{l10n('orderEntry.shippingInstruction.requestedShipDate')}</AxLabel>
           <AxInput
             type="date"
             value={requestedShipDate}
             onChange={e => onRequestedShipDateChange(e.target.value)}
             disabled={readOnly}
-            fullWidth
           />
         </AxFormGroup>
 
         <AxFormGroup>
-          <AxLabel>{t('orderEntry.shippingInstruction.notes')}</AxLabel>
+          <AxLabel>{l10n('orderEntry.shippingInstruction.notes')}</AxLabel>
           <textarea
             value={shippingInstructions}
             onChange={e => onShippingInstructionsChange(e.target.value)}
@@ -45,7 +44,7 @@ export function OrderShippingInstructionStepPage(props: OrderShippingInstruction
               border: '1px solid var(--color-border-default)',
               fontFamily: 'inherit',
             }}
-            placeholder={t('orderEntry.shippingInstruction.notesPlaceholder')}
+            placeholder={l10n('orderEntry.shippingInstruction.notesPlaceholder')}
           />
         </AxFormGroup>
       </div>

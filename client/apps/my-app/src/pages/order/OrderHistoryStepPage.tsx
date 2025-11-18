@@ -72,7 +72,7 @@ interface HistoryRecord {
 
 export function OrderHistoryStepPage(props: OrderHistoryStepProps) {
   const { order, onAddNote, submitting = false, customers, readOnly = false } = props;
-  const { t } = useI18n();
+  const { l10n } = useI18n();
   const [noteDialogOpen, setNoteDialogOpen] = useState(false);
   const [noteText, setNoteText] = useState('');
   const [savingNote, setSavingNote] = useState(false);
@@ -87,27 +87,27 @@ export function OrderHistoryStepPage(props: OrderHistoryStepProps) {
   const historyRecords = getHistoryRecords();
 
   const stepLabels: Record<string, string> = {
-    entry: t('orderEntry.history.step.entry'),
-    approval: t('orderEntry.history.step.approval'),
-    confirmation: t('orderEntry.history.step.confirmation'),
-    shipping_instruction: t('orderEntry.history.step.shippingInstruction'),
-    shipping: t('orderEntry.history.step.shipping'),
-    invoicing: t('orderEntry.history.step.invoicing'),
-    payment: t('orderEntry.history.step.payment'),
-    status_change: t('orderEntry.history.step.statusChange'),
-    note: t('orderEntry.history.step.note'),
+    entry: l10n('orderEntry.history.step.entry'),
+    approval: l10n('orderEntry.history.step.approval'),
+    confirmation: l10n('orderEntry.history.step.confirmation'),
+    shipping_instruction: l10n('orderEntry.history.step.shippingInstruction'),
+    shipping: l10n('orderEntry.history.step.shipping'),
+    invoicing: l10n('orderEntry.history.step.invoicing'),
+    payment: l10n('orderEntry.history.step.payment'),
+    status_change: l10n('orderEntry.history.step.statusChange'),
+    note: l10n('orderEntry.history.step.note'),
   };
 
   const getStatusLabel = (status: string): string => {
     const statusMap: Record<string, string> = {
-      'DRAFT': t('orderEntry.status.draft'),
-      'PENDING_APPROVAL': t('orderEntry.status.pendingApproval'),
-      'APPROVED': t('orderEntry.status.approved'),
-      'SHIPPING_INSTRUCTED': t('orderEntry.status.shippingInstructed'),
-      'SHIPPED': t('orderEntry.status.shipped'),
-      'INVOICED': t('orderEntry.status.invoiced'),
-      'PAID': t('orderEntry.status.paid'),
-      'CANCELLED': t('orderEntry.status.cancelled'),
+      'DRAFT': l10n('orderEntry.status.draft'),
+      'PENDING_APPROVAL': l10n('orderEntry.status.pendingApproval'),
+      'APPROVED': l10n('orderEntry.status.approved'),
+      'SHIPPING_INSTRUCTED': l10n('orderEntry.status.shippingInstructed'),
+      'SHIPPED': l10n('orderEntry.status.shipped'),
+      'INVOICED': l10n('orderEntry.status.invoiced'),
+      'PAID': l10n('orderEntry.status.paid'),
+      'CANCELLED': l10n('orderEntry.status.cancelled'),
     };
     return statusMap[status] || status;
   };
@@ -120,20 +120,20 @@ export function OrderHistoryStepPage(props: OrderHistoryStepProps) {
 
   const getDataKeyLabel = (key: string): string => {
     const keyMap: Record<string, string> = {
-      'customerId': t('orderEntry.history.data.customerId'),
-      'itemCount': t('orderEntry.history.data.itemCount'),
-      'total': t('orderEntry.history.data.total'),
-      'orderNumber': t('orderEntry.history.data.orderNumber'),
-      'requestedShipDate': t('orderEntry.history.data.requestedShipDate'),
-      'shipDate': t('orderEntry.history.data.shipDate'),
-      'trackingNumber': t('orderEntry.history.data.trackingNumber'),
-      'invoiceNumber': t('orderEntry.history.data.invoiceNumber'),
-      'invoiceDate': t('orderEntry.history.data.invoiceDate'),
-      'paymentAmount': t('orderEntry.history.data.paymentAmount'),
-      'paymentDate': t('orderEntry.history.data.paymentDate'),
-      'paymentMethod': t('orderEntry.history.data.paymentMethod'),
-      'oldStatus': t('orderEntry.history.data.oldStatus'),
-      'newStatus': t('orderEntry.history.data.newStatus'),
+      'customerId': l10n('orderEntry.history.data.customerId'),
+      'itemCount': l10n('orderEntry.history.data.itemCount'),
+      'total': l10n('orderEntry.history.data.total'),
+      'orderNumber': l10n('orderEntry.history.data.orderNumber'),
+      'requestedShipDate': l10n('orderEntry.history.data.requestedShipDate'),
+      'shipDate': l10n('orderEntry.history.data.shipDate'),
+      'trackingNumber': l10n('orderEntry.history.data.trackingNumber'),
+      'invoiceNumber': l10n('orderEntry.history.data.invoiceNumber'),
+      'invoiceDate': l10n('orderEntry.history.data.invoiceDate'),
+      'paymentAmount': l10n('orderEntry.history.data.paymentAmount'),
+      'paymentDate': l10n('orderEntry.history.data.paymentDate'),
+      'paymentMethod': l10n('orderEntry.history.data.paymentMethod'),
+      'oldStatus': l10n('orderEntry.history.data.oldStatus'),
+      'newStatus': l10n('orderEntry.history.data.newStatus'),
     };
     return keyMap[key] || key;
   };
@@ -164,7 +164,7 @@ export function OrderHistoryStepPage(props: OrderHistoryStepProps) {
       setNoteText('');
     } catch (err) {
       console.error('Error saving note:', err);
-      alert(t('orderEntry.history.saveError'));
+      alert(l10n('orderEntry.history.saveError'));
     } finally {
       setSavingNote(false);
     }
@@ -188,21 +188,21 @@ export function OrderHistoryStepPage(props: OrderHistoryStepProps) {
   return (
     <HistoryContainer>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 'var(--spacing-md)' }}>
-        <AxHeading3 style={{ margin: 0 }}>{t('orderEntry.history.title')}</AxHeading3>
+        <AxHeading3 style={{ margin: 0 }}>{l10n('orderEntry.history.title')}</AxHeading3>
         <AxButton variant="primary" onClick={handleAddNoteClick} disabled={submitting || !order?.id}>
-          {t('orderEntry.history.addNote')}
+          {l10n('orderEntry.history.addNote')}
         </AxButton>
       </div>
 
       <AxParagraph style={{ marginBottom: 'var(--spacing-lg)', color: 'var(--color-text-secondary)' }}>
-        {t('orderEntry.history.description')}
+        {l10n('orderEntry.history.description')}
       </AxParagraph>
 
       {historyRecords.length === 0 ? (
         <EmptyState>
-          <AxParagraph>{t('orderEntry.history.empty')}</AxParagraph>
+          <AxParagraph>{l10n('orderEntry.history.empty')}</AxParagraph>
           <AxParagraph style={{ fontSize: 'var(--font-size-sm)', marginTop: 'var(--spacing-sm)' }}>
-            {t('orderEntry.history.emptyDescription')}
+            {l10n('orderEntry.history.emptyDescription')}
           </AxParagraph>
         </EmptyState>
       ) : (
@@ -267,7 +267,7 @@ export function OrderHistoryStepPage(props: OrderHistoryStepProps) {
           setNoteDialogOpen(false);
           setNoteText('');
         }}
-        title={t('orderEntry.history.addNoteTitle')}
+        title={l10n('orderEntry.history.addNoteTitle')}
         size="medium"
         footer={
           <div style={{ display: 'flex', gap: 'var(--spacing-sm)', justifyContent: 'flex-end' }}>
@@ -279,20 +279,20 @@ export function OrderHistoryStepPage(props: OrderHistoryStepProps) {
               }}
               disabled={savingNote}
             >
-              {t('orderEntry.history.cancel')}
+              {l10n('orderEntry.history.cancel')}
             </AxButton>
             <AxButton variant="primary" onClick={handleSaveNote} disabled={savingNote || !noteText.trim()}>
-              {savingNote ? t('orderEntry.history.saving') : t('orderEntry.history.save')}
+              {savingNote ? l10n('orderEntry.history.saving') : l10n('orderEntry.history.save')}
             </AxButton>
           </div>
         }
       >
         <AxFormGroup>
-          <AxLabel>{t('orderEntry.history.note')}</AxLabel>
+          <AxLabel>{l10n('orderEntry.history.note')}</AxLabel>
           <textarea
             value={noteText}
             onChange={e => setNoteText(e.target.value)}
-            placeholder={t('orderEntry.history.notePlaceholder')}
+            placeholder={l10n('orderEntry.history.notePlaceholder')}
             style={{
               width: '100%',
               minHeight: '150px',

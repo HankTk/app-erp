@@ -20,6 +20,8 @@ export interface AxListboxProps {
   searchable?: boolean;
   searchPlaceholder?: string;
   noResultsText?: string;
+  style?: React.CSSProperties;
+  className?: string;
 }
 
 interface StyledListboxContainerProps {
@@ -29,6 +31,7 @@ interface StyledListboxContainerProps {
 const StyledListboxContainer = styled.div<StyledListboxContainerProps>`
   position: relative;
   width: ${({ $fullWidth }) => ($fullWidth ? '100%' : 'auto')};
+  box-sizing: border-box;
 `;
 
 interface StyledListboxButtonProps {
@@ -71,8 +74,9 @@ const StyledListboxButton = styled.button<StyledListboxButtonProps>`
   border-radius: var(--radius-md);
   outline: none;
   transition: border-color var(--transition-base), box-shadow var(--transition-base);
-  width: ${({ $fullWidth }) => ($fullWidth ? '100%' : 'auto')};
+  width: 100%;
   min-width: 200px;
+  box-sizing: border-box;
   color: var(--color-text-primary);
   background-color: var(--color-background-default);
   cursor: ${({ $disabled }) => ($disabled ? 'not-allowed' : 'pointer')};
@@ -317,6 +321,8 @@ export const AxListbox: React.FC<AxListboxProps> = ({
   searchable = false,
   searchPlaceholder = '検索...',
   noResultsText = '該当する結果がありません',
+  style,
+  className,
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
@@ -454,7 +460,7 @@ export const AxListbox: React.FC<AxListboxProps> = ({
   };
 
   return (
-    <StyledListboxContainer ref={containerRef} $fullWidth={fullWidth}>
+    <StyledListboxContainer ref={containerRef} $fullWidth={fullWidth} style={style} className={className}>
       {searchable ? (
         <StyledSearchInputWrapper>
           <StyledSearchInput

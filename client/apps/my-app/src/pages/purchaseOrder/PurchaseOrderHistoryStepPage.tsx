@@ -41,7 +41,7 @@ interface HistoryRecord {
 
 export function PurchaseOrderHistoryStepPage(props: PurchaseOrderHistoryStepProps) {
   const { po, onAddNote, submitting = false, vendors, readOnly = false } = props;
-  const { t } = useI18n();
+  const { l10n } = useI18n();
   const [noteDialogOpen, setNoteDialogOpen] = useState(false);
   const [noteText, setNoteText] = useState('');
   const [savingNote, setSavingNote] = useState(false);
@@ -56,24 +56,24 @@ export function PurchaseOrderHistoryStepPage(props: PurchaseOrderHistoryStepProp
   const historyRecords = getHistoryRecords();
 
   const stepLabels: Record<string, string> = {
-    entry: t('purchaseOrderEntry.history.step.entry'),
-    approval: t('purchaseOrderEntry.history.step.approval'),
-    received: t('purchaseOrderEntry.history.step.received'),
-    invoicing: t('purchaseOrderEntry.history.step.invoicing'),
-    payment: t('purchaseOrderEntry.history.step.payment'),
-    status_change: t('purchaseOrderEntry.history.step.statusChange'),
-    note: t('purchaseOrderEntry.history.step.note'),
+    entry: l10n('purchaseOrderEntry.history.step.entry'),
+    approval: l10n('purchaseOrderEntry.history.step.approval'),
+    received: l10n('purchaseOrderEntry.history.step.received'),
+    invoicing: l10n('purchaseOrderEntry.history.step.invoicing'),
+    payment: l10n('purchaseOrderEntry.history.step.payment'),
+    status_change: l10n('purchaseOrderEntry.history.step.statusChange'),
+    note: l10n('purchaseOrderEntry.history.step.note'),
   };
 
   const getStatusLabel = (status: string): string => {
     const statusMap: Record<string, string> = {
-      'DRAFT': t('purchaseOrder.status.draft'),
-      'PENDING_APPROVAL': t('purchaseOrder.status.pendingApproval'),
-      'APPROVED': t('purchaseOrder.status.approved'),
-      'RECEIVED': t('purchaseOrder.status.received'),
-      'INVOICED': t('purchaseOrder.status.invoiced'),
-      'PAID': t('purchaseOrder.status.paid'),
-      'CANCELLED': t('purchaseOrder.status.cancelled'),
+      'DRAFT': l10n('purchaseOrder.status.draft'),
+      'PENDING_APPROVAL': l10n('purchaseOrder.status.pendingApproval'),
+      'APPROVED': l10n('purchaseOrder.status.approved'),
+      'RECEIVED': l10n('purchaseOrder.status.received'),
+      'INVOICED': l10n('purchaseOrder.status.invoiced'),
+      'PAID': l10n('purchaseOrder.status.paid'),
+      'CANCELLED': l10n('purchaseOrder.status.cancelled'),
     };
     return statusMap[status] || status;
   };
@@ -86,18 +86,18 @@ export function PurchaseOrderHistoryStepPage(props: PurchaseOrderHistoryStepProp
 
   const getDataKeyLabel = (key: string): string => {
     const keyMap: Record<string, string> = {
-      'supplierId': t('purchaseOrderEntry.history.data.supplierId'),
-      'itemCount': t('purchaseOrderEntry.history.data.itemCount'),
-      'total': t('purchaseOrderEntry.history.data.total'),
-      'orderNumber': t('purchaseOrderEntry.history.data.orderNumber'),
-      'receivedDate': t('purchaseOrderEntry.history.data.receivedDate'),
-      'invoiceNumber': t('purchaseOrderEntry.history.data.invoiceNumber'),
-      'invoiceDate': t('purchaseOrderEntry.history.data.invoiceDate'),
-      'paymentAmount': t('purchaseOrderEntry.history.data.paymentAmount'),
-      'paymentDate': t('purchaseOrderEntry.history.data.paymentDate'),
-      'paymentMethod': t('purchaseOrderEntry.history.data.paymentMethod'),
-      'oldStatus': t('purchaseOrderEntry.history.data.oldStatus'),
-      'newStatus': t('purchaseOrderEntry.history.data.newStatus'),
+      'supplierId': l10n('purchaseOrderEntry.history.data.supplierId'),
+      'itemCount': l10n('purchaseOrderEntry.history.data.itemCount'),
+      'total': l10n('purchaseOrderEntry.history.data.total'),
+      'orderNumber': l10n('purchaseOrderEntry.history.data.orderNumber'),
+      'receivedDate': l10n('purchaseOrderEntry.history.data.receivedDate'),
+      'invoiceNumber': l10n('purchaseOrderEntry.history.data.invoiceNumber'),
+      'invoiceDate': l10n('purchaseOrderEntry.history.data.invoiceDate'),
+      'paymentAmount': l10n('purchaseOrderEntry.history.data.paymentAmount'),
+      'paymentDate': l10n('purchaseOrderEntry.history.data.paymentDate'),
+      'paymentMethod': l10n('purchaseOrderEntry.history.data.paymentMethod'),
+      'oldStatus': l10n('purchaseOrderEntry.history.data.oldStatus'),
+      'newStatus': l10n('purchaseOrderEntry.history.data.newStatus'),
     };
     return keyMap[key] || key;
   };
@@ -128,7 +128,7 @@ export function PurchaseOrderHistoryStepPage(props: PurchaseOrderHistoryStepProp
       setNoteText('');
     } catch (err) {
       console.error('Error saving note:', err);
-      alert(t('purchaseOrderEntry.history.saveError'));
+      alert(l10n('purchaseOrderEntry.history.saveError'));
     } finally {
       setSavingNote(false);
     }
@@ -152,23 +152,23 @@ export function PurchaseOrderHistoryStepPage(props: PurchaseOrderHistoryStepProp
   return (
     <HistoryContainer>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 'var(--spacing-md)' }}>
-        <AxHeading3 style={{ margin: 0 }}>{t('purchaseOrderEntry.history.title')}</AxHeading3>
+        <AxHeading3 style={{ margin: 0 }}>{l10n('purchaseOrderEntry.history.title')}</AxHeading3>
         {!readOnly && (
           <AxButton variant="primary" onClick={handleAddNoteClick} disabled={submitting || !po?.id}>
-            {t('purchaseOrderEntry.history.addNote')}
+            {l10n('purchaseOrderEntry.history.addNote')}
           </AxButton>
         )}
       </div>
 
       <AxParagraph style={{ marginBottom: 'var(--spacing-lg)', color: 'var(--color-text-secondary)' }}>
-        {t('purchaseOrderEntry.history.description')}
+        {l10n('purchaseOrderEntry.history.description')}
       </AxParagraph>
 
       {historyRecords.length === 0 ? (
         <EmptyState>
-          <AxParagraph>{t('purchaseOrderEntry.history.empty')}</AxParagraph>
+          <AxParagraph>{l10n('purchaseOrderEntry.history.empty')}</AxParagraph>
           <AxParagraph style={{ fontSize: 'var(--font-size-sm)', marginTop: 'var(--spacing-sm)' }}>
-            {t('purchaseOrderEntry.history.emptyDescription')}
+            {l10n('purchaseOrderEntry.history.emptyDescription')}
           </AxParagraph>
         </EmptyState>
       ) : (
@@ -182,11 +182,11 @@ export function PurchaseOrderHistoryStepPage(props: PurchaseOrderHistoryStepProp
           <AxTable fullWidth>
             <AxTableHead>
               <AxTableRow>
-                <AxTableHeader>{t('purchaseOrderEntry.history.dateTime')}</AxTableHeader>
-                <AxTableHeader>{t('purchaseOrderEntry.history.step')}</AxTableHeader>
-                <AxTableHeader>{t('purchaseOrderEntry.history.status')}</AxTableHeader>
-                <AxTableHeader>{t('purchaseOrderEntry.history.notes')}</AxTableHeader>
-                <AxTableHeader>{t('purchaseOrderEntry.history.data')}</AxTableHeader>
+                <AxTableHeader>{l10n('purchaseOrderEntry.history.dateTime')}</AxTableHeader>
+                <AxTableHeader>{l10n('purchaseOrderEntry.history.step')}</AxTableHeader>
+                <AxTableHeader>{l10n('purchaseOrderEntry.history.status')}</AxTableHeader>
+                <AxTableHeader>{l10n('purchaseOrderEntry.history.notes')}</AxTableHeader>
+                <AxTableHeader>{l10n('purchaseOrderEntry.history.data')}</AxTableHeader>
               </AxTableRow>
             </AxTableHead>
             <AxTableBody>
@@ -233,7 +233,7 @@ export function PurchaseOrderHistoryStepPage(props: PurchaseOrderHistoryStepProp
           setNoteDialogOpen(false);
           setNoteText('');
         }}
-        title={t('purchaseOrderEntry.history.addNoteTitle')}
+        title={l10n('purchaseOrderEntry.history.addNoteTitle')}
         size="medium"
         footer={
           <div style={{ display: 'flex', gap: 'var(--spacing-sm)', justifyContent: 'flex-end' }}>
@@ -245,20 +245,20 @@ export function PurchaseOrderHistoryStepPage(props: PurchaseOrderHistoryStepProp
               }}
               disabled={savingNote}
             >
-              {t('purchaseOrderEntry.history.cancel')}
+              {l10n('purchaseOrderEntry.history.cancel')}
             </AxButton>
             <AxButton variant="primary" onClick={handleSaveNote} disabled={savingNote || !noteText.trim()}>
-              {savingNote ? t('purchaseOrderEntry.history.saving') : t('purchaseOrderEntry.history.save')}
+              {savingNote ? l10n('purchaseOrderEntry.history.saving') : l10n('purchaseOrderEntry.history.save')}
             </AxButton>
           </div>
         }
       >
         <AxFormGroup>
-          <AxLabel>{t('purchaseOrderEntry.history.note')}</AxLabel>
+          <AxLabel>{l10n('purchaseOrderEntry.history.note')}</AxLabel>
           <textarea
             value={noteText}
             onChange={e => setNoteText(e.target.value)}
-            placeholder={t('purchaseOrderEntry.history.notePlaceholder')}
+            placeholder={l10n('purchaseOrderEntry.history.notePlaceholder')}
             style={{
               width: '100%',
               minHeight: '150px',

@@ -407,7 +407,7 @@ export function OrderListingPage({ onNavigateToOrderEntry, onEditOrder, onViewOr
               <AxParagraph>No orders found</AxParagraph>
             </div>
           ) : (
-            <AxTable fullWidth>
+            <AxTable fullWidth stickyHeader>
               <AxTableHead>
                 <AxTableRow>
                   <AxTableHeader>Order Number</AxTableHeader>

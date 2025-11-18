@@ -90,7 +90,7 @@ export function OrderEntryStepPage(props: OrderEntryStepProps) {
     loading = false,
     readOnly = false,
   } = props;
-  const { t } = useI18n();
+  const { l10n } = useI18n();
   const [customerDialogOpen, setCustomerDialogOpen] = useState(false);
 
   const isSubStepCompleted = (subStep: EntrySubStep) => {
@@ -323,7 +323,7 @@ export function OrderEntryStepPage(props: OrderEntryStepProps) {
 
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--spacing-md)' }}>
           <AxFormGroup>
-            <AxLabel>{t('orderEntry.shippingAddress')}</AxLabel>
+            <AxLabel>{l10n('orderEntry.shippingAddress')}</AxLabel>
             <div style={{ display: 'flex', gap: 'var(--spacing-sm)', alignItems: 'flex-start' }}>
               <div style={{ flex: 1 }}>
                 <AxListbox
@@ -380,7 +380,7 @@ export function OrderEntryStepPage(props: OrderEntryStepProps) {
           </AxFormGroup>
 
           <AxFormGroup>
-            <AxLabel>{t('orderEntry.billingAddress')}</AxLabel>
+            <AxLabel>{l10n('orderEntry.billingAddress')}</AxLabel>
             <div style={{ display: 'flex', gap: 'var(--spacing-sm)', alignItems: 'flex-start' }}>
               <div style={{ flex: 1 }}>
                 <AxListbox

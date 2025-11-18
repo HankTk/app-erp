@@ -52,7 +52,7 @@ interface LoginPageProps {
 }
 
 export function LoginPage({ onLoginSuccess }: LoginPageProps) {
-  const { t } = useI18n();
+  const { l10n } = useI18n();
   const [userid, setUserid] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
@@ -67,7 +67,7 @@ export function LoginPage({ onLoginSuccess }: LoginPageProps) {
       const user = await login(userid, password);
       onLoginSuccess(user);
     } catch (err) {
-      setError(err instanceof Error ? err.message : t('login.error'));
+      setError(err instanceof Error ? err.message : l10n('login.error'));
     } finally {
       setLoading(false);
     }
@@ -77,18 +77,18 @@ export function LoginPage({ onLoginSuccess }: LoginPageProps) {
     <LoginContainer {...debugProps(COMPONENT_NAME, 'LoginContainer')}>
       <LoginCard {...debugProps(COMPONENT_NAME, 'LoginCard')}>
         <TitleSection {...debugProps(COMPONENT_NAME, 'TitleSection')}>
-          <AxHeading3>{t('login.title')}</AxHeading3>
-          <AxParagraph>{t('login.subtitle')}</AxParagraph>
+          <AxHeading3>{l10n('login.title')}</AxHeading3>
+          <AxParagraph>{l10n('login.subtitle')}</AxParagraph>
         </TitleSection>
         <LoginForm onSubmit={handleSubmit} {...debugProps(COMPONENT_NAME, 'LoginForm')}>
           <AxFormGroup>
-            <AxLabel htmlFor="userid">{t('login.userid')}</AxLabel>
+            <AxLabel htmlFor="userid">{l10n('login.userid')}</AxLabel>
             <AxInput
               id="userid"
               type="text"
               value={userid}
               onChange={(e) => setUserid(e.target.value)}
-              placeholder={t('login.useridPlaceholder')}
+              placeholder={l10n('login.useridPlaceholder')}
               fullWidth
               required
               autoFocus
@@ -96,13 +96,13 @@ export function LoginPage({ onLoginSuccess }: LoginPageProps) {
             />
           </AxFormGroup>
           <AxFormGroup>
-            <AxLabel htmlFor="password">{t('login.password')}</AxLabel>
+            <AxLabel htmlFor="password">{l10n('login.password')}</AxLabel>
             <AxInput
               id="password"
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              placeholder={t('login.passwordPlaceholder')}
+              placeholder={l10n('login.passwordPlaceholder')}
               fullWidth
               required
               disabled={loading}
@@ -115,7 +115,7 @@ export function LoginPage({ onLoginSuccess }: LoginPageProps) {
             fullWidth
             disabled={loading || !userid || !password}
           >
-            {loading ? t('login.loading') : t('login.submit')}
+            {loading ? l10n('login.loading') : l10n('login.submit')}
           </AxButton>
           <AxButton
             type="button"

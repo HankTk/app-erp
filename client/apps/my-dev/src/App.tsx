@@ -45,10 +45,10 @@ function AppContent()
   const [currentPage, setCurrentPage] = useState('button');
   const [drawerOpen, setDrawerOpen] = useState(false);
   const { theme, toggleTheme } = useTheme();
-  const { t } = useI18n();
+  const { l10n } = useI18n();
 
   const CurrentPageComponent = pages[currentPage]?.component || ButtonPage;
-  const pageTitle = pages[currentPage] ? t(pages[currentPage].titleKey) : t('page.button');
+  const pageTitle = pages[currentPage] ? l10n(pages[currentPage].titleKey) : l10n('page.button');
 
   return (
     <AxContainer>
@@ -65,8 +65,8 @@ function AppContent()
       <AxMainContent>
         <AxHeader>
           <div>
-            <AxTitle>{t('app.title')}</AxTitle>
-            <AxSubtitle>{t('app.subtitle')}</AxSubtitle>
+            <AxTitle>{l10n('app.title')}</AxTitle>
+            <AxSubtitle>{l10n('app.subtitle')}</AxSubtitle>
           </div>
         </AxHeader>
         <AxSection>

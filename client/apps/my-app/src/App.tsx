@@ -109,7 +109,7 @@ function AppContent() {
   const [checkingUsers, setCheckingUsers] = useState(true);
   const [hasUsers, setHasUsers] = useState<boolean | null>(null);
   const { theme, toggleTheme } = useTheme();
-  const { t } = useI18n();
+  const { l10n } = useI18n();
 
   // Check if there are any users in the system
   useEffect(() => {
@@ -295,7 +295,7 @@ function AppContent() {
       <AppHeader
         onMenuClick={() => setSidebarOpen(!sidebarOpen)}
         onSettingsClick={() => setDrawerOpen(!drawerOpen)}
-        title={getPageTitle(currentPage, t)}
+        title={getPageTitle(currentPage, l10n)}
       />
       {currentPage === 'orders' || currentPage === 'order-entry' || currentPage === 'accounts-receivable' || currentPage === 'accounts-receivable-detail' || currentPage === 'purchase-order' || currentPage === 'purchase-order-entry' || currentPage === 'accounts-payable' || currentPage === 'accounts-payable-detail' || currentPage === 'general-ledger' || currentPage === 'general-ledger-detail' || currentPage === 'inventory-control' || currentPage === 'customers' || currentPage === 'vendors' || currentPage === 'products' || currentPage === 'addresses' || currentPage === 'users' || currentPage === 'master' || currentPage === 'rma' || currentPage === 'rma-entry' || currentPage === 'shop-floor-control' || currentPage === 'shop-floor-control-entry' || currentPage === 'shop' ? (
         <FullWidthContainer {...debugProps(COMPONENT_NAME, 'FullWidthContainer')}>

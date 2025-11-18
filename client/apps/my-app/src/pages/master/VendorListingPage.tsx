@@ -81,7 +81,7 @@ interface VendorListingPageProps {
 }
 
 export function VendorListingPage({ onNavigateBack }: VendorListingPageProps = {}) {
-  const { t } = useI18n();
+  const { l10n } = useI18n();
   const [vendors, setVendors] = useState<Vendor[]>([]);
   const [addresses, setAddresses] = useState<Address[]>([]);
   const [loading, setLoading] = useState(true);
@@ -262,26 +262,26 @@ export function VendorListingPage({ onNavigateBack }: VendorListingPageProps = {
                   onClick={onNavigateBack}
                   style={{ minWidth: 'auto', padding: 'var(--spacing-sm) var(--spacing-md)' }}
                 >
-                  {t('vendor.back')}
+                  {l10n('vendor.back')}
                 </AxButton>
               )}
               <div>
                 <AxHeading3 style={{ marginBottom: 'var(--spacing-xs)' }}>
-                  {t('module.vendor')}
+                  {l10n('module.vendor')}
                 </AxHeading3>
                 <AxParagraph style={{ color: 'var(--color-text-secondary)' }}>
-                  {t('vendor.subtitle')}
+                  {l10n('vendor.subtitle')}
                 </AxParagraph>
               </div>
             </HeaderLeft>
             <HeaderRight {...debugProps(COMPONENT_NAME, 'HeaderRight')}>
-              <AxButton variant="primary" onClick={handleAdd}>{t('vendor.addNew')}</AxButton>
+              <AxButton variant="primary" onClick={handleAdd}>{l10n('vendor.addNew')}</AxButton>
             </HeaderRight>
           </HeaderSection>
         </HeaderCard>
         <TableCard padding="large" {...debugProps(COMPONENT_NAME, 'TableCard')}>
           <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '200px' }}>
-            <AxParagraph>{t('vendor.loading')}</AxParagraph>
+            <AxParagraph>{l10n('vendor.loading')}</AxParagraph>
           </div>
         </TableCard>
       </PageContainer>
@@ -300,20 +300,20 @@ export function VendorListingPage({ onNavigateBack }: VendorListingPageProps = {
                   onClick={onNavigateBack}
                   style={{ minWidth: 'auto', padding: 'var(--spacing-sm) var(--spacing-md)' }}
                 >
-                  {t('vendor.back')}
+                  {l10n('vendor.back')}
                 </AxButton>
               )}
               <div>
                 <AxHeading3 style={{ marginBottom: 'var(--spacing-xs)' }}>
-                  {t('module.vendor')}
+                  {l10n('module.vendor')}
                 </AxHeading3>
                 <AxParagraph style={{ color: 'var(--color-text-secondary)' }}>
-                  {t('vendor.subtitle')}
+                  {l10n('vendor.subtitle')}
                 </AxParagraph>
               </div>
             </HeaderLeft>
             <HeaderRight {...debugProps(COMPONENT_NAME, 'HeaderRight')}>
-              <AxButton variant="primary" onClick={handleAdd}>{t('vendor.addNew')}</AxButton>
+              <AxButton variant="primary" onClick={handleAdd}>{l10n('vendor.addNew')}</AxButton>
             </HeaderRight>
           </HeaderSection>
         </HeaderCard>
@@ -340,20 +340,20 @@ export function VendorListingPage({ onNavigateBack }: VendorListingPageProps = {
                 onClick={onNavigateBack}
                 style={{ minWidth: 'auto', padding: 'var(--spacing-sm) var(--spacing-md)' }}
               >
-                {t('vendor.back')}
+                {l10n('vendor.back')}
               </AxButton>
             )}
             <div>
               <AxHeading3 style={{ marginBottom: 'var(--spacing-xs)' }}>
-                {t('module.vendor')}
+                {l10n('module.vendor')}
               </AxHeading3>
               <AxParagraph style={{ color: 'var(--color-text-secondary)' }}>
-                {t('vendor.subtitle')}
+                {l10n('vendor.subtitle')}
               </AxParagraph>
             </div>
           </HeaderLeft>
           <HeaderRight {...debugProps(COMPONENT_NAME, 'HeaderRight')}>
-            <AxButton variant="primary" onClick={handleAdd}>{t('vendor.addNew')}</AxButton>
+            <AxButton variant="primary" onClick={handleAdd}>{l10n('vendor.addNew')}</AxButton>
           </HeaderRight>
         </HeaderSection>
       </HeaderCard>
@@ -362,19 +362,19 @@ export function VendorListingPage({ onNavigateBack }: VendorListingPageProps = {
         <div style={{ flex: 1, overflow: 'auto', minHeight: 0 }}>
           {vendors.length === 0 ? (
             <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '200px' }}>
-              <AxParagraph>{t('vendor.noData')}</AxParagraph>
+              <AxParagraph>{l10n('vendor.noData')}</AxParagraph>
             </div>
           ) : (
-            <AxTable fullWidth>
+            <AxTable fullWidth stickyHeader>
               <AxTableHead>
                 <AxTableRow>
-                  <AxTableHeader>{t('vendor.vendorNumber')}</AxTableHeader>
-                  <AxTableHeader>{t('vendor.companyName')}</AxTableHeader>
-                  <AxTableHeader>{t('vendor.firstName')}</AxTableHeader>
-                  <AxTableHeader>{t('vendor.lastName')}</AxTableHeader>
-                  <AxTableHeader>{t('vendor.email')}</AxTableHeader>
-                  <AxTableHeader>{t('vendor.phone')}</AxTableHeader>
-                  <AxTableHeader align="center">{t('vendor.actions')}</AxTableHeader>
+                  <AxTableHeader>{l10n('vendor.vendorNumber')}</AxTableHeader>
+                  <AxTableHeader>{l10n('vendor.companyName')}</AxTableHeader>
+                  <AxTableHeader>{l10n('vendor.firstName')}</AxTableHeader>
+                  <AxTableHeader>{l10n('vendor.lastName')}</AxTableHeader>
+                  <AxTableHeader>{l10n('vendor.email')}</AxTableHeader>
+                  <AxTableHeader>{l10n('vendor.phone')}</AxTableHeader>
+                  <AxTableHeader align="center">{l10n('vendor.actions')}</AxTableHeader>
                 </AxTableRow>
               </AxTableHead>
               <AxTableBody>
@@ -397,7 +397,7 @@ export function VendorListingPage({ onNavigateBack }: VendorListingPageProps = {
                               onClick={() => handleEdit(vendor)}
                               style={{ minWidth: '80px' }}
                             >
-                              {t('vendor.edit')}
+                              {l10n('vendor.edit')}
                             </AxButton>
                             <AxButton 
                               variant="danger" 
@@ -405,7 +405,7 @@ export function VendorListingPage({ onNavigateBack }: VendorListingPageProps = {
                               onClick={() => handleDeleteClick(vendor)}
                               style={{ minWidth: '80px' }}
                             >
-                              {t('vendor.delete')}
+                              {l10n('vendor.delete')}
                             </AxButton>
                           </div>
                         </AxTableCell>
@@ -444,7 +444,7 @@ export function VendorListingPage({ onNavigateBack }: VendorListingPageProps = {
           setFormData({});
           setSelectedVendor(null);
         }}
-        title={dialogMode === 'add' ? t('vendor.addTitle') : t('vendor.editTitle')}
+        title={dialogMode === 'add' ? l10n('vendor.addTitle') : l10n('vendor.editTitle')}
         size="large"
         footer={
           <div style={{ display: 'flex', gap: 'var(--spacing-sm)', justifyContent: 'space-between' }}>
@@ -455,7 +455,7 @@ export function VendorListingPage({ onNavigateBack }: VendorListingPageProps = {
                   onClick={handleManageAddresses}
                   disabled={submitting}
                 >
-                  {t('vendor.manageAddresses')}
+                  {l10n('vendor.manageAddresses')}
                 </AxButton>
               )}
             </div>
@@ -469,14 +469,14 @@ export function VendorListingPage({ onNavigateBack }: VendorListingPageProps = {
                 }}
                 disabled={submitting}
               >
-                {t('vendor.cancel')}
+                {l10n('vendor.cancel')}
               </AxButton>
               <AxButton 
                 variant="primary" 
                 onClick={handleSave}
                 disabled={submitting}
               >
-                {submitting ? t('vendor.saving') : t('vendor.save')}
+                {submitting ? l10n('vendor.saving') : l10n('vendor.save')}
               </AxButton>
             </div>
           </div>
@@ -484,7 +484,7 @@ export function VendorListingPage({ onNavigateBack }: VendorListingPageProps = {
       >
         <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-lg)' }}>
           <AxFormGroup>
-            <AxLabel>{t('vendor.vendorNumber')}</AxLabel>
+            <AxLabel>{l10n('vendor.vendorNumber')}</AxLabel>
             <AxInput
               type="text"
               value={formData.vendorNumber || ''}
@@ -497,7 +497,7 @@ export function VendorListingPage({ onNavigateBack }: VendorListingPageProps = {
             />
           </AxFormGroup>
           <AxFormGroup>
-            <AxLabel>{t('vendor.companyName')}</AxLabel>
+            <AxLabel>{l10n('vendor.companyName')}</AxLabel>
             <AxInput
               type="text"
               value={formData.companyName || ''}
@@ -510,7 +510,7 @@ export function VendorListingPage({ onNavigateBack }: VendorListingPageProps = {
             />
           </AxFormGroup>
           <AxFormGroup>
-            <AxLabel>{t('vendor.firstName')}</AxLabel>
+            <AxLabel>{l10n('vendor.firstName')}</AxLabel>
             <AxInput
               type="text"
               value={formData.firstName || ''}
@@ -523,7 +523,7 @@ export function VendorListingPage({ onNavigateBack }: VendorListingPageProps = {
             />
           </AxFormGroup>
           <AxFormGroup>
-            <AxLabel>{t('vendor.lastName')}</AxLabel>
+            <AxLabel>{l10n('vendor.lastName')}</AxLabel>
             <AxInput
               type="text"
               value={formData.lastName || ''}
@@ -536,7 +536,7 @@ export function VendorListingPage({ onNavigateBack }: VendorListingPageProps = {
             />
           </AxFormGroup>
           <AxFormGroup>
-            <AxLabel>{t('vendor.email')}</AxLabel>
+            <AxLabel>{l10n('vendor.email')}</AxLabel>
             <AxInput
               type="email"
               value={formData.email || ''}
@@ -549,7 +549,7 @@ export function VendorListingPage({ onNavigateBack }: VendorListingPageProps = {
             />
           </AxFormGroup>
           <AxFormGroup>
-            <AxLabel>{t('vendor.phone')}</AxLabel>
+            <AxLabel>{l10n('vendor.phone')}</AxLabel>
             <AxInput
               type="tel"
               value={formData.phone || ''}
@@ -563,14 +563,14 @@ export function VendorListingPage({ onNavigateBack }: VendorListingPageProps = {
           </AxFormGroup>
           {dialogMode === 'edit' && selectedVendor?.id && (
             <AxFormGroup>
-              <AxLabel>{t('vendor.associatedAddresses')}</AxLabel>
+              <AxLabel>{l10n('vendor.associatedAddresses')}</AxLabel>
               <div style={{ marginTop: 'var(--spacing-xs)' }}>
                 {(() => {
                   const vendorAddresses = getVendorAddresses(selectedVendor.id);
                   if (vendorAddresses.length === 0) {
                     return (
                       <AxParagraph style={{ color: 'var(--color-text-secondary)', fontStyle: 'italic' }}>
-                        {t('vendor.noAddresses')}
+                        {l10n('vendor.noAddresses')}
                       </AxParagraph>
                     );
                   }
@@ -608,7 +608,7 @@ export function VendorListingPage({ onNavigateBack }: VendorListingPageProps = {
           setDeleteDialogOpen(false);
           setSelectedVendor(null);
         }}
-        title={t('vendor.deleteTitle')}
+        title={l10n('vendor.deleteTitle')}
         size="medium"
         footer={
           <div style={{ display: 'flex', gap: 'var(--spacing-sm)', justifyContent: 'flex-end' }}>
@@ -620,23 +620,23 @@ export function VendorListingPage({ onNavigateBack }: VendorListingPageProps = {
               }}
               disabled={submitting}
             >
-              {t('vendor.cancel')}
+              {l10n('vendor.cancel')}
             </AxButton>
             <AxButton 
               variant="danger" 
               onClick={handleDelete}
               disabled={submitting}
             >
-              {submitting ? t('vendor.deleting') : t('vendor.delete')}
+              {submitting ? l10n('vendor.deleting') : l10n('vendor.delete')}
             </AxButton>
           </div>
         }
       >
         <AxParagraph style={{ marginBottom: 'var(--spacing-md)' }}>
-          {t('vendor.deleteMessage')}
+          {l10n('vendor.deleteMessage')}
         </AxParagraph>
         <AxParagraph style={{ color: 'var(--color-text-secondary)', fontSize: 'var(--font-size-sm)' }}>
-          {t('vendor.deleteWarning')}
+          {l10n('vendor.deleteWarning')}
         </AxParagraph>
       </AxDialog>
 
@@ -645,7 +645,7 @@ export function VendorListingPage({ onNavigateBack }: VendorListingPageProps = {
         <AxDialog
           open={showAddressDialog}
           onClose={handleAddressDialogClose}
-          title={t('vendor.manageAddresses')}
+          title={l10n('vendor.manageAddresses')}
           size="large"
           footer={
             <div style={{ display: 'flex', gap: 'var(--spacing-sm)', justifyContent: 'flex-end' }}>
@@ -653,7 +653,7 @@ export function VendorListingPage({ onNavigateBack }: VendorListingPageProps = {
                 variant="secondary" 
                 onClick={handleAddressDialogClose}
               >
-                {t('vendor.close')}
+                {l10n('vendor.close')}
               </AxButton>
             </div>
           }

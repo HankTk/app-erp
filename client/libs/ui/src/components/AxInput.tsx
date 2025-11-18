@@ -12,7 +12,7 @@ interface StyledInputProps
   $fullWidth?: boolean;
 }
 
-const StyledInput = styled.input<StyledInputProps>`
+const StyledInput = styled.input<StyledInputProps & { type?: string }>`
   font-family: var(--font-family-base);
   font-size: var(--font-size-base);
   font-weight: var(--font-weight-normal);
@@ -25,9 +25,17 @@ const StyledInput = styled.input<StyledInputProps>`
   border-radius: var(--radius-md);
   outline: none;
   transition: border-color var(--transition-base), box-shadow var(--transition-base);
-  width: ${({ $fullWidth }) =>
+  box-sizing: border-box;
+  width: ${({ $fullWidth, type }) =>
   {
-    return $fullWidth ? '100%' : 'auto';
+    if ($fullWidth) {
+      return '100%';
+    }
+    // Date, time, and datetime inputs should have a reasonable width
+    if (type === 'date' || type === 'time' || type === 'datetime-local') {
+      return '220px';
+    }
+    return 'auto';
   }};
   color: var(--color-text-primary);
   background-color: var(--color-background-default);
@@ -60,9 +68,10 @@ const StyledInput = styled.input<StyledInputProps>`
 export const AxInput: React.FC<AxInputProps> = ({
   error,
   fullWidth,
+  type,
   ...props
 }) =>
 {
-  return <StyledInput $error={error} $fullWidth={fullWidth} {...props} />;
+  return <StyledInput $error={error} $fullWidth={fullWidth} type={type} {...props} />;
 };
 

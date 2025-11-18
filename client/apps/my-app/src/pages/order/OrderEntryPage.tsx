@@ -174,7 +174,7 @@ interface OrderEntryPageProps {
 
 export function OrderEntryPage(props: OrderEntryPageProps = {}) {
   const { onNavigateToOrders, orderIdToEdit, onNavigateBack, readOnly = false, title, subtitle } = props;
-  const { t } = useI18n();
+  const { l10n } = useI18n();
   const [currentStep, setCurrentStep] = useState<OrderStep>('entry');
   const [currentEntrySubStep, setCurrentEntrySubStep] = useState<EntrySubStep>('customer');
   const [order, setOrder] = useState<Order | null>(null);
@@ -214,13 +214,13 @@ export function OrderEntryPage(props: OrderEntryPageProps = {}) {
   const [invoiceDate, setInvoiceDate] = useState<string>('');
 
   const steps: { key: OrderStep; label: string; description: string }[] = [
-    { key: 'entry', label: t('orderEntry.step.entry'), description: t('orderEntry.step.entry') },
-    { key: 'approval', label: t('orderEntry.step.approval'), description: t('orderEntry.step.approval') },
-    { key: 'confirmation', label: t('orderEntry.step.confirmation'), description: t('orderEntry.step.confirmation') },
-    { key: 'shipping_instruction', label: t('orderEntry.step.shippingInstruction'), description: t('orderEntry.step.shippingInstruction') },
-    { key: 'shipping', label: t('orderEntry.step.shipping'), description: t('orderEntry.step.shipping') },
-    { key: 'invoicing', label: t('orderEntry.step.invoicing'), description: t('orderEntry.step.invoicing') },
-    { key: 'history', label: t('orderEntry.step.history'), description: t('orderEntry.step.history') },
+    { key: 'entry', label: l10n('orderEntry.step.entry'), description: l10n('orderEntry.step.entry') },
+    { key: 'approval', label: l10n('orderEntry.step.approval'), description: l10n('orderEntry.step.approval') },
+    { key: 'confirmation', label: l10n('orderEntry.step.confirmation'), description: l10n('orderEntry.step.confirmation') },
+    { key: 'shipping_instruction', label: l10n('orderEntry.step.shippingInstruction'), description: l10n('orderEntry.step.shippingInstruction') },
+    { key: 'shipping', label: l10n('orderEntry.step.shipping'), description: l10n('orderEntry.step.shipping') },
+    { key: 'invoicing', label: l10n('orderEntry.step.invoicing'), description: l10n('orderEntry.step.invoicing') },
+    { key: 'history', label: l10n('orderEntry.step.history'), description: l10n('orderEntry.step.history') },
   ];
 
   const entrySubSteps: { key: EntrySubStep; label: string }[] = [
@@ -702,7 +702,7 @@ export function OrderEntryPage(props: OrderEntryPageProps = {}) {
       });
       setOrder(updated);
       // 履歴に記録（更新されたorderを使用）
-      await addHistoryRecord('approval', t('orderEntry.history.step.approval'), approvalNotes, 'APPROVED', {
+      await addHistoryRecord('approval', l10n('orderEntry.history.step.approval'), approvalNotes, 'APPROVED', {
         creditCheckPassed,
         inventoryConfirmed,
         priceApproved,
@@ -729,7 +729,7 @@ export function OrderEntryPage(props: OrderEntryPageProps = {}) {
       });
       setOrder(updated);
       // 履歴に記録（更新されたorderを使用）
-      await addHistoryRecord('confirmation', t('orderEntry.history.step.confirmation'), undefined, 'APPROVED', {
+      await addHistoryRecord('confirmation', l10n('orderEntry.history.step.confirmation'), undefined, 'APPROVED', {
         orderNumber: updated.orderNumber,
       }, updated);
       setCurrentStep('shipping_instruction');
@@ -755,7 +755,7 @@ export function OrderEntryPage(props: OrderEntryPageProps = {}) {
       });
       setOrder(updated);
       // 履歴に記録（更新されたorderを使用）
-      await addHistoryRecord('shipping_instruction', t('orderEntry.history.step.shippingInstruction'), shippingInstructions, 'SHIPPING_INSTRUCTED', {
+      await addHistoryRecord('shipping_instruction', l10n('orderEntry.history.step.shippingInstruction'), shippingInstructions, 'SHIPPING_INSTRUCTED', {
         requestedShipDate,
       }, updated);
       setCurrentStep('shipping');
@@ -782,7 +782,7 @@ export function OrderEntryPage(props: OrderEntryPageProps = {}) {
       });
       setOrder(updated);
       // 履歴に記録（更新されたorderを使用）
-      await addHistoryRecord('shipping', t('orderEntry.history.step.shipping'), undefined, 'SHIPPED', {
+      await addHistoryRecord('shipping', l10n('orderEntry.history.step.shipping'), undefined, 'SHIPPED', {
         shipDate,
         trackingNumber,
       }, updated);
@@ -813,7 +813,7 @@ export function OrderEntryPage(props: OrderEntryPageProps = {}) {
       });
       setOrder(updated);
       // 履歴に記録（更新されたorderを使用）
-      await addHistoryRecord('invoicing', t('orderEntry.history.step.invoicing'), undefined, 'INVOICED', {
+      await addHistoryRecord('invoicing', l10n('orderEntry.history.step.invoicing'), undefined, 'INVOICED', {
         invoiceNumber,
         invoiceDate,
         total: updated.total,
@@ -1445,9 +1445,9 @@ export function OrderEntryPage(props: OrderEntryPageProps = {}) {
   const renderApprovalStep = () => {
     return (
       <div>
-        <AxHeading3 style={{ marginBottom: 'var(--spacing-md)' }}>{t('orderEntry.approval.title')}</AxHeading3>
+        <AxHeading3 style={{ marginBottom: 'var(--spacing-md)' }}>{l10n('orderEntry.approval.title')}</AxHeading3>
         <AxParagraph style={{ marginBottom: 'var(--spacing-lg)', color: 'var(--color-text-secondary)' }}>
-          {t('orderEntry.approval.description')}
+          {l10n('orderEntry.approval.description')}
         </AxParagraph>
         
         <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-md)' }}>
@@ -1459,7 +1459,7 @@ export function OrderEntryPage(props: OrderEntryPageProps = {}) {
                 onChange={(e) => setCreditCheckPassed(e.target.checked)}
                 style={{ marginRight: 'var(--spacing-xs)' }}
               />
-              {t('orderEntry.approval.creditCheck')}
+              {l10n('orderEntry.approval.creditCheck')}
             </AxLabel>
           </AxFormGroup>
 
@@ -1471,7 +1471,7 @@ export function OrderEntryPage(props: OrderEntryPageProps = {}) {
                 onChange={(e) => setInventoryConfirmed(e.target.checked)}
                 style={{ marginRight: 'var(--spacing-xs)' }}
               />
-              {t('orderEntry.approval.inventoryConfirmed')}
+              {l10n('orderEntry.approval.inventoryConfirmed')}
             </AxLabel>
           </AxFormGroup>
 
@@ -1483,12 +1483,12 @@ export function OrderEntryPage(props: OrderEntryPageProps = {}) {
                 onChange={(e) => setPriceApproved(e.target.checked)}
                 style={{ marginRight: 'var(--spacing-xs)' }}
               />
-              {t('orderEntry.approval.priceApproved')}
+              {l10n('orderEntry.approval.priceApproved')}
             </AxLabel>
           </AxFormGroup>
 
           <AxFormGroup>
-            <AxLabel>{t('orderEntry.approval.notes')}</AxLabel>
+            <AxLabel>{l10n('orderEntry.approval.notes')}</AxLabel>
             <textarea
               value={approvalNotes}
               onChange={(e) => setApprovalNotes(e.target.value)}
@@ -1500,7 +1500,7 @@ export function OrderEntryPage(props: OrderEntryPageProps = {}) {
                 border: '1px solid var(--color-border-default)',
                 fontFamily: 'inherit',
               }}
-              placeholder={t('orderEntry.approval.notesPlaceholder')}
+              placeholder={l10n('orderEntry.approval.notesPlaceholder')}
             />
           </AxFormGroup>
         </div>
@@ -1511,23 +1511,23 @@ export function OrderEntryPage(props: OrderEntryPageProps = {}) {
   const renderConfirmationStep = () => {
     return (
       <div>
-        <AxHeading3 style={{ marginBottom: 'var(--spacing-md)' }}>{t('orderEntry.confirmation.title')}</AxHeading3>
+        <AxHeading3 style={{ marginBottom: 'var(--spacing-md)' }}>{l10n('orderEntry.confirmation.title')}</AxHeading3>
         <AxParagraph style={{ marginBottom: 'var(--spacing-lg)', color: 'var(--color-text-secondary)' }}>
-          {t('orderEntry.confirmation.description')}
+          {l10n('orderEntry.confirmation.description')}
         </AxParagraph>
         
         <div style={{ padding: 'var(--spacing-lg)', backgroundColor: 'var(--color-background-secondary)', borderRadius: 'var(--radius-md)' }}>
           <AxParagraph style={{ marginBottom: 'var(--spacing-md)' }}>
-            <strong>{t('orderEntry.confirmation.orderNumber')}</strong> {order?.orderNumber || 'N/A'}
+            <strong>{l10n('orderEntry.confirmation.orderNumber')}</strong> {order?.orderNumber || 'N/A'}
           </AxParagraph>
           <AxParagraph style={{ marginBottom: 'var(--spacing-md)' }}>
-            <strong>{t('orderEntry.confirmation.customer')}</strong> {selectedCustomer?.companyName || selectedCustomer?.email || 'N/A'}
+            <strong>{l10n('orderEntry.confirmation.customer')}</strong> {selectedCustomer?.companyName || selectedCustomer?.email || 'N/A'}
           </AxParagraph>
           <AxParagraph style={{ marginBottom: 'var(--spacing-md)' }}>
-            <strong>{t('orderEntry.confirmation.totalAmount')}</strong> ${order?.total?.toFixed(2) || '0.00'}
+            <strong>{l10n('orderEntry.confirmation.totalAmount')}</strong> ${order?.total?.toFixed(2) || '0.00'}
           </AxParagraph>
           <AxParagraph>
-            {t('orderEntry.confirmation.confirmMessage')}
+            {l10n('orderEntry.confirmation.confirmMessage')}
           </AxParagraph>
         </div>
       </div>
@@ -1537,24 +1537,23 @@ export function OrderEntryPage(props: OrderEntryPageProps = {}) {
   const renderShippingInstructionStep = () => {
     return (
       <div>
-        <AxHeading3 style={{ marginBottom: 'var(--spacing-md)' }}>{t('orderEntry.shippingInstruction.title')}</AxHeading3>
+        <AxHeading3 style={{ marginBottom: 'var(--spacing-md)' }}>{l10n('orderEntry.shippingInstruction.title')}</AxHeading3>
         <AxParagraph style={{ marginBottom: 'var(--spacing-lg)', color: 'var(--color-text-secondary)' }}>
-          {t('orderEntry.shippingInstruction.description')}
+          {l10n('orderEntry.shippingInstruction.description')}
         </AxParagraph>
         
         <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-md)' }}>
           <AxFormGroup>
-            <AxLabel>{t('orderEntry.shippingInstruction.requestedShipDate')}</AxLabel>
+            <AxLabel>{l10n('orderEntry.shippingInstruction.requestedShipDate')}</AxLabel>
             <AxInput
               type="date"
               value={requestedShipDate}
               onChange={(e) => setRequestedShipDate(e.target.value)}
-              fullWidth
             />
           </AxFormGroup>
 
           <AxFormGroup>
-            <AxLabel>{t('orderEntry.shippingInstruction.notes')}</AxLabel>
+            <AxLabel>{l10n('orderEntry.shippingInstruction.notes')}</AxLabel>
             <textarea
               value={shippingInstructions}
               onChange={(e) => setShippingInstructions(e.target.value)}
@@ -1566,7 +1565,7 @@ export function OrderEntryPage(props: OrderEntryPageProps = {}) {
                 border: '1px solid var(--color-border-default)',
                 fontFamily: 'inherit',
               }}
-              placeholder={t('orderEntry.shippingInstruction.notesPlaceholder')}
+              placeholder={l10n('orderEntry.shippingInstruction.notesPlaceholder')}
             />
           </AxFormGroup>
         </div>
@@ -1577,29 +1576,28 @@ export function OrderEntryPage(props: OrderEntryPageProps = {}) {
   const renderShippingFulfillmentStep = () => {
     return (
       <div>
-        <AxHeading3 style={{ marginBottom: 'var(--spacing-md)' }}>{t('orderEntry.shipping.title')}</AxHeading3>
+        <AxHeading3 style={{ marginBottom: 'var(--spacing-md)' }}>{l10n('orderEntry.shipping.title')}</AxHeading3>
         <AxParagraph style={{ marginBottom: 'var(--spacing-lg)', color: 'var(--color-text-secondary)' }}>
-          {t('orderEntry.shipping.description')}
+          {l10n('orderEntry.shipping.description')}
         </AxParagraph>
         
         <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-md)' }}>
           <AxFormGroup>
-            <AxLabel>{t('orderEntry.shipping.actualShipDate')}</AxLabel>
+            <AxLabel>{l10n('orderEntry.shipping.actualShipDate')}</AxLabel>
             <AxInput
               type="date"
               value={actualShipDate}
               onChange={(e) => setActualShipDate(e.target.value)}
-              fullWidth
             />
           </AxFormGroup>
 
           <AxFormGroup>
-            <AxLabel>{t('orderEntry.shipping.trackingNumber')}</AxLabel>
+            <AxLabel>{l10n('orderEntry.shipping.trackingNumber')}</AxLabel>
             <AxInput
               type="text"
               value={trackingNumber}
               onChange={(e) => setTrackingNumber(e.target.value)}
-              placeholder={t('orderEntry.shipping.trackingNumberPlaceholder')}
+              placeholder={l10n('orderEntry.shipping.trackingNumberPlaceholder')}
               fullWidth
             />
           </AxFormGroup>
@@ -1611,36 +1609,35 @@ export function OrderEntryPage(props: OrderEntryPageProps = {}) {
   const renderInvoicingStep = () => {
     return (
       <div>
-        <AxHeading3 style={{ marginBottom: 'var(--spacing-md)' }}>{t('orderEntry.invoicing.title')}</AxHeading3>
+        <AxHeading3 style={{ marginBottom: 'var(--spacing-md)' }}>{l10n('orderEntry.invoicing.title')}</AxHeading3>
         <AxParagraph style={{ marginBottom: 'var(--spacing-lg)', color: 'var(--color-text-secondary)' }}>
-          {t('orderEntry.invoicing.description')}
+          {l10n('orderEntry.invoicing.description')}
         </AxParagraph>
         
         <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-md)' }}>
           <AxFormGroup>
-            <AxLabel>{t('orderEntry.invoicing.invoiceNumber')}</AxLabel>
+            <AxLabel>{l10n('orderEntry.invoicing.invoiceNumber')}</AxLabel>
             <AxInput
               type="text"
               value={invoiceNumber}
               onChange={(e) => setInvoiceNumber(e.target.value)}
-              placeholder={t('orderEntry.invoicing.invoiceNumberPlaceholder')}
-              fullWidth
+              placeholder={l10n('orderEntry.invoicing.invoiceNumberPlaceholder')}
+              style={{ width: '220px' }}
             />
           </AxFormGroup>
 
           <AxFormGroup>
-            <AxLabel>{t('orderEntry.invoicing.invoiceDate')}</AxLabel>
+            <AxLabel>{l10n('orderEntry.invoicing.invoiceDate')}</AxLabel>
             <AxInput
               type="date"
               value={invoiceDate}
               onChange={(e) => setInvoiceDate(e.target.value)}
-              fullWidth
             />
           </AxFormGroup>
 
           <div style={{ padding: 'var(--spacing-md)', backgroundColor: 'var(--color-background-secondary)', borderRadius: 'var(--radius-md)' }}>
             <AxParagraph style={{ fontWeight: 'var(--font-weight-bold)', marginBottom: 'var(--spacing-sm)' }}>
-              {t('orderEntry.invoicing.invoiceAmount')}
+              {l10n('orderEntry.invoicing.invoiceAmount')}
             </AxParagraph>
             <AxParagraph style={{ fontSize: 'var(--font-size-lg)' }}>
               ${order?.total?.toFixed(2) || '0.00'}
@@ -1847,14 +1844,14 @@ export function OrderEntryPage(props: OrderEntryPageProps = {}) {
   const selectedCustomer = customers.find(c => c.id === order?.customerId);
 
   const statusOptions = [
-    { value: 'DRAFT', label: t('orderEntry.status.draft') },
-    { value: 'PENDING_APPROVAL', label: t('orderEntry.status.pendingApproval') },
-    { value: 'APPROVED', label: t('orderEntry.status.approved') },
-    { value: 'SHIPPING_INSTRUCTED', label: t('orderEntry.status.shippingInstructed') },
-    { value: 'SHIPPED', label: t('orderEntry.status.shipped') },
-    { value: 'INVOICED', label: t('orderEntry.status.invoiced') },
-    { value: 'PAID', label: t('orderEntry.status.paid') },
-    { value: 'CANCELLED', label: t('orderEntry.status.cancelled') },
+    { value: 'DRAFT', label: l10n('orderEntry.status.draft') },
+    { value: 'PENDING_APPROVAL', label: l10n('orderEntry.status.pendingApproval') },
+    { value: 'APPROVED', label: l10n('orderEntry.status.approved') },
+    { value: 'SHIPPING_INSTRUCTED', label: l10n('orderEntry.status.shippingInstructed') },
+    { value: 'SHIPPED', label: l10n('orderEntry.status.shipped') },
+    { value: 'INVOICED', label: l10n('orderEntry.status.invoiced') },
+    { value: 'PAID', label: l10n('orderEntry.status.paid') },
+    { value: 'CANCELLED', label: l10n('orderEntry.status.cancelled') },
   ];
 
   // WebSocket connection for real-time updates (must be called before any early returns)
@@ -1942,15 +1939,15 @@ export function OrderEntryPage(props: OrderEntryPageProps = {}) {
                 onClick={handleNavigateBack}
                 style={{ minWidth: 'auto', padding: 'var(--spacing-sm) var(--spacing-md)' }}
               >
-                {t('orderEntry.back')}
+                {l10n('orderEntry.back')}
               </AxButton>
             )}
             <div style={{ flex: 1 }}>
               <AxHeading3 style={{ marginBottom: 'var(--spacing-xs)' }}>
-                {title || t('orderEntry.title')}
+                {title || l10n('orderEntry.title')}
               </AxHeading3>
               <AxParagraph style={{ color: 'var(--color-text-secondary)' }}>
-                {subtitle || t('orderEntry.subtitle')}
+                {subtitle || l10n('orderEntry.subtitle')}
               </AxParagraph>
             </div>
           </HeaderLeft>
@@ -1964,7 +1961,7 @@ export function OrderEntryPage(props: OrderEntryPageProps = {}) {
                   minWidth: '150px'
                 }}>
                   <AxParagraph style={{ fontWeight: 'var(--font-weight-bold)', marginBottom: 'var(--spacing-xs)', fontSize: 'var(--font-size-sm)' }}>
-                    {t('orderEntry.confirmation.orderNumber')}
+                    {l10n('orderEntry.confirmation.orderNumber')}
                   </AxParagraph>
                   <AxParagraph style={{ fontSize: 'var(--font-size-sm)' }}>
                     {order.orderNumber}
@@ -1979,7 +1976,7 @@ export function OrderEntryPage(props: OrderEntryPageProps = {}) {
                   minWidth: '200px'
                 }}>
                   <AxParagraph style={{ fontWeight: 'var(--font-weight-bold)', marginBottom: 'var(--spacing-xs)', fontSize: 'var(--font-size-sm)' }}>
-                    {t('orderEntry.customer')}
+                    {l10n('orderEntry.customer')}
                   </AxParagraph>
                   <AxParagraph style={{ fontSize: 'var(--font-size-sm)' }}>
                     {selectedCustomer.companyName || `${selectedCustomer.lastName} ${selectedCustomer.firstName}` || selectedCustomer.email}
@@ -2006,7 +2003,7 @@ export function OrderEntryPage(props: OrderEntryPageProps = {}) {
                           maxWidth: '250px'
                         }}>
                           <AxParagraph style={{ fontWeight: 'var(--font-weight-bold)', marginBottom: 'var(--spacing-xs)', fontSize: 'var(--font-size-sm)' }}>
-                            {t('orderEntry.shippingAddress')}
+                            {l10n('orderEntry.shippingAddress')}
                           </AxParagraph>
                           <AxParagraph style={{ fontSize: 'var(--font-size-sm)', lineHeight: 'var(--line-height-tight)' }}>
                             {shippingAddress.streetAddress1}
@@ -2031,7 +2028,7 @@ export function OrderEntryPage(props: OrderEntryPageProps = {}) {
                           maxWidth: '250px'
                         }}>
                           <AxParagraph style={{ fontWeight: 'var(--font-weight-bold)', marginBottom: 'var(--spacing-xs)', fontSize: 'var(--font-size-sm)' }}>
-                            {t('orderEntry.billingAddress')}
+                            {l10n('orderEntry.billingAddress')}
                           </AxParagraph>
                           <AxParagraph style={{ fontSize: 'var(--font-size-sm)', lineHeight: 'var(--line-height-tight)' }}>
                             {billingAddress.streetAddress1}
@@ -2061,7 +2058,7 @@ export function OrderEntryPage(props: OrderEntryPageProps = {}) {
                     minWidth: '200px'
                   }}>
                     <AxParagraph style={{ fontWeight: 'var(--font-weight-bold)', marginBottom: 'var(--spacing-xs)', fontSize: 'var(--font-size-sm)' }}>
-                      {t('orderEntry.orderStatus')}
+                      {l10n('orderEntry.orderStatus')}
                     </AxParagraph>
                     <AxListbox
                       key={`status-${order.id}-${order.status || 'null'}`}
@@ -2072,7 +2069,7 @@ export function OrderEntryPage(props: OrderEntryPageProps = {}) {
                           handleStatusChange(value);
                         }
                       }}
-                      placeholder={t('orderEntry.selectStatus')}
+                      placeholder={l10n('orderEntry.selectStatus')}
                       fullWidth
                       disabled={loading || !order?.id || readOnly}
                     />
@@ -2168,7 +2165,7 @@ export function OrderEntryPage(props: OrderEntryPageProps = {}) {
               onClick={handlePrevious}
               disabled={(currentStep === 'entry' && currentEntrySubStep === 'customer') || submitting}
             >
-              {t('orderEntry.previous')}
+              {l10n('orderEntry.previous')}
             </AxButton>
             {currentStep === 'entry' && currentEntrySubStep === 'review' ? (
               <AxButton
@@ -2176,7 +2173,7 @@ export function OrderEntryPage(props: OrderEntryPageProps = {}) {
                 onClick={handleCompleteEntry}
                 disabled={!canProceedToNext() || submitting}
               >
-                {submitting ? t('orderEntry.saving') : (orderIdToEdit ? t('orderEntry.saveOrder') : t('orderEntry.completeOrder'))}
+                {submitting ? l10n('orderEntry.saving') : (orderIdToEdit ? l10n('orderEntry.saveOrder') : l10n('orderEntry.completeOrder'))}
               </AxButton>
             ) : currentStep === 'approval' ? (
               <AxButton
@@ -2184,7 +2181,7 @@ export function OrderEntryPage(props: OrderEntryPageProps = {}) {
                 onClick={handleApproveOrder}
                 disabled={!canProceedToNext() || submitting}
               >
-                {submitting ? t('orderEntry.approving') : t('orderEntry.approveOrder')}
+                {submitting ? l10n('orderEntry.approving') : l10n('orderEntry.approveOrder')}
               </AxButton>
             ) : currentStep === 'confirmation' ? (
               <AxButton
@@ -2192,7 +2189,7 @@ export function OrderEntryPage(props: OrderEntryPageProps = {}) {
                 onClick={handleConfirmOrder}
                 disabled={!canProceedToNext() || submitting}
               >
-                {submitting ? t('orderEntry.confirming') : t('orderEntry.confirmOrder')}
+                {submitting ? l10n('orderEntry.confirming') : l10n('orderEntry.confirmOrder')}
               </AxButton>
             ) : currentStep === 'shipping_instruction' ? (
               <AxButton
@@ -2200,7 +2197,7 @@ export function OrderEntryPage(props: OrderEntryPageProps = {}) {
                 onClick={handleShippingInstruction}
                 disabled={!canProceedToNext() || submitting}
               >
-                {submitting ? t('orderEntry.submitting') : t('orderEntry.submitShippingInstruction')}
+                {submitting ? l10n('orderEntry.submitting') : l10n('orderEntry.submitShippingInstruction')}
               </AxButton>
             ) : currentStep === 'shipping' ? (
               <AxButton
@@ -2208,7 +2205,7 @@ export function OrderEntryPage(props: OrderEntryPageProps = {}) {
                 onClick={handleShipOrder}
                 disabled={!canProceedToNext() || submitting}
               >
-                {submitting ? t('orderEntry.shipping') : t('orderEntry.shipOrder')}
+                {submitting ? l10n('orderEntry.shipping') : l10n('orderEntry.shipOrder')}
               </AxButton>
             ) : currentStep === 'invoicing' ? (
               <AxButton
@@ -2216,7 +2213,7 @@ export function OrderEntryPage(props: OrderEntryPageProps = {}) {
                 onClick={handleInvoiceOrder}
                 disabled={!canProceedToNext() || submitting}
               >
-                {submitting ? t('orderEntry.invoicing') : t('orderEntry.createInvoice')}
+                {submitting ? l10n('orderEntry.invoicing') : l10n('orderEntry.createInvoice')}
               </AxButton>
             ) : currentStep === 'history' ? (
               <AxButton
@@ -2230,7 +2227,7 @@ export function OrderEntryPage(props: OrderEntryPageProps = {}) {
                 }}
                 disabled={submitting}
               >
-                {onNavigateToOrders ? t('orderEntry.backToOrders') : t('orderEntry.previous')}
+                {onNavigateToOrders ? l10n('orderEntry.backToOrders') : l10n('orderEntry.previous')}
               </AxButton>
             ) : (
               <AxButton
@@ -2238,7 +2235,7 @@ export function OrderEntryPage(props: OrderEntryPageProps = {}) {
                 onClick={handleNext}
                 disabled={!canProceedToNext() || submitting}
               >
-                {t('orderEntry.next')}
+                {l10n('orderEntry.next')}
               </AxButton>
             )}
           </ButtonGroup>
@@ -2255,7 +2252,7 @@ export function OrderEntryPage(props: OrderEntryPageProps = {}) {
                 }
               }}
             >
-              {onNavigateToOrders ? t('orderEntry.backToOrders') : t('orderEntry.previous')}
+              {onNavigateToOrders ? l10n('orderEntry.backToOrders') : l10n('orderEntry.previous')}
             </AxButton>
           </ButtonGroup>
         )}
@@ -2281,7 +2278,7 @@ export function OrderEntryPage(props: OrderEntryPageProps = {}) {
                 return currentIndex === 0 || !steps.slice(0, currentIndex).some(s => isStepCompleted(s.key));
               })()}
             >
-              {t('orderEntry.previous')}
+              {l10n('orderEntry.previous')}
             </AxButton>
             <AxButton
               variant="primary"
@@ -2304,7 +2301,7 @@ export function OrderEntryPage(props: OrderEntryPageProps = {}) {
                 return remainingSteps.length === 0 || !remainingSteps.some(s => isStepCompleted(s.key));
               })()}
             >
-              {t('orderEntry.next')}
+              {l10n('orderEntry.next')}
             </AxButton>
           </ButtonGroup>
         )}

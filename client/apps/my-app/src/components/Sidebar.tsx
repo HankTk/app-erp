@@ -144,7 +144,7 @@ const menuItems: MenuItem[] = [
 
 export function Sidebar({ isOpen, onToggle, currentPage, onPageChange, onLogout }: SidebarProps)
 {
-  const { t } = useI18n();
+  const { l10n } = useI18n();
 
   return (
     <>
@@ -152,8 +152,8 @@ export function Sidebar({ isOpen, onToggle, currentPage, onPageChange, onLogout 
       <AxSidebar $isOpen={isOpen} {...debugProps(COMPONENT_NAME, 'AxSidebar')}>
         <AxSidebarHeader {...debugProps(COMPONENT_NAME, 'AxSidebarHeader')}>
           <AxSidebarTitleWrapper>
-            <AxSidebarTitle>{t('sidebar.title')}</AxSidebarTitle>
-            <AxSidebarSubtitle>{t('sidebar.subtitle')}</AxSidebarSubtitle>
+            <AxSidebarTitle>{l10n('sidebar.title')}</AxSidebarTitle>
+            <AxSidebarSubtitle>{l10n('sidebar.subtitle')}</AxSidebarSubtitle>
           </AxSidebarTitleWrapper>
         </AxSidebarHeader>
         <AxMenuList {...debugProps(COMPONENT_NAME, 'AxMenuList')}>
@@ -171,8 +171,8 @@ export function Sidebar({ isOpen, onToggle, currentPage, onPageChange, onLogout 
                 variant={currentPage === item.id ? 'primary' : 'secondary'}
                 disabled={item.disabled === true}
               >
-                {t(item.labelKey)}
-                {item.disabled === true && ` (${t('module.comingSoon')})`}
+                {l10n(item.labelKey)}
+                {item.disabled === true && ` (${l10n('module.comingSoon')})`}
               </AxMenuButton>
             </AxMenuItem>
           ))}
@@ -185,7 +185,7 @@ export function Sidebar({ isOpen, onToggle, currentPage, onPageChange, onLogout 
           }}
           variant="secondary"
         >
-          {t('sidebar.logout')}
+          {l10n('sidebar.logout')}
         </AxLogoutButton>
       </AxSidebar>
     </>
