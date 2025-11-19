@@ -1,57 +1,57 @@
-# ERPシステム 主要モジュール関連図
+# ERP System Main Module Relationship Diagram
 
-## システム全体アーキテクチャ図
+## Overall System Architecture Diagram
 
 ```mermaid
 graph TB
-    subgraph "マスタデータ管理"
+    subgraph "Master Data Management"
         direction TB
-        Customer[顧客<br/>Customer]
-        Vendor[仕入先<br/>Vendor]
-        Product[商品<br/>Product]
-        Warehouse[倉庫<br/>Warehouse]
-        Address[住所<br/>Address]
-        User[ユーザー<br/>User]
+        Customer[Customer<br/>Customer]
+        Vendor[Vendor<br/>Vendor]
+        Product[Product<br/>Product]
+        Warehouse[Warehouse<br/>Warehouse]
+        Address[Address<br/>Address]
+        User[User<br/>User]
     end
 
-    subgraph "販売サイクル"
+    subgraph "Sales Cycle"
         direction TB
-        OE[受注管理<br/>Order Entry<br/>O/E]
-        OE_WF[ワークフロー:<br/>Draft→Approval→<br/>Confirmation→Shipping<br/>→Invoicing→History]
+        OE[Order Entry<br/>Order Entry<br/>O/E]
+        OE_WF[Workflow:<br/>Draft→Approval→<br/>Confirmation→Shipping<br/>→Invoicing→History]
         OE --> OE_WF
     end
 
-    subgraph "購買サイクル"
+    subgraph "Procurement Cycle"
         direction TB
-        PO[発注管理<br/>Purchase Order<br/>P/O]
-        PO_WF[ワークフロー:<br/>Draft→Approval→<br/>Received→Invoicing]
+        PO[Purchase Order<br/>Purchase Order<br/>P/O]
+        PO_WF[Workflow:<br/>Draft→Approval→<br/>Received→Invoicing]
         PO --> PO_WF
     end
 
-    subgraph "在庫管理"
+    subgraph "Inventory Management"
         direction TB
-        IC[在庫管理<br/>Inventory Control<br/>I/C]
-        IC_Adjust[在庫調整機能]
+        IC[Inventory Control<br/>Inventory Control<br/>I/C]
+        IC_Adjust[Inventory Adjustment Function]
         IC --> IC_Adjust
     end
 
-    subgraph "財務管理"
+    subgraph "Financial Management"
         direction TB
-        AR[売掛金管理<br/>Accounts Receivable<br/>A/R]
-        AP[買掛金管理<br/>Accounts Payable<br/>A/P]
-        GL[総勘定元帳<br/>General Ledger<br/>G/L]
-        Reports[財務レポート<br/>Financial Reports]
+        AR[Accounts Receivable<br/>Accounts Receivable<br/>A/R]
+        AP[Accounts Payable<br/>Accounts Payable<br/>A/P]
+        GL[General Ledger<br/>General Ledger<br/>G/L]
+        Reports[Financial Reports<br/>Financial Reports]
     end
 
-    subgraph "返品・製造管理"
+    subgraph "Returns & Manufacturing Management"
         direction TB
-        RMA[返品管理<br/>RMA]
-        RMA_WF[ワークフロー:<br/>Draft→Approval→<br/>Received→Processed]
+        RMA[Return Management<br/>RMA]
+        RMA_WF[Workflow:<br/>Draft→Approval→<br/>Received→Processed]
         RMA --> RMA_WF
-        SFC[製造現場管理<br/>Shop Floor Control<br/>SFC]
+        SFC[Shop Floor Control<br/>Shop Floor Control<br/>SFC]
     end
 
-    %% マスタデータの関係
+    %% Master data relationships
     Customer --> OE
     Product --> OE
     Product --> PO
@@ -61,31 +61,31 @@ graph TB
     Warehouse --> IC
     Product --> IC
 
-    %% 販売サイクルの流れ
-    OE -->|出荷時<br/>Status: SHIPPED| IC_Decrease[在庫減少<br/>自動処理]
-    OE -->|請求時<br/>Status: INVOICED| AR
-    OE -->|リンク可能| RMA
+    %% Sales cycle flow
+    OE -->|On Shipment<br/>Status: SHIPPED| IC_Decrease[Inventory Decrease<br/>Automatic Process]
+    OE -->|On Invoicing<br/>Status: INVOICED| AR
+    OE -->|Linkable| RMA
 
-    %% 購買サイクルの流れ
-    PO -->|受入時<br/>Status: RECEIVED| IC_Increase[在庫増加<br/>自動処理]
-    PO -->|請求時<br/>Status: INVOICED| AP
+    %% Procurement cycle flow
+    PO -->|On Receipt<br/>Status: RECEIVED| IC_Increase[Inventory Increase<br/>Automatic Process]
+    PO -->|On Invoicing<br/>Status: INVOICED| AP
 
-    %% 在庫管理への統合
+    %% Integration with inventory management
     IC_Decrease --> IC
     IC_Increase --> IC
-    RMA -->|受入時<br/>Status: RECEIVED| IC_Restock[在庫再入庫<br/>自動処理]
+    RMA -->|On Receipt<br/>Status: RECEIVED| IC_Restock[Inventory Restocking<br/>Automatic Process]
     IC_Restock --> IC
-    SFC -.->|生産データ| IC
+    SFC -.->|Production Data| IC
 
-    %% 財務管理の流れ
-    AR -->|収益・支払記録| GL
-    AP -->|費用・支払記録| GL
-    GL -->|集計データ| Reports
+    %% Financial management flow
+    AR -->|Revenue & Payment Records| GL
+    AP -->|Expense & Payment Records| GL
+    GL -->|Aggregated Data| Reports
 
-    %% 返品管理の関係
-    RMA -->|元の受注にリンク| OE
+    %% Return management relationships
+    RMA -->|Link to Original Order| OE
 
-    %% スタイル設定
+    %% Style settings
     style Customer fill:#e3f2fd
     style Vendor fill:#e3f2fd
     style Product fill:#e3f2fd
@@ -104,80 +104,80 @@ graph TB
     style Reports fill:#f5f5f5
 ```
 
-## データフロー詳細図
+## Data Flow Detail Diagram
 
 ```mermaid
 sequenceDiagram
-    participant Customer as 顧客
-    participant OE as 受注管理<br/>O/E
-    participant IC as 在庫管理<br/>I/C
-    participant AR as 売掛金<br/>A/R
-    participant GL as 総勘定元帳<br/>G/L
+    participant Customer as Customer
+    participant OE as Order Entry<br/>O/E
+    participant IC as Inventory Control<br/>I/C
+    participant AR as Accounts Receivable<br/>A/R
+    participant GL as General Ledger<br/>G/L
 
-    participant Vendor as 仕入先
-    participant PO as 発注管理<br/>P/O
-    participant AP as 買掛金<br/>A/P
+    participant Vendor as Vendor
+    participant PO as Purchase Order<br/>P/O
+    participant AP as Accounts Payable<br/>A/P
 
-    Note over Customer,GL: 販売サイクル
-    Customer->>OE: 受注作成
-    OE->>OE: 承認プロセス
-    OE->>OE: 出荷指示
-    OE->>IC: 出荷時: 在庫自動減少
-    OE->>AR: 請求時: 売掛金作成
-    AR->>GL: 収益記録
-    Customer->>AR: 支払い
-    AR->>GL: 支払記録
+    Note over Customer,GL: Sales Cycle
+    Customer->>OE: Create Order
+    OE->>OE: Approval Process
+    OE->>OE: Shipping Instruction
+    OE->>IC: On Shipment: Automatic Inventory Decrease
+    OE->>AR: On Invoicing: Create Accounts Receivable
+    AR->>GL: Revenue Record
+    Customer->>AR: Payment
+    AR->>GL: Payment Record
 
-    Note over Vendor,AP: 購買サイクル
-    Vendor->>PO: 発注作成
-    PO->>PO: 承認プロセス
-    PO->>IC: 受入時: 在庫自動増加
-    Vendor->>PO: 納品
-    PO->>AP: 請求時: 買掛金作成
-    AP->>GL: 費用記録
-    AP->>Vendor: 支払い
-    AP->>GL: 支払記録
+    Note over Vendor,AP: Procurement Cycle
+    Vendor->>PO: Create Purchase Order
+    PO->>PO: Approval Process
+    PO->>IC: On Receipt: Automatic Inventory Increase
+    Vendor->>PO: Delivery
+    PO->>AP: On Invoicing: Create Accounts Payable
+    AP->>GL: Expense Record
+    AP->>Vendor: Payment
+    AP->>GL: Payment Record
 
-    Note over GL: 財務レポート生成
-    GL->>GL: 収益・費用・純利益計算
+    Note over GL: Financial Report Generation
+    GL->>GL: Revenue, Expense & Net Income Calculation
 ```
 
-## モジュール間の自動処理トリガー
+## Automatic Process Triggers Between Modules
 
 ```mermaid
 graph LR
-    subgraph "受注管理 O/E"
-        OE_Status[ステータス管理]
+    subgraph "Order Entry O/E"
+        OE_Status[Status Management]
         OE_SHIPPED[SHIPPED]
         OE_INVOICED[INVOICED]
     end
 
-    subgraph "発注管理 P/O"
-        PO_Status[ステータス管理]
+    subgraph "Purchase Order P/O"
+        PO_Status[Status Management]
         PO_RECEIVED[RECEIVED]
         PO_INVOICED[INVOICED]
     end
 
-    subgraph "返品管理 RMA"
-        RMA_Status[ステータス管理]
+    subgraph "Return Management RMA"
+        RMA_Status[Status Management]
         RMA_RECEIVED[RECEIVED]
         RMA_PROCESSED[PROCESSED]
     end
 
-    subgraph "自動処理"
-        Auto_IC_Dec[在庫自動減少]
-        Auto_IC_Inc[在庫自動増加]
-        Auto_IC_Restock[在庫再入庫]
-        Auto_AR[売掛金作成]
-        Auto_AP[買掛金作成]
+    subgraph "Automatic Processes"
+        Auto_IC_Dec[Automatic Inventory Decrease]
+        Auto_IC_Inc[Automatic Inventory Increase]
+        Auto_IC_Restock[Inventory Restocking]
+        Auto_AR[Create Accounts Receivable]
+        Auto_AP[Create Accounts Payable]
     end
 
-    OE_SHIPPED -->|トリガー| Auto_IC_Dec
-    OE_INVOICED -->|トリガー| Auto_AR
-    PO_RECEIVED -->|トリガー| Auto_IC_Inc
-    PO_INVOICED -->|トリガー| Auto_AP
-    RMA_RECEIVED -->|トリガー| Auto_IC_Restock
-    RMA_PROCESSED -->|トリガー| Auto_IC_Restock
+    OE_SHIPPED -->|Trigger| Auto_IC_Dec
+    OE_INVOICED -->|Trigger| Auto_AR
+    PO_RECEIVED -->|Trigger| Auto_IC_Inc
+    PO_INVOICED -->|Trigger| Auto_AP
+    RMA_RECEIVED -->|Trigger| Auto_IC_Restock
+    RMA_PROCESSED -->|Trigger| Auto_IC_Restock
 
     style OE_SHIPPED fill:#e1f5ff
     style OE_INVOICED fill:#e1f5ff
@@ -192,43 +192,43 @@ graph LR
     style Auto_AP fill:#fce4ec
 ```
 
-## 財務統合フロー
+## Financial Integration Flow
 
 ```mermaid
 graph TB
-    subgraph "収益サイクル"
-        OE[受注管理]
-        Invoice[請求書発行]
-        AR[売掛金管理]
-        Payment[入金処理]
+    subgraph "Revenue Cycle"
+        OE[Order Entry]
+        Invoice[Invoice Issuance]
+        AR[Accounts Receivable]
+        Payment[Payment Processing]
     end
 
-    subgraph "費用サイクル"
-        PO[発注管理]
-        PO_Invoice[仕入先請求書]
-        AP[買掛金管理]
-        PO_Payment[支払処理]
+    subgraph "Expense Cycle"
+        PO[Purchase Order]
+        PO_Invoice[Vendor Invoice]
+        AP[Accounts Payable]
+        PO_Payment[Payment Processing]
     end
 
-    subgraph "財務統合"
-        GL[総勘定元帳]
-        GL_Revenue[収益項目]
-        GL_Expense[費用項目]
-        GL_Payment[支払項目]
-        NetIncome[純利益計算]
+    subgraph "Financial Integration"
+        GL[General Ledger]
+        GL_Revenue[Revenue Items]
+        GL_Expense[Expense Items]
+        GL_Payment[Payment Items]
+        NetIncome[Net Income Calculation]
     end
 
     OE --> Invoice
     Invoice --> AR
     AR --> Payment
-    AR -->|収益データ| GL_Revenue
-    Payment -->|支払データ| GL_Payment
+    AR -->|Revenue Data| GL_Revenue
+    Payment -->|Payment Data| GL_Payment
 
     PO --> PO_Invoice
     PO_Invoice --> AP
     AP --> PO_Payment
-    AP -->|費用データ| GL_Expense
-    PO_Payment -->|支払データ| GL_Payment
+    AP -->|Expense Data| GL_Expense
+    PO_Payment -->|Payment Data| GL_Payment
 
     GL_Revenue --> GL
     GL_Expense --> GL
@@ -243,36 +243,36 @@ graph TB
     style NetIncome fill:#c8e6c9
 ```
 
-## 在庫管理統合フロー
+## Inventory Management Integration Flow
 
 ```mermaid
 graph TB
-    subgraph "在庫増加要因"
-        PO_Received[発注受入<br/>P/O: RECEIVED]
-        RMA_Received[返品受入<br/>RMA: RECEIVED]
-        SFC_Production[生産完了<br/>SFC]
-        Manual_Adjust[手動調整]
+    subgraph "Inventory Increase Factors"
+        PO_Received[Purchase Order Receipt<br/>P/O: RECEIVED]
+        RMA_Received[Return Receipt<br/>RMA: RECEIVED]
+        SFC_Production[Production Completion<br/>SFC]
+        Manual_Adjust[Manual Adjustment]
     end
 
-    subgraph "在庫減少要因"
-        OE_Shipped[受注出荷<br/>O/E: SHIPPED]
-        Manual_Decrease[手動調整]
+    subgraph "Inventory Decrease Factors"
+        OE_Shipped[Order Shipment<br/>O/E: SHIPPED]
+        Manual_Decrease[Manual Adjustment]
     end
 
-    subgraph "在庫管理 I/C"
-        IC[在庫管理システム]
-        IC_ByWarehouse[倉庫別在庫]
-        IC_ByProduct[商品別在庫]
-        IC_Adjustment[在庫調整機能]
+    subgraph "Inventory Control I/C"
+        IC[Inventory Control System]
+        IC_ByWarehouse[Inventory by Warehouse]
+        IC_ByProduct[Inventory by Product]
+        IC_Adjustment[Inventory Adjustment Function]
     end
 
-    PO_Received -->|自動増加| IC
-    RMA_Received -->|自動再入庫| IC
-    SFC_Production -.->|生産データ| IC
-    Manual_Adjust -->|手動調整| IC_Adjustment
+    PO_Received -->|Automatic Increase| IC
+    RMA_Received -->|Automatic Restocking| IC
+    SFC_Production -.->|Production Data| IC
+    Manual_Adjust -->|Manual Adjustment| IC_Adjustment
 
-    OE_Shipped -->|自動減少| IC
-    Manual_Decrease -->|手動調整| IC_Adjustment
+    OE_Shipped -->|Automatic Decrease| IC
+    Manual_Decrease -->|Manual Adjustment| IC_Adjustment
 
     IC --> IC_ByWarehouse
     IC --> IC_ByProduct
@@ -285,23 +285,23 @@ graph TB
     style IC_Adjustment fill:#ffebee
 ```
 
-## モジュール依存関係マップ
+## Module Dependency Map
 
 ```mermaid
 graph TD
-    subgraph "コアモジュール"
-        Master[マスタ管理]
-        IC[在庫管理]
-        GL[総勘定元帳]
+    subgraph "Core Modules"
+        Master[Master Management]
+        IC[Inventory Control]
+        GL[General Ledger]
     end
 
-    subgraph "業務モジュール"
-        OE[受注管理]
-        PO[発注管理]
-        AR[売掛金]
-        AP[買掛金]
-        RMA[返品管理]
-        SFC[製造現場管理]
+    subgraph "Business Modules"
+        OE[Order Entry]
+        PO[Purchase Order]
+        AR[Accounts Receivable]
+        AP[Accounts Payable]
+        RMA[Return Management]
+        SFC[Shop Floor Control]
     end
 
     Master --> OE
@@ -335,76 +335,75 @@ graph TD
     style SFC fill:#f1f8e9
 ```
 
-## ワークフロー状態遷移図
+## Workflow State Transition Diagram
 
 ```mermaid
 stateDiagram-v2
-    [*] --> Draft: 作成
+    [*] --> Draft: Create
 
-    state "受注管理 O/E" as OE {
-        Draft --> Approval: 提出
-        Approval --> Confirmation: 承認
-        Confirmation --> ShippingInstruction: 確認
-        ShippingInstruction --> Shipping: 出荷指示
-        Shipping --> Invoicing: 出荷完了
-        Invoicing --> History: 請求完了
+    state "Order Entry O/E" as OE {
+        Draft --> Approval: Submit
+        Approval --> Confirmation: Approve
+        Confirmation --> ShippingInstruction: Confirm
+        ShippingInstruction --> Shipping: Shipping Instruction
+        Shipping --> Invoicing: Shipment Complete
+        Invoicing --> History: Invoicing Complete
         History --> [*]
     }
 
-    state "発注管理 P/O" as PO {
-        [*] --> Draft: 作成
-        Draft --> Approval: 提出
-        Approval --> Received: 承認
-        Received --> Invoicing: 受入完了
-        Invoicing --> History: 請求完了
+    state "Purchase Order P/O" as PO {
+        [*] --> Draft: Create
+        Draft --> Approval: Submit
+        Approval --> Received: Approve
+        Received --> Invoicing: Receipt Complete
+        Invoicing --> History: Invoicing Complete
         History --> [*]
     }
 
-    state "返品管理 RMA" as RMA {
-        [*] --> Draft: 作成
-        Draft --> PendingApproval: 提出
-        PendingApproval --> Approved: 承認
-        Approved --> Received: 返品受入
-        Received --> Processed: 処理完了
+    state "Return Management RMA" as RMA {
+        [*] --> Draft: Create
+        Draft --> PendingApproval: Submit
+        PendingApproval --> Approved: Approve
+        Approved --> Received: Return Receipt
+        Received --> Processed: Processing Complete
         Processed --> [*]
         
-        Draft --> Cancelled: キャンセル
-        PendingApproval --> Cancelled: キャンセル
-        Approved --> Cancelled: キャンセル
-        Received --> Cancelled: キャンセル
+        Draft --> Cancelled: Cancel
+        PendingApproval --> Cancelled: Cancel
+        Approved --> Cancelled: Cancel
+        Received --> Cancelled: Cancel
         Cancelled --> [*]
     }
 
     note right of Shipping
-        在庫自動減少
+        Automatic Inventory Decrease
     end note
 
     note right of Received
-        在庫自動増加
+        Automatic Inventory Increase
     end note
 
     note right of Invoicing
-        売掛金/買掛金作成
+        Create Accounts Receivable/Payable
     end note
 ```
 
-## モジュール一覧表
+## Module List Table
 
-| モジュール | 略称 | 主要機能 | 自動処理トリガー |
-|----------|------|---------|----------------|
-| **受注管理** | O/E | 顧客受注の全ライフサイクル管理 | SHIPPED → 在庫減少<br/>INVOICED → 売掛金作成 |
-| **発注管理** | P/O | 仕入先発注の全ライフサイクル管理 | RECEIVED → 在庫増加<br/>INVOICED → 買掛金作成 |
-| **在庫管理** | I/C | 倉庫別・商品別在庫追跡・調整 | 受注・発注・RMAから自動更新 |
-| **売掛金管理** | A/R | 顧客請求書・入金管理 | 受注請求時自動作成 |
-| **買掛金管理** | A/P | 仕入先請求書・支払管理 | 発注請求時自動作成 |
-| **総勘定元帳** | G/L | 全財務取引の集約・レポート | 売掛金・買掛金から自動集計 |
-| **返品管理** | RMA | 顧客返品の承認・処理 | RECEIVED → 在庫再入庫 |
-| **製造現場管理** | SFC | 製造・生産オペレーション管理 | 生産データ → 在庫更新 |
-| **マスタ管理** | - | 顧客・商品・仕入先・倉庫等の基本データ | - |
+| Module | Abbreviation | Main Functions | Automatic Process Triggers |
+|--------|-------------|----------------|---------------------------|
+| **Order Entry** | O/E | Full lifecycle management of customer orders | SHIPPED → Inventory Decrease<br/>INVOICED → Create Accounts Receivable |
+| **Purchase Order** | P/O | Full lifecycle management of vendor orders | RECEIVED → Inventory Increase<br/>INVOICED → Create Accounts Payable |
+| **Inventory Control** | I/C | Warehouse and product-based inventory tracking and adjustment | Auto-update from Orders, Purchase Orders, and RMA |
+| **Accounts Receivable** | A/R | Customer invoice and payment management | Auto-created on order invoicing |
+| **Accounts Payable** | A/P | Vendor invoice and payment management | Auto-created on purchase order invoicing |
+| **General Ledger** | G/L | Aggregation and reporting of all financial transactions | Auto-aggregation from Accounts Receivable and Payable |
+| **Return Management** | RMA | Approval and processing of customer returns | RECEIVED → Inventory Restocking |
+| **Shop Floor Control** | SFC | Manufacturing and production operations management | Production Data → Inventory Update |
+| **Master Management** | - | Basic data for customers, products, vendors, warehouses, etc. | - |
 
 ---
 
-**作成日**: 2024年
-**システム**: ERP System (my-app)
-**バージョン**: v2.3.0+
-
+**Created**: 2024
+**System**: ERP System (my-app)
+**Version**: v2.3.0+

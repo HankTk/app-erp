@@ -316,11 +316,11 @@ export const AxListbox: React.FC<AxListboxProps> = ({
   disabled = false,
   error = false,
   fullWidth = false,
-  placeholder = '選択してください',
+  placeholder = 'Please select',
   size = 'medium',
   searchable = false,
-  searchPlaceholder = '検索...',
-  noResultsText = '該当する結果がありません',
+  searchPlaceholder = 'Search...',
+  noResultsText = 'No results found',
   style,
   className,
 }) => {
@@ -424,7 +424,7 @@ export const AxListbox: React.FC<AxListboxProps> = ({
       if (selectedOptions.length === 1) {
         return selectedOptions[0].label;
       }
-      return `${selectedOptions.length}個選択中`;
+      return `${selectedOptions.length} selected`;
     } else {
       const selectedOption = options.find((opt) => opt.value === value);
       return selectedOption ? selectedOption.label : placeholder;

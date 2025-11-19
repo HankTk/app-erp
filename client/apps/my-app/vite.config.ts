@@ -25,7 +25,7 @@ export default defineConfig({
   server:
   {
     port: 3001,
-    strictPort: true, // ポートが使用中の場合はエラーを出す（自動的に次のポートに切り替えない）
+    strictPort: true, // Throw error if port is in use (don't automatically switch to next port)
     open: false,
   },
   resolve:

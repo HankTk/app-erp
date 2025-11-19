@@ -1,13 +1,13 @@
 /**
- * DOMエレメントからソースコードを特定するための追加ヘルパー
+ * Additional helper to identify source code from DOM elements
  * 
- * このファイルには、ブラウザの開発者ツールで使用できる便利な関数が含まれています。
- * コンソールにコピー＆ペーストして使用できます。
+ * This file contains convenient functions that can be used in browser developer tools.
+ * You can copy and paste them into the console to use.
  */
 
 /**
- * 要素をクリックしたときに、その要素のデバッグ情報をコンソールに表示する
- * 使用方法: ブラウザのコンソールに貼り付けて実行
+ * Display debug information in the console when an element is clicked
+ * Usage: Copy and paste into the browser console to execute
  */
 export const enableClickDebug = () => {
   if (typeof window === 'undefined') return;
@@ -39,7 +39,7 @@ export const enableClickDebug = () => {
 };
 
 /**
- * 特定のコンポーネント名で要素を検索
+ * Find elements by specific component name
  */
 export const findElementsByComponent = (componentName: string) => {
   if (typeof document === 'undefined') return [];
@@ -47,7 +47,7 @@ export const findElementsByComponent = (componentName: string) => {
 };
 
 /**
- * 特定の要素名で要素を検索
+ * Find elements by specific element name
  */
 export const findElementsByElement = (elementName: string) => {
   if (typeof document === 'undefined') return [];
@@ -55,7 +55,7 @@ export const findElementsByElement = (elementName: string) => {
 };
 
 /**
- * すべてのデバッグ要素を一覧表示
+ * List all debug elements
  */
 export const listAllDebugElements = () => {
   if (typeof document === 'undefined') return [];

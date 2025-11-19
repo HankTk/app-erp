@@ -332,7 +332,7 @@ export function OrderEntryPage(props: OrderEntryPageProps = {}) {
                 setCurrentEntrySubStep('customer');
             }
             
-            // 履歴データを読み込む（既にjsonDataから読み込まれている）
+            // Load history data (already loaded from jsonData)
             return;
           } else {
             throw new Error('Order not found');
@@ -548,14 +548,14 @@ export function OrderEntryPage(props: OrderEntryPageProps = {}) {
         status: 'PENDING_APPROVAL',
       });
       setOrder(updated);
-      // 履歴に記録（更新されたorderを使用）
-      await addHistoryRecord('entry', '受注入力', undefined, 'PENDING_APPROVAL', {
+      // Record in history (using updated order)
+      await addHistoryRecord('entry', l10n('orderEntry.history.step.entry'), undefined, 'PENDING_APPROVAL', {
         customerId: updated.customerId,
         itemCount: updated.items?.length || 0,
         total: updated.total,
       }, updated);
       alert('Order submitted for approval successfully!');
-      // オーダー一覧に戻る
+      // Navigate back to order list
       if (onNavigateToOrders) {
         onNavigateToOrders();
       }
@@ -584,7 +584,7 @@ export function OrderEntryPage(props: OrderEntryPageProps = {}) {
         jsonData,
       });
       setOrder(updated);
-      // 履歴に記録（更新されたorderを使用）
+      // Record in history (using updated order)
       await addHistoryRecord('approval', l10n('orderEntry.history.step.approval'), approvalNotes, 'APPROVED', {
         creditCheckPassed,
         inventoryConfirmed,
@@ -611,7 +611,7 @@ export function OrderEntryPage(props: OrderEntryPageProps = {}) {
         jsonData,
       });
       setOrder(updated);
-      // 履歴に記録（更新されたorderを使用）
+      // Record in history (using updated order)
       await addHistoryRecord('confirmation', l10n('orderEntry.history.step.confirmation'), undefined, 'APPROVED', {
         orderNumber: updated.orderNumber,
       }, updated);
@@ -637,7 +637,7 @@ export function OrderEntryPage(props: OrderEntryPageProps = {}) {
         jsonData,
       });
       setOrder(updated);
-      // 履歴に記録（更新されたorderを使用）
+      // Record in history (using updated order)
       await addHistoryRecord('shipping_instruction', l10n('orderEntry.history.step.shippingInstruction'), shippingInstructions, 'SHIPPING_INSTRUCTED', {
         requestedShipDate,
       }, updated);
@@ -664,7 +664,7 @@ export function OrderEntryPage(props: OrderEntryPageProps = {}) {
         jsonData,
       });
       setOrder(updated);
-      // 履歴に記録（更新されたorderを使用）
+      // Record in history (using updated order)
       await addHistoryRecord('shipping', l10n('orderEntry.history.step.shipping'), undefined, 'SHIPPED', {
         shipDate,
         trackingNumber,
@@ -695,7 +695,7 @@ export function OrderEntryPage(props: OrderEntryPageProps = {}) {
         jsonData,
       });
       setOrder(updated);
-      // 履歴に記録（更新されたorderを使用）
+      // Record in history (using updated order)
       await addHistoryRecord('invoicing', l10n('orderEntry.history.step.invoicing'), undefined, 'INVOICED', {
         invoiceNumber,
         invoiceDate,
@@ -808,7 +808,7 @@ export function OrderEntryPage(props: OrderEntryPageProps = {}) {
       case 'invoicing':
         return order.status === 'INVOICED' || order.status === 'PAID';
       case 'history':
-        return true; // 履歴ページは常にアクセス可能
+        return true; // History page is always accessible
       default:
         return false;
     }
@@ -842,7 +842,7 @@ export function OrderEntryPage(props: OrderEntryPageProps = {}) {
       case 'invoicing':
         return !!invoiceNumber && !!invoiceDate;
       case 'history':
-        return true; // 履歴ページは常に進むことができる
+        return true; // History page can always proceed
       default:
         return false;
     }
@@ -931,15 +931,15 @@ export function OrderEntryPage(props: OrderEntryPageProps = {}) {
   const handleAddNote = async (note: string) => {
     if (!order?.id) return;
     try {
-      // 備考をorder.notesに追加（既存の備考がある場合は改行で追加）
+      // Add note to order.notes (append with newline if existing notes exist)
       const updatedNotes = order.notes ? `${order.notes}\n\n${note}` : note;
       const updated = await updateOrder(order.id, {
         ...order,
         notes: updatedNotes,
       });
       setOrder(updated);
-      // 履歴にも記録（更新されたorderを使用）
-      await addHistoryRecord('note', '備考', note, undefined, undefined, updated);
+      // Also record in history (using updated order)
+      await addHistoryRecord('note', l10n('orderEntry.history.step.note'), note, undefined, undefined, updated);
     } catch (err) {
       console.error('Error adding note:', err);
       throw err;
@@ -1146,8 +1146,8 @@ export function OrderEntryPage(props: OrderEntryPageProps = {}) {
         status: newStatus as Order['status'],
       });
       setOrder(updated);
-      // 履歴に記録（更新されたorderを使用）
-      await addHistoryRecord('status_change', 'ステータス変更', undefined, newStatus, {
+      // Record in history (using updated order)
+      await addHistoryRecord('status_change', l10n('orderEntry.history.step.statusChange'), undefined, newStatus, {
         oldStatus: oldStatus,
         newStatus: newStatus,
       }, updated);
