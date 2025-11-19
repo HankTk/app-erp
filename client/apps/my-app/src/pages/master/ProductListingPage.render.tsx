@@ -1,10 +1,5 @@
 import {
   AxTable,
-  AxTableHead,
-  AxTableBody,
-  AxTableRow,
-  AxTableHeader,
-  AxTableCell,
   AxCard,
   AxHeading3,
   AxParagraph,
@@ -14,6 +9,7 @@ import {
   AxLabel,
   AxFormGroup,
   AxCheckbox,
+  ColumnDefinition,
 } from '@ui/components';
 import { debugProps } from '../../utils/emotionCache';
 import { Product } from '../../api/productApi';
@@ -35,51 +31,51 @@ type ListingRenderContext = {
   onDeleteClick: (product: Product) => void;
 };
 
-const LISTING_TABLE_COLUMNS = [
+const createColumns = (): ColumnDefinition<Product, ListingRenderContext>[] => [
   { 
     key: 'product.productCode',
-    label: 'Product Code',
-    align: undefined as 'left' | 'right' | 'center' | undefined,
+    header: 'Product Code',
+    align: undefined,
     render: (product: Product) => product.productCode || ''
   },
   { 
     key: 'product.productName',
-    label: 'Product Name',
-    align: undefined as 'left' | 'right' | 'center' | undefined,
+    header: 'Product Name',
+    align: undefined,
     render: (product: Product) => product.productName || ''
   },
   { 
     key: 'product.description',
-    label: 'Description',
-    align: undefined as 'left' | 'right' | 'center' | undefined,
+    header: 'Description',
+    align: undefined,
     render: (product: Product) => product.description || ''
   },
   { 
     key: 'product.unitPrice',
-    label: 'Unit Price',
-    align: 'right' as const,
+    header: 'Unit Price',
+    align: 'right',
     render: (product: Product) => product.unitPrice !== undefined && product.unitPrice !== null 
       ? `$${product.unitPrice.toFixed(2)}` 
       : ''
   },
   { 
     key: 'product.cost',
-    label: 'Cost',
-    align: 'right' as const,
+    header: 'Cost',
+    align: 'right',
     render: (product: Product) => product.cost !== undefined && product.cost !== null 
       ? `$${product.cost.toFixed(2)}` 
       : '-'
   },
   { 
     key: 'product.unitOfMeasure',
-    label: 'Unit of Measure',
-    align: undefined as 'left' | 'right' | 'center' | undefined,
+    header: 'Unit of Measure',
+    align: undefined,
     render: (product: Product) => product.unitOfMeasure || ''
   },
   { 
     key: 'product.active',
-    label: 'Active',
-    align: 'center' as const,
+    header: 'Active',
+    align: 'center',
     render: (product: Product) => (
       <span style={{ 
         color: product.active ? 'var(--color-success)' : 'var(--color-text-secondary)',
@@ -91,14 +87,14 @@ const LISTING_TABLE_COLUMNS = [
   },
   { 
     key: 'product.actions',
-    label: 'Actions',
-    align: 'center' as const,
-    render: (product: Product, context: ListingRenderContext) => (
+    header: 'Actions',
+    align: 'center',
+    render: (product: Product, context) => (
       <div style={{ display: 'flex', gap: 'var(--spacing-sm)', justifyContent: 'center' }}>
         <AxButton 
           variant="secondary" 
           size="small"
-          onClick={() => context.onEdit(product)}
+          onClick={() => context?.onEdit(product)}
           style={{ minWidth: '80px' }}
         >
           Edit
@@ -106,7 +102,7 @@ const LISTING_TABLE_COLUMNS = [
         <AxButton 
           variant="danger" 
           size="small"
-          onClick={() => context.onDeleteClick(product)}
+          onClick={() => context?.onDeleteClick(product)}
           style={{ minWidth: '80px' }}
         >
           Delete
@@ -158,6 +154,12 @@ export function ProductListingPageRender(props: ProductListingPageRenderProps) {
     onFormDataChange,
     onRetry,
   } = props;
+
+  const columns = createColumns();
+  const tableContext: ListingRenderContext = {
+    onEdit,
+    onDeleteClick,
+  };
 
   if (loading) {
     return (
@@ -274,34 +276,14 @@ export function ProductListingPageRender(props: ProductListingPageRenderProps) {
               <AxParagraph>No products found</AxParagraph>
             </div>
           ) : (
-            <AxTable fullWidth stickyHeader>
-              <AxTableHead>
-                <AxTableRow>
-                  {LISTING_TABLE_COLUMNS.map((column) => (
-                    <AxTableHeader key={column.key} align={column.align}>
-                      {column.label}
-                    </AxTableHeader>
-                  ))}
-                </AxTableRow>
-              </AxTableHead>
-              <AxTableBody>
-                {products.map((product) => {
-                  const context: ListingRenderContext = {
-                    onEdit,
-                    onDeleteClick,
-                  };
-                  return (
-                    <AxTableRow key={product.id}>
-                      {LISTING_TABLE_COLUMNS.map((column) => (
-                        <AxTableCell key={column.key} align={column.align}>
-                          {column.render(product, context)}
-                        </AxTableCell>
-                      ))}
-                    </AxTableRow>
-                  );
-                })}
-              </AxTableBody>
-            </AxTable>
+            <AxTable
+              fullWidth
+              stickyHeader
+              data={products}
+              columns={columns}
+              context={tableContext}
+              getRowKey={(product) => product.id || ''}
+            />
           )}
         </div>
       </TableCard>

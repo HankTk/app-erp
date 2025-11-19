@@ -1,16 +1,10 @@
 import {
   AxTable,
-  AxTableHead,
-  AxTableBody,
-  AxTableRow,
-  AxTableHeader,
-  AxTableCell,
   AxCard,
-  AxHeading3,
   AxParagraph,
   AxButton,
-  AxFormGroup,
   AxListbox,
+  ColumnDefinition,
 } from '@ui/components';
 import { useI18n } from '../../i18n/I18nProvider';
 import { debugProps } from '../../utils/emotionCache';
@@ -27,7 +21,6 @@ import {
   HeadingWithMargin,
   ParagraphSecondary,
   ParagraphDanger,
-  FormGroupNoMargin,
   TableContainer,
   LoadingContainer,
   StatusBadge,
@@ -43,47 +36,55 @@ type ListingRenderContext = {
   onViewInvoice?: (prId: string) => void;
 };
 
-const LISTING_TABLE_COLUMNS = [
+const createColumns = (l10n: (key: string) => string): ColumnDefinition<PurchaseOrder, ListingRenderContext>[] => [
   { 
     key: 'accountsPayable.invoiceNumber',
-    align: undefined as 'left' | 'right' | 'center' | undefined,
-    render: (invoice: PurchaseOrder, context: ListingRenderContext) => invoice.invoiceNumber || 'N/A'
+    header: l10n('accountsPayable.invoiceNumber'),
+    align: undefined,
+    render: (invoice: PurchaseOrder) => invoice.invoiceNumber || 'N/A'
   },
   { 
     key: 'accountsPayable.orderNumber',
-    align: undefined as 'left' | 'right' | 'center' | undefined,
-    render: (invoice: PurchaseOrder, context: ListingRenderContext) => invoice.orderNumber || invoice.id?.substring(0, 8) || 'N/A'
+    header: l10n('accountsPayable.orderNumber'),
+    align: undefined,
+    render: (invoice: PurchaseOrder) => invoice.orderNumber || invoice.id?.substring(0, 8) || 'N/A'
   },
   { 
     key: 'accountsPayable.supplier',
-    align: undefined as 'left' | 'right' | 'center' | undefined,
-    render: (invoice: PurchaseOrder, context: ListingRenderContext) => context.getSupplierName(invoice.supplierId)
+    header: l10n('accountsPayable.supplier'),
+    align: undefined,
+    render: (invoice: PurchaseOrder, context) => context?.getSupplierName(invoice.supplierId) || 'N/A'
   },
   { 
     key: 'accountsPayable.invoiceDate',
-    align: undefined as 'left' | 'right' | 'center' | undefined,
-    render: (invoice: PurchaseOrder, context: ListingRenderContext) => context.formatDate(invoice.invoiceDate)
+    header: l10n('accountsPayable.invoiceDate'),
+    align: undefined,
+    render: (invoice: PurchaseOrder, context) => context?.formatDate(invoice.invoiceDate) || 'N/A'
   },
   { 
     key: 'accountsPayable.dueDate',
-    align: undefined as 'left' | 'right' | 'center' | undefined,
-    render: (invoice: PurchaseOrder, context: ListingRenderContext) => context.formatDate(invoice.invoiceDate)
+    header: l10n('accountsPayable.dueDate'),
+    align: undefined,
+    render: (invoice: PurchaseOrder, context) => context?.formatDate(invoice.invoiceDate) || 'N/A'
   },
   { 
     key: 'accountsPayable.total',
-    align: 'right' as const,
+    header: l10n('accountsPayable.total'),
+    align: 'right',
     render: (invoice: PurchaseOrder) => `$${(invoice.total?.toFixed(2) || '0.00')}`
   },
   { 
     key: 'accountsPayable.paid',
-    align: 'right' as const,
+    header: l10n('accountsPayable.paid'),
+    align: 'right',
     render: (invoice: PurchaseOrder) => `$${((invoice.jsonData?.paymentAmount || 0).toFixed(2))}`
   },
   { 
     key: 'accountsPayable.outstanding',
-    align: 'right' as const,
-    render: (invoice: PurchaseOrder, context: ListingRenderContext) => {
-      const outstanding = context.calculateOutstandingAmount(invoice);
+    header: l10n('accountsPayable.outstanding'),
+    align: 'right',
+    render: (invoice: PurchaseOrder, context) => {
+      const outstanding = context?.calculateOutstandingAmount(invoice) || 0;
       return (
         <span style={{
           color: outstanding > 0 ? 'var(--color-warning)' : 'var(--color-success)',
@@ -96,18 +97,20 @@ const LISTING_TABLE_COLUMNS = [
   },
   { 
     key: 'accountsPayable.status',
-    align: undefined as 'left' | 'right' | 'center' | undefined,
-    render: (invoice: PurchaseOrder, context: ListingRenderContext) => (
+    header: l10n('accountsPayable.status'),
+    align: undefined,
+    render: (invoice: PurchaseOrder, context) => (
       <StatusBadge $status={invoice.status as 'PAID' | 'INVOICED'}>
-        {invoice.status === 'PAID' ? context.l10n('accountsPayable.status.paid') : context.l10n('accountsPayable.status.invoiced')}
+        {invoice.status === 'PAID' ? context?.l10n('accountsPayable.status.paid') : context?.l10n('accountsPayable.status.invoiced')}
       </StatusBadge>
     )
   },
   { 
     key: 'accountsPayable.actions',
-    align: undefined as 'left' | 'right' | 'center' | undefined,
-    render: (invoice: PurchaseOrder, context: ListingRenderContext) => {
-      if (context.onViewInvoice && invoice.id) {
+    header: l10n('accountsPayable.actions'),
+    align: undefined,
+    render: (invoice: PurchaseOrder, context) => {
+      if (context?.onViewInvoice && invoice.id) {
         return (
           <AxButton variant="secondary" size="small" onClick={() => context.onViewInvoice!(invoice.id!)}>
             {context.l10n('accountsPayable.view')}
@@ -135,7 +138,6 @@ interface AccountPayableListingPageRenderProps {
 
 export function AccountPayableListingPageRender(props: AccountPayableListingPageRenderProps) {
   const {
-    invoices,
     loading,
     error,
     statusFilter,
@@ -149,6 +151,14 @@ export function AccountPayableListingPageRender(props: AccountPayableListingPage
   } = props;
   
   const { l10n } = useI18n();
+  const columns = createColumns(l10n);
+  const tableContext: ListingRenderContext = {
+    getSupplierName,
+    formatDate,
+    calculateOutstandingAmount,
+    l10n,
+    onViewInvoice,
+  };
 
   return (
     <PageContainer {...debugProps(COMPONENT_NAME, 'PageContainer')}>
@@ -173,10 +183,10 @@ export function AccountPayableListingPageRender(props: AccountPayableListingPage
             </HeaderTitleContainer>
           </HeaderLeft>
           <HeaderRight {...debugProps(COMPONENT_NAME, 'HeaderRight')}>
-            <FormGroupNoMargin>
+            <div style={{ margin: 0 }}>
               <AxListbox
                 value={statusFilter || ''}
-                onChange={(value: string | null) => onStatusFilterChange(value || null)}
+                onChange={(value: string | string[]) => onStatusFilterChange(Array.isArray(value) ? value[0] || null : value || null)}
                 options={[
                   { value: '', label: l10n('accountsPayable.filter.all') },
                   { value: 'INVOICED', label: l10n('accountsPayable.status.invoiced') },
@@ -184,7 +194,7 @@ export function AccountPayableListingPageRender(props: AccountPayableListingPage
                 ]}
                 placeholder={l10n('accountsPayable.filter.placeholder')}
               />
-            </FormGroupNoMargin>
+            </div>
           </HeaderRight>
         </HeaderSection>
       </HeaderCard>
@@ -206,37 +216,14 @@ export function AccountPayableListingPageRender(props: AccountPayableListingPage
               <AxParagraph>{l10n('accountsPayable.noData')}</AxParagraph>
             </LoadingContainer>
           ) : (
-            <AxTable fullWidth stickyHeader>
-            <AxTableHead>
-              <AxTableRow>
-                {LISTING_TABLE_COLUMNS.map((column) => (
-                  <AxTableHeader key={column.key} align={column.align}>
-                    {l10n(column.key)}
-                  </AxTableHeader>
-                ))}
-              </AxTableRow>
-            </AxTableHead>
-            <AxTableBody>
-              {filteredInvoices.map((invoice) => {
-                const context: ListingRenderContext = {
-                  getSupplierName,
-                  formatDate,
-                  calculateOutstandingAmount,
-                  l10n,
-                  onViewInvoice,
-                };
-                return (
-                  <AxTableRow key={invoice.id}>
-                    {LISTING_TABLE_COLUMNS.map((column) => (
-                      <AxTableCell key={column.key} align={column.align}>
-                        {column.render(invoice, context)}
-                      </AxTableCell>
-                    ))}
-                  </AxTableRow>
-                );
-              })}
-            </AxTableBody>
-          </AxTable>
+            <AxTable
+              fullWidth
+              stickyHeader
+              data={filteredInvoices}
+              columns={columns}
+              context={tableContext}
+              getRowKey={(invoice) => invoice.id || ''}
+            />
           )}
         </TableContainer>
       </TableCard>

@@ -14,7 +14,7 @@ export type { AxCardProps } from './components/AxCard';
 export type { AxInputProps } from './components/AxInput';
 export type { AxCheckboxProps } from './components/AxCheckbox';
 export type { AxRadioProps } from './components/AxRadio';
-export type { AxTableProps, AxTableRowProps, AxTableHeaderProps, AxTableCellProps } from './components/AxTable';
+export type { AxTableProps, AxTableRowProps, AxTableHeaderProps, AxTableCellProps, ColumnDefinition } from './components/AxTable';
 export type { AxChartProps } from './components/AxChart';
 export type { AxDialogProps } from './components/AxDialog';
 export type { AxDateRangePickerProps } from './components/AxDateRangePicker';

@@ -1,10 +1,5 @@
 import {
   AxTable,
-  AxTableHead,
-  AxTableBody,
-  AxTableRow,
-  AxTableHeader,
-  AxTableCell,
   AxCard,
   AxHeading3,
   AxParagraph,
@@ -12,6 +7,7 @@ import {
   AxDialog,
   AxFormGroup,
   AxListbox,
+  ColumnDefinition,
 } from '@ui/components';
 import { debugProps } from '../../utils/emotionCache';
 import { Order } from '../../api/orderApi';
@@ -37,70 +33,70 @@ type ListingRenderContext = {
   onDeleteClick: (order: Order) => void;
 };
 
-const LISTING_TABLE_COLUMNS = [
+const createColumns = (): ColumnDefinition<Order, ListingRenderContext>[] => [
   { 
     key: 'order.orderNumber',
-    label: 'Order Number',
-    align: undefined as 'left' | 'right' | 'center' | undefined,
-    render: (order: Order, context: ListingRenderContext) => order.orderNumber || order.id?.substring(0, 8) || 'N/A'
+    header: 'Order Number',
+    align: undefined,
+    render: (order: Order) => order.orderNumber || order.id?.substring(0, 8) || 'N/A'
   },
   { 
     key: 'order.customer',
-    label: 'Customer',
-    align: undefined as 'left' | 'right' | 'center' | undefined,
-    render: (order: Order, context: ListingRenderContext) => context.getCustomerName(order.customerId)
+    header: 'Customer',
+    align: undefined,
+    render: (order: Order, context) => context?.getCustomerName(order.customerId) || 'N/A'
   },
   { 
     key: 'order.status',
-    label: 'Status',
-    align: undefined as 'left' | 'right' | 'center' | undefined,
-    render: (order: Order, context: ListingRenderContext) => (
+    header: 'Status',
+    align: undefined,
+    render: (order: Order, context) => (
       <span 
         style={{ 
-          color: context.getStatusColor(order.status), 
+          color: context?.getStatusColor(order.status) || 'var(--color-text-primary)', 
           fontWeight: 600,
           padding: '4px 12px',
           borderRadius: '12px',
-          backgroundColor: context.getStatusBackgroundColor(order.status),
+          backgroundColor: context?.getStatusBackgroundColor(order.status) || 'transparent',
           display: 'inline-block',
           fontSize: 'var(--font-size-sm)',
         }}
       >
-        {context.getStatusLabel(order.status)}
+        {context?.getStatusLabel(order.status) || order.status || 'N/A'}
       </span>
     )
   },
   { 
     key: 'order.orderDate',
-    label: 'Order Date',
-    align: undefined as 'left' | 'right' | 'center' | undefined,
-    render: (order: Order, context: ListingRenderContext) => context.formatDate(order.orderDate)
+    header: 'Order Date',
+    align: undefined,
+    render: (order: Order, context) => context?.formatDate(order.orderDate) || 'N/A'
   },
   { 
     key: 'order.shipDate',
-    label: 'Ship Date',
-    align: undefined as 'left' | 'right' | 'center' | undefined,
-    render: (order: Order, context: ListingRenderContext) => context.formatDate(order.shipDate)
+    header: 'Ship Date',
+    align: undefined,
+    render: (order: Order, context) => context?.formatDate(order.shipDate) || 'N/A'
   },
   { 
     key: 'order.total',
-    label: 'Total',
-    align: 'right' as const,
+    header: 'Total',
+    align: 'right',
     render: (order: Order) => `$${(order.total?.toFixed(2) || '0.00')}`
   },
   { 
     key: 'order.items',
-    label: 'Items',
-    align: 'center' as const,
+    header: 'Items',
+    align: 'center',
     render: (order: Order) => order.items?.length || 0
   },
   { 
     key: 'order.actions',
-    label: 'Actions',
-    align: 'center' as const,
-    render: (order: Order, context: ListingRenderContext) => (
+    header: 'Actions',
+    align: 'center',
+    render: (order: Order, context) => (
       <div style={{ display: 'flex', gap: 'var(--spacing-sm)', justifyContent: 'center' }}>
-        {context.onViewOrder && (
+        {context?.onViewOrder && (
           <AxButton 
             variant="secondary" 
             size="small"
@@ -110,7 +106,7 @@ const LISTING_TABLE_COLUMNS = [
             View
           </AxButton>
         )}
-        {context.onEditOrder && (
+        {context?.onEditOrder && (
           <AxButton 
             variant="secondary" 
             size="small"
@@ -124,7 +120,8 @@ const LISTING_TABLE_COLUMNS = [
         <AxButton 
           variant="danger" 
           size="small"
-          onClick={() => context.onDeleteClick(order)}
+          onClick={() => context?.onDeleteClick(order)}
+          disabled={order.status === 'PAID' || order.status === 'CANCELLED'}
           style={{ minWidth: '80px' }}
         >
           Delete
@@ -182,6 +179,18 @@ export function OrderListingPageRender(props: OrderListingPageRenderProps) {
     getStatusBackgroundColor,
     getStatusLabel,
   } = props;
+
+  const columns = createColumns();
+  const tableContext: ListingRenderContext = {
+    getCustomerName,
+    formatDate,
+    getStatusColor,
+    getStatusBackgroundColor,
+    getStatusLabel,
+    onViewOrder,
+    onEditOrder,
+    onDeleteClick,
+  };
 
   if (loading) {
     return (
@@ -284,10 +293,10 @@ export function OrderListingPageRender(props: OrderListingPageRenderProps) {
             </div>
           </HeaderLeft>
           <HeaderRight {...debugProps(COMPONENT_NAME, 'HeaderRight')}>
-            <AxFormGroup style={{ margin: 0, minWidth: '200px' }}>
+            <div style={{ margin: 0, minWidth: '200px' }}>
               <AxListbox
                 options={[
-                  { value: null, label: 'All Statuses' },
+                  { value: '', label: 'All Statuses' },
                   { value: 'DRAFT', label: 'Draft' },
                   { value: 'PENDING_APPROVAL', label: 'Pending Approval' },
                   { value: 'APPROVED', label: 'Approved' },
@@ -297,11 +306,11 @@ export function OrderListingPageRender(props: OrderListingPageRenderProps) {
                   { value: 'PAID', label: 'Paid' },
                   { value: 'CANCELLED', label: 'Cancelled' },
                 ]}
-                value={statusFilter}
-                onChange={(value) => onStatusFilterChange(value)}
+                value={statusFilter || ''}
+                onChange={(value: string | string[]) => onStatusFilterChange(Array.isArray(value) ? value[0] || null : value || null)}
                 placeholder="Filter by status"
               />
-            </AxFormGroup>
+            </div>
             {onNavigateToOrderEntry && (
               <AxButton variant="primary" onClick={onNavigateToOrderEntry}>
                 Create Order
@@ -318,40 +327,14 @@ export function OrderListingPageRender(props: OrderListingPageRenderProps) {
               <AxParagraph>No orders found</AxParagraph>
             </div>
           ) : (
-            <AxTable fullWidth stickyHeader>
-              <AxTableHead>
-                <AxTableRow>
-                  {LISTING_TABLE_COLUMNS.map((column) => (
-                    <AxTableHeader key={column.key} align={column.align}>
-                      {column.label}
-                    </AxTableHeader>
-                  ))}
-                </AxTableRow>
-              </AxTableHead>
-              <AxTableBody>
-                {filteredOrders.map((order) => {
-                  const context: ListingRenderContext = {
-                    getCustomerName,
-                    formatDate,
-                    getStatusColor,
-                    getStatusBackgroundColor,
-                    getStatusLabel,
-                    onViewOrder,
-                    onEditOrder,
-                    onDeleteClick,
-                  };
-                  return (
-                    <AxTableRow key={order.id}>
-                      {LISTING_TABLE_COLUMNS.map((column) => (
-                        <AxTableCell key={column.key} align={column.align}>
-                          {column.render(order, context)}
-                        </AxTableCell>
-                      ))}
-                    </AxTableRow>
-                  );
-                })}
-              </AxTableBody>
-            </AxTable>
+            <AxTable
+              fullWidth
+              stickyHeader
+              data={filteredOrders}
+              columns={columns}
+              context={tableContext}
+              getRowKey={(order) => order.id || ''}
+            />
           )}
         </div>
       </TableCard>

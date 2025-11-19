@@ -1,16 +1,11 @@
 import {
   AxTable,
-  AxTableHead,
-  AxTableBody,
-  AxTableRow,
-  AxTableHeader,
-  AxTableCell,
   AxCard,
   AxHeading3,
   AxParagraph,
   AxButton,
-  AxFormGroup,
   AxListbox,
+  ColumnDefinition,
 } from '@ui/components';
 import { debugProps } from '../../utils/emotionCache';
 import { Order } from '../../api/orderApi';
@@ -35,55 +30,55 @@ type ListingRenderContext = {
   onViewInvoice?: (orderId: string) => void;
 };
 
-const LISTING_TABLE_COLUMNS = [
+const createColumns = (): ColumnDefinition<Order, ListingRenderContext>[] => [
   { 
     key: 'accountsReceivable.invoiceNumber',
-    label: 'Invoice Number',
-    align: undefined as 'left' | 'right' | 'center' | undefined,
-    render: (invoice: Order, context: ListingRenderContext) => invoice.invoiceNumber || 'N/A'
+    header: 'Invoice Number',
+    align: undefined,
+    render: (invoice: Order) => invoice.invoiceNumber || 'N/A'
   },
   { 
     key: 'accountsReceivable.orderNumber',
-    label: 'Order Number',
-    align: undefined as 'left' | 'right' | 'center' | undefined,
-    render: (invoice: Order, context: ListingRenderContext) => invoice.orderNumber || invoice.id?.substring(0, 8) || 'N/A'
+    header: 'Order Number',
+    align: undefined,
+    render: (invoice: Order) => invoice.orderNumber || invoice.id?.substring(0, 8) || 'N/A'
   },
   { 
     key: 'accountsReceivable.customer',
-    label: 'Customer',
-    align: undefined as 'left' | 'right' | 'center' | undefined,
-    render: (invoice: Order, context: ListingRenderContext) => context.getCustomerName(invoice.customerId)
+    header: 'Customer',
+    align: undefined,
+    render: (invoice: Order, context) => context?.getCustomerName(invoice.customerId) || 'N/A'
   },
   { 
     key: 'accountsReceivable.invoiceDate',
-    label: 'Invoice Date',
-    align: undefined as 'left' | 'right' | 'center' | undefined,
-    render: (invoice: Order, context: ListingRenderContext) => context.formatDate(invoice.invoiceDate)
+    header: 'Invoice Date',
+    align: undefined,
+    render: (invoice: Order, context) => context?.formatDate(invoice.invoiceDate) || 'N/A'
   },
   { 
     key: 'accountsReceivable.dueDate',
-    label: 'Due Date',
-    align: undefined as 'left' | 'right' | 'center' | undefined,
-    render: (invoice: Order, context: ListingRenderContext) => context.formatDate(invoice.invoiceDate)
+    header: 'Due Date',
+    align: undefined,
+    render: (invoice: Order, context) => context?.formatDate(invoice.invoiceDate) || 'N/A'
   },
   { 
     key: 'accountsReceivable.invoiceAmount',
-    label: 'Invoice Amount',
-    align: 'right' as const,
+    header: 'Invoice Amount',
+    align: 'right',
     render: (invoice: Order) => `$${(invoice.total?.toFixed(2) || '0.00')}`
   },
   { 
     key: 'accountsReceivable.paidAmount',
-    label: 'Paid Amount',
-    align: 'right' as const,
+    header: 'Paid Amount',
+    align: 'right',
     render: (invoice: Order) => `$${((invoice.jsonData?.paymentAmount || 0).toFixed(2))}`
   },
   { 
     key: 'accountsReceivable.outstanding',
-    label: 'Outstanding',
-    align: 'right' as const,
-    render: (invoice: Order, context: ListingRenderContext) => {
-      const outstanding = context.calculateOutstandingAmount(invoice);
+    header: 'Outstanding',
+    align: 'right',
+    render: (invoice: Order, context) => {
+      const outstanding = context?.calculateOutstandingAmount(invoice) || 0;
       return (
         <span style={{ 
           color: outstanding > 0 ? 'var(--color-warning)' : 'var(--color-success)',
@@ -96,30 +91,30 @@ const LISTING_TABLE_COLUMNS = [
   },
   { 
     key: 'accountsReceivable.status',
-    label: 'Status',
-    align: undefined as 'left' | 'right' | 'center' | undefined,
-    render: (invoice: Order, context: ListingRenderContext) => (
+    header: 'Status',
+    align: undefined,
+    render: (invoice: Order, context) => (
       <span 
         style={{ 
-          color: context.getStatusColor(invoice.status), 
+          color: context?.getStatusColor(invoice.status) || 'var(--color-text-primary)', 
           fontWeight: 600,
           padding: '4px 12px',
           borderRadius: '12px',
-          backgroundColor: context.getStatusBackgroundColor(invoice.status),
+          backgroundColor: context?.getStatusBackgroundColor(invoice.status) || 'transparent',
           display: 'inline-block',
           fontSize: 'var(--font-size-sm)',
         }}
       >
-        {context.getStatusLabel(invoice.status)}
+        {context?.getStatusLabel(invoice.status) || invoice.status || 'N/A'}
       </span>
     )
   },
   { 
     key: 'accountsReceivable.actions',
-    label: 'Actions',
-    align: 'center' as const,
-    render: (invoice: Order, context: ListingRenderContext) => {
-      if (context.onViewInvoice && invoice.id) {
+    header: 'Actions',
+    align: 'center',
+    render: (invoice: Order, context) => {
+      if (context?.onViewInvoice && invoice.id) {
         return (
           <AxButton 
             variant="secondary" 
@@ -155,7 +150,6 @@ interface AccountReceivableListingPageRenderProps {
 
 export function AccountReceivableListingPageRender(props: AccountReceivableListingPageRenderProps) {
   const {
-    invoices,
     loading,
     error,
     statusFilter,
@@ -170,6 +164,17 @@ export function AccountReceivableListingPageRender(props: AccountReceivableListi
     getStatusBackgroundColor,
     getStatusLabel,
   } = props;
+
+  const columns = createColumns();
+  const tableContext: ListingRenderContext = {
+    getCustomerName,
+    formatDate,
+    calculateOutstandingAmount,
+    getStatusColor,
+    getStatusBackgroundColor,
+    getStatusLabel,
+    onViewInvoice,
+  };
 
   if (loading) {
     return (
@@ -272,18 +277,18 @@ export function AccountReceivableListingPageRender(props: AccountReceivableListi
             </div>
           </HeaderLeft>
           <HeaderRight {...debugProps(COMPONENT_NAME, 'HeaderRight')}>
-            <AxFormGroup style={{ margin: 0, minWidth: '200px' }}>
+            <div style={{ margin: 0, minWidth: '200px' }}>
               <AxListbox
                 options={[
-                  { value: null, label: 'All Statuses' },
+                  { value: '', label: 'All Statuses' },
                   { value: 'INVOICED', label: 'Invoiced' },
                   { value: 'PAID', label: 'Paid' },
                 ]}
-                value={statusFilter}
-                onChange={(value) => onStatusFilterChange(value)}
+                value={statusFilter || ''}
+                onChange={(value: string | string[]) => onStatusFilterChange(Array.isArray(value) ? value[0] || null : value || null)}
                 placeholder="Filter by status"
               />
-            </AxFormGroup>
+            </div>
           </HeaderRight>
         </HeaderSection>
       </HeaderCard>
@@ -295,39 +300,14 @@ export function AccountReceivableListingPageRender(props: AccountReceivableListi
               <AxParagraph>No invoices found</AxParagraph>
             </div>
           ) : (
-            <AxTable fullWidth stickyHeader>
-              <AxTableHead>
-                <AxTableRow>
-                  {LISTING_TABLE_COLUMNS.map((column) => (
-                    <AxTableHeader key={column.key} align={column.align}>
-                      {column.label}
-                    </AxTableHeader>
-                  ))}
-                </AxTableRow>
-              </AxTableHead>
-              <AxTableBody>
-                {filteredInvoices.map((invoice) => {
-                  const context: ListingRenderContext = {
-                    getCustomerName,
-                    formatDate,
-                    calculateOutstandingAmount,
-                    getStatusColor,
-                    getStatusBackgroundColor,
-                    getStatusLabel,
-                    onViewInvoice,
-                  };
-                  return (
-                    <AxTableRow key={invoice.id}>
-                      {LISTING_TABLE_COLUMNS.map((column) => (
-                        <AxTableCell key={column.key} align={column.align}>
-                          {column.render(invoice, context)}
-                        </AxTableCell>
-                      ))}
-                    </AxTableRow>
-                  );
-                })}
-              </AxTableBody>
-            </AxTable>
+            <AxTable
+              fullWidth
+              stickyHeader
+              data={filteredInvoices}
+              columns={columns}
+              context={tableContext}
+              getRowKey={(invoice) => invoice.id || ''}
+            />
           )}
         </div>
       </TableCard>

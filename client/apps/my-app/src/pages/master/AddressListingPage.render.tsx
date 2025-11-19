@@ -1,10 +1,5 @@
 import {
   AxTable,
-  AxTableHead,
-  AxTableBody,
-  AxTableRow,
-  AxTableHeader,
-  AxTableCell,
   AxCard,
   AxHeading3,
   AxParagraph,
@@ -14,6 +9,7 @@ import {
   AxLabel,
   AxFormGroup,
   AxListbox,
+  ColumnDefinition,
 } from '@ui/components';
 import { debugProps } from '../../utils/emotionCache';
 import { Address } from '../../api/addressApi';
@@ -35,55 +31,55 @@ type ListingRenderContext = {
   onDeleteClick: (address: Address) => void;
 };
 
-const LISTING_TABLE_COLUMNS = [
+const createColumns = (): ColumnDefinition<Address, ListingRenderContext>[] => [
   { 
     key: 'address.type',
-    label: 'Type',
-    align: undefined as 'left' | 'right' | 'center' | undefined,
+    header: 'Type',
+    align: undefined,
     render: (address: Address) => address.addressType 
       ? address.addressType 
       : <span style={{ color: 'var(--color-text-secondary)', fontStyle: 'italic' }}>Both</span>
   },
   { 
     key: 'address.streetAddress',
-    label: 'Street Address',
-    align: undefined as 'left' | 'right' | 'center' | undefined,
+    header: 'Street Address',
+    align: undefined,
     render: (address: Address) => address.streetAddress1 || ''
   },
   { 
     key: 'address.city',
-    label: 'City',
-    align: undefined as 'left' | 'right' | 'center' | undefined,
+    header: 'City',
+    align: undefined,
     render: (address: Address) => address.city || ''
   },
   { 
     key: 'address.state',
-    label: 'State',
-    align: undefined as 'left' | 'right' | 'center' | undefined,
+    header: 'State',
+    align: undefined,
     render: (address: Address) => address.state || ''
   },
   { 
     key: 'address.postalCode',
-    label: 'Postal Code',
-    align: undefined as 'left' | 'right' | 'center' | undefined,
+    header: 'Postal Code',
+    align: undefined,
     render: (address: Address) => address.postalCode || ''
   },
   { 
     key: 'address.country',
-    label: 'Country',
-    align: undefined as 'left' | 'right' | 'center' | undefined,
+    header: 'Country',
+    align: undefined,
     render: (address: Address) => address.country || ''
   },
   { 
     key: 'address.actions',
-    label: 'Actions',
-    align: 'center' as const,
-    render: (address: Address, context: ListingRenderContext) => (
+    header: 'Actions',
+    align: 'center',
+    render: (address: Address, context) => (
       <div style={{ display: 'flex', gap: 'var(--spacing-sm)', justifyContent: 'center' }}>
         <AxButton 
           variant="secondary" 
           size="small"
-          onClick={() => context.onEdit(address)}
+          onClick={() => context?.onEdit(address)}
           style={{ minWidth: '80px' }}
         >
           Edit
@@ -91,7 +87,7 @@ const LISTING_TABLE_COLUMNS = [
         <AxButton 
           variant="danger" 
           size="small"
-          onClick={() => context.onDeleteClick(address)}
+          onClick={() => context?.onDeleteClick(address)}
           style={{ minWidth: '80px' }}
         >
           Delete
@@ -151,6 +147,12 @@ export function AddressListingPageRender(props: AddressListingPageRenderProps) {
     onFormDataChange,
     onRetry,
   } = props;
+
+  const columns = createColumns();
+  const tableContext: ListingRenderContext = {
+    onEdit,
+    onDeleteClick,
+  };
 
   if (loading) {
     return (
@@ -270,34 +272,14 @@ export function AddressListingPageRender(props: AddressListingPageRenderProps) {
               <AxParagraph>No addresses found</AxParagraph>
             </div>
           ) : (
-            <AxTable fullWidth stickyHeader>
-              <AxTableHead>
-                <AxTableRow>
-                  {LISTING_TABLE_COLUMNS.map((column) => (
-                    <AxTableHeader key={column.key} align={column.align}>
-                      {column.label}
-                    </AxTableHeader>
-                  ))}
-                </AxTableRow>
-              </AxTableHead>
-              <AxTableBody>
-                {filteredAddresses.map((address) => {
-                  const context: ListingRenderContext = {
-                    onEdit,
-                    onDeleteClick,
-                  };
-                  return (
-                    <AxTableRow key={address.id}>
-                      {LISTING_TABLE_COLUMNS.map((column) => (
-                        <AxTableCell key={column.key} align={column.align}>
-                          {column.render(address, context)}
-                        </AxTableCell>
-                      ))}
-                    </AxTableRow>
-                  );
-                })}
-              </AxTableBody>
-            </AxTable>
+            <AxTable
+              fullWidth
+              stickyHeader
+              data={filteredAddresses}
+              columns={columns}
+              context={tableContext}
+              getRowKey={(address) => address.id || ''}
+            />
           )}
         </div>
       </TableCard>

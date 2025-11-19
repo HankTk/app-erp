@@ -1,10 +1,5 @@
 import {
   AxTable,
-  AxTableHead,
-  AxTableBody,
-  AxTableRow,
-  AxTableHeader,
-  AxTableCell,
   AxCard,
   AxHeading3,
   AxParagraph,
@@ -12,6 +7,7 @@ import {
   AxDialog,
   AxFormGroup,
   AxListbox,
+  ColumnDefinition,
 } from '@ui/components';
 import { debugProps } from '../../utils/emotionCache';
 import { RMA } from '../../api/rmaApi';
@@ -38,76 +34,76 @@ type ListingRenderContext = {
   onNavigateToShopFloorControl?: (rmaId: string) => void;
 };
 
-const LISTING_TABLE_COLUMNS = [
+const createColumns = (): ColumnDefinition<RMA, ListingRenderContext>[] => [
   { 
     key: 'rma.rmaNumber',
-    label: 'RMA Number',
-    align: undefined as 'left' | 'right' | 'center' | undefined,
+    header: 'RMA Number',
+    align: undefined,
     render: (rma: RMA) => rma.rmaNumber || rma.id?.substring(0, 8) || 'N/A'
   },
   { 
     key: 'rma.orderNumber',
-    label: 'Order Number',
-    align: undefined as 'left' | 'right' | 'center' | undefined,
+    header: 'Order Number',
+    align: undefined,
     render: (rma: RMA) => rma.orderNumber || 'N/A'
   },
   { 
     key: 'rma.customer',
-    label: 'Customer',
-    align: undefined as 'left' | 'right' | 'center' | undefined,
-    render: (rma: RMA, context: ListingRenderContext) => context.getCustomerName(rma)
+    header: 'Customer',
+    align: undefined,
+    render: (rma: RMA, context) => context?.getCustomerName(rma) || 'N/A'
   },
   { 
     key: 'rma.status',
-    label: 'Status',
-    align: undefined as 'left' | 'right' | 'center' | undefined,
-    render: (rma: RMA, context: ListingRenderContext) => (
+    header: 'Status',
+    align: undefined,
+    render: (rma: RMA, context) => (
       <span 
         style={{ 
-          color: context.getStatusColor(rma.status), 
+          color: context?.getStatusColor(rma.status) || 'var(--color-text-primary)', 
           fontWeight: 600,
           padding: '4px 12px',
           borderRadius: '12px',
-          backgroundColor: context.getStatusBackgroundColor(rma.status),
+          backgroundColor: context?.getStatusBackgroundColor(rma.status) || 'transparent',
           display: 'inline-block',
           fontSize: 'var(--font-size-sm)',
         }}
       >
-        {context.getStatusLabel(rma.status)}
+        {context?.getStatusLabel(rma.status) || rma.status || 'N/A'}
       </span>
     )
   },
   { 
     key: 'rma.rmaDate',
-    label: 'RMA Date',
-    align: undefined as 'left' | 'right' | 'center' | undefined,
-    render: (rma: RMA, context: ListingRenderContext) => context.formatDate(rma.rmaDate)
+    header: 'RMA Date',
+    align: undefined,
+    render: (rma: RMA, context) => context?.formatDate(rma.rmaDate) || 'N/A'
   },
   { 
     key: 'rma.receivedDate',
-    label: 'Received Date',
-    align: undefined as 'left' | 'right' | 'center' | undefined,
-    render: (rma: RMA, context: ListingRenderContext) => context.formatDate(rma.receivedDate)
+    header: 'Received Date',
+    align: undefined,
+    render: (rma: RMA, context) => context?.formatDate(rma.receivedDate) || 'N/A'
   },
   { 
     key: 'rma.total',
-    label: 'Total',
-    align: 'right' as const,
+    header: 'Total',
+    align: 'right',
     render: (rma: RMA) => `$${(rma.total?.toFixed(2) || '0.00')}`
   },
   { 
     key: 'rma.items',
-    label: 'Items',
-    align: 'center' as const,
+    header: 'Items',
+    align: 'center',
     render: (rma: RMA) => rma.items?.length || 0
   },
   { 
     key: 'rma.actions',
-    label: 'Actions',
-    align: 'center' as const,
-    render: (rma: RMA, context: ListingRenderContext) => (
+    header: 'Actions',
+    align: 'center',
+    render: (rma: RMA, context) => (
       <div style={{ display: 'flex', gap: 'var(--spacing-sm)', justifyContent: 'center', flexWrap: 'wrap' }}>
-        {context.onViewRMA && (
+        {context?.onViewRMA && (
           <AxButton 
             variant="secondary" 
             size="small"
@@ -117,7 +113,7 @@ const LISTING_TABLE_COLUMNS = [
             View
           </AxButton>
         )}
-        {context.onEditRMA && (
+        {context?.onEditRMA && (
           <AxButton 
             variant="secondary" 
             size="small"
@@ -128,7 +124,7 @@ const LISTING_TABLE_COLUMNS = [
             Edit
           </AxButton>
         )}
-        {rma.id && context.onNavigateToShopFloorControl && (
+        {rma.id && context?.onNavigateToShopFloorControl && (
           <AxButton 
             variant="primary" 
             size="small"
@@ -141,7 +137,7 @@ const LISTING_TABLE_COLUMNS = [
         <AxButton 
           variant="danger" 
           size="small"
-          onClick={() => context.onDeleteClick(rma)}
+          onClick={() => context?.onDeleteClick(rma)}
           style={{ minWidth: '80px' }}
         >
           Delete
@@ -201,6 +197,19 @@ export function RMAListingPageRender(props: RMAListingPageRenderProps) {
     getStatusBackgroundColor,
     getStatusLabel,
   } = props;
+
+  const columns = createColumns();
+  const tableContext: ListingRenderContext = {
+    getCustomerName,
+    formatDate,
+    getStatusColor,
+    getStatusBackgroundColor,
+    getStatusLabel,
+    onViewRMA,
+    onEditRMA,
+    onDeleteClick,
+    onNavigateToShopFloorControl,
+  };
 
   if (loading) {
     return (
@@ -331,41 +340,14 @@ export function RMAListingPageRender(props: RMAListingPageRenderProps) {
               <AxParagraph>No RMAs found</AxParagraph>
             </div>
           ) : (
-            <AxTable fullWidth stickyHeader>
-              <AxTableHead>
-                <AxTableRow>
-                  {LISTING_TABLE_COLUMNS.map((column) => (
-                    <AxTableHeader key={column.key} align={column.align}>
-                      {column.label}
-                    </AxTableHeader>
-                  ))}
-                </AxTableRow>
-              </AxTableHead>
-              <AxTableBody>
-                {filteredRMAs.map((rma) => {
-                  const context: ListingRenderContext = {
-                    getCustomerName,
-                    formatDate,
-                    getStatusColor,
-                    getStatusBackgroundColor,
-                    getStatusLabel,
-                    onViewRMA,
-                    onEditRMA,
-                    onDeleteClick,
-                    onNavigateToShopFloorControl,
-                  };
-                  return (
-                    <AxTableRow key={rma.id}>
-                      {LISTING_TABLE_COLUMNS.map((column) => (
-                        <AxTableCell key={column.key} align={column.align}>
-                          {column.render(rma, context)}
-                        </AxTableCell>
-                      ))}
-                    </AxTableRow>
-                  );
-                })}
-              </AxTableBody>
-            </AxTable>
+            <AxTable
+              fullWidth
+              stickyHeader
+              data={filteredRMAs}
+              columns={columns}
+              context={tableContext}
+              getRowKey={(rma) => rma.id || ''}
+            />
           )}
         </div>
       </TableCard>

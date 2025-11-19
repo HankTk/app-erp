@@ -1,13 +1,30 @@
 import React, { createContext, useContext } from 'react';
 import styled from '@emotion/styled';
 
-const TableContext = createContext<{ stickyHeader?: boolean }>({});
+const TableContext = createContext<{ stickyHeader?: boolean; variant?: 'default' | 'bordered' | 'striped' }>({});
 
-export interface AxTableProps extends React.TableHTMLAttributes<HTMLTableElement> {
+export interface ColumnDefinition<T = any, C = any> {
+  key: string;
+  label?: string | React.ReactNode;
+  header?: string | React.ReactNode;
+  align?: 'left' | 'center' | 'right';
+  headerAlign?: 'left' | 'center' | 'right';
+  render?: (item: T, context?: C) => React.ReactNode;
+  variant?: 'default' | 'bordered' | 'striped';
+}
+
+export interface AxTableProps<T = any, C = any> extends Omit<React.TableHTMLAttributes<HTMLTableElement>, 'children'> {
   variant?: 'default' | 'bordered' | 'striped';
   size?: 'small' | 'medium' | 'large';
   fullWidth?: boolean;
   stickyHeader?: boolean;
+  // Generic data-driven API
+  data?: T[];
+  columns?: ColumnDefinition<T, C>[];
+  context?: C;
+  getRowKey?: (item: T, index: number) => string | number;
+  // Legacy API (children-based)
+  children?: React.ReactNode;
 }
 
 interface StyledTableProps {
@@ -141,28 +158,83 @@ export const StyledTableCell = styled.td<{ $align?: 'left' | 'center' | 'right';
   }}
 `;
 
-export const AxTable: React.FC<AxTableProps> = ({
+export function AxTable<T = any, C = any>({
   children,
   variant,
   size,
   fullWidth,
   stickyHeader,
+  data,
+  columns,
+  context,
+  getRowKey,
   ...props
-}) => {
+}: AxTableProps<T, C>) {
+  // If data and columns are provided, use generic data-driven API
+  const useGenericAPI = data !== undefined && columns !== undefined;
+
+  const renderContent = () => {
+    if (useGenericAPI) {
+      // Generic data-driven rendering
+      return (
+        <>
+          <AxTableHead>
+            <AxTableRow>
+              {columns!.map((column) => (
+                <AxTableHeader
+                  key={column.key}
+                  align={column.headerAlign ?? column.align}
+                  variant={column.variant ?? variant}
+                >
+                  {column.header ?? column.label ?? column.key}
+                </AxTableHeader>
+              ))}
+            </AxTableRow>
+          </AxTableHead>
+          <AxTableBody>
+            {data!.map((item, index) => {
+              const rowKey = getRowKey ? getRowKey(item, index) : (item as any)?.id ?? index;
+              return (
+                <AxTableRow key={rowKey} variant={variant}>
+                  {columns!.map((column) => {
+                    const cellContent = column.render
+                      ? column.render(item, context)
+                      : (item as any)?.[column.key] ?? '';
+                    return (
+                      <AxTableCell
+                        key={column.key}
+                        align={column.align}
+                        variant={column.variant ?? variant}
+                      >
+                        {cellContent}
+                      </AxTableCell>
+                    );
+                  })}
+                </AxTableRow>
+              );
+            })}
+          </AxTableBody>
+        </>
+      );
+    }
+    // Legacy children-based API
+    return children;
+  };
+
   return (
-    <TableContext.Provider value={{ stickyHeader }}>
-    <StyledTable
-      $variant={variant}
-      $size={size}
-      $fullWidth={fullWidth}
+    <TableContext.Provider value={{ stickyHeader, variant }}>
+      <StyledTable
+        $variant={variant}
+        $size={size}
+        $fullWidth={fullWidth}
         $stickyHeader={stickyHeader}
-      {...props}
-    >
-      {children}
-    </StyledTable>
+        {...props}
+      >
+        {renderContent()}
+      </StyledTable>
     </TableContext.Provider>
   );
-};
+}
 
 // Helper components for easier usage
 export interface AxTableHeadProps extends React.HTMLAttributes<HTMLTableSectionElement> {
@@ -192,9 +264,11 @@ export interface AxTableRowProps extends React.HTMLAttributes<HTMLTableRowElemen
 
 export const AxTableRow: React.FC<AxTableRowProps> = ({
   children,
-  variant,
+  variant: variantProp,
   ...props
 }) => {
+  const { variant: variantContext } = useContext(TableContext);
+  const variant = variantProp ?? variantContext;
   return (
     <StyledTableRow $variant={variant} {...props}>
       {children}
@@ -211,12 +285,13 @@ export interface AxTableHeaderProps extends React.ThHTMLAttributes<HTMLTableCell
 export const AxTableHeader: React.FC<AxTableHeaderProps> = ({
   children,
   align,
-  variant,
+  variant: variantProp,
   stickyHeader: stickyHeaderProp,
   ...props
 }) => {
-  const { stickyHeader: stickyHeaderContext } = useContext(TableContext);
+  const { stickyHeader: stickyHeaderContext, variant: variantContext } = useContext(TableContext);
   const stickyHeader = stickyHeaderProp ?? stickyHeaderContext;
+  const variant = variantProp ?? variantContext;
   return (
     <StyledTableHeader $align={align} $variant={variant} $stickyHeader={stickyHeader} {...props}>
       {children}
@@ -232,9 +307,11 @@ export interface AxTableCellProps extends React.TdHTMLAttributes<HTMLTableCellEl
 export const AxTableCell: React.FC<AxTableCellProps> = ({
   children,
   align,
-  variant,
+  variant: variantProp,
   ...props
 }) => {
+  const { variant: variantContext } = useContext(TableContext);
+  const variant = variantProp ?? variantContext;
   return (
     <StyledTableCell $align={align} $variant={variant} {...props}>
       {children}

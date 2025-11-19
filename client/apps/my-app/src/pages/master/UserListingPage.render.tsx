@@ -1,10 +1,5 @@
 import {
   AxTable,
-  AxTableHead,
-  AxTableBody,
-  AxTableRow,
-  AxTableHeader,
-  AxTableCell,
   AxCard,
   AxHeading3,
   AxParagraph,
@@ -14,6 +9,7 @@ import {
   AxLabel,
   AxFormGroup,
   AxListbox,
+  ColumnDefinition,
 } from '@ui/components';
 import { useI18n } from '../../i18n/I18nProvider';
 import { debugProps } from '../../utils/emotionCache';
@@ -89,6 +85,14 @@ export function UserListingPageRender(props: UserListingPageRenderProps) {
   } = props;
   
   const { l10n } = useI18n();
+
+  // Convert ColumnConfig to ColumnDefinition
+  const tableColumns: ColumnDefinition<User, never>[] = columns.map(col => ({
+    key: col.key,
+    header: col.label,
+    align: col.align,
+    render: col.render ? (user: User) => col.render!(user[col.key], user) : (user: User) => user[col.key] ?? ''
+  }));
 
   if (loading) {
     return (
@@ -205,30 +209,13 @@ export function UserListingPageRender(props: UserListingPageRenderProps) {
               <AxParagraph>No users found</AxParagraph>
             </div>
           ) : (
-            <AxTable fullWidth stickyHeader>
-              <AxTableHead>
-                <AxTableRow>
-                  {columns.map((column) => (
-                    <AxTableHeader key={column.key} align={column.align}>
-                      {column.label}
-                    </AxTableHeader>
-                  ))}
-                </AxTableRow>
-              </AxTableHead>
-              <AxTableBody>
-                {users.map((user, index) => (
-                  <AxTableRow key={user.id || user._id || index}>
-                    {columns.map((column) => (
-                      <AxTableCell key={column.key} align={column.align}>
-                        {column.render
-                          ? column.render(user[column.key], user)
-                          : user[column.key] ?? ''}
-                      </AxTableCell>
-                    ))}
-                  </AxTableRow>
-                ))}
-              </AxTableBody>
-            </AxTable>
+            <AxTable
+              fullWidth
+              stickyHeader
+              data={users}
+              columns={tableColumns}
+              getRowKey={(user, index) => user.id || user._id || index}
+            />
           )}
         </div>
       </TableCard>
