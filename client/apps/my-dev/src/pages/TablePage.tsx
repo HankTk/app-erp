@@ -1,18 +1,103 @@
+import React from 'react';
 import {
   AxTable,
-  AxTableHead,
-  AxTableBody,
-  AxTableRow,
-  AxTableHeader,
-  AxTableCell,
-  AxCard,
-  AxHeading3,
-  AxParagraph,
+  ColumnDefinition,
 } from '@ui/components';
 import { I18N } from '../i18n/I18nProvider';
+import { Card, Heading, Description, SizeSection, SizeLabel } from './TablePage.styles';
+
+type SampleData = {
+  id: number;
+  name: string;
+  email: string;
+  role: string;
+  status: string;
+};
+
+type AlignmentData = {
+  id: number;
+  left: React.ReactNode;
+  center: React.ReactNode;
+  right: React.ReactNode;
+};
+
+const createColumns = (): ColumnDefinition<SampleData, never>[] => [
+  {
+    key: 'id',
+    header: 'ID',
+    align: undefined,
+    render: (row: SampleData) => row.id,
+  },
+  {
+    key: 'name',
+    header: 'Name',
+    align: undefined,
+    render: (row: SampleData) => row.name,
+  },
+  {
+    key: 'email',
+    header: 'Email',
+    align: undefined,
+    render: (row: SampleData) => row.email,
+  },
+  {
+    key: 'role',
+    header: 'Role',
+    align: undefined,
+    render: (row: SampleData) => row.role,
+  },
+  {
+    key: 'status',
+    header: 'Status',
+    align: undefined,
+    render: (row: SampleData) => row.status,
+  },
+];
+
+const createCompactColumns = (): ColumnDefinition<SampleData, never>[] => [
+  {
+    key: 'name',
+    header: 'Name',
+    align: undefined,
+    render: (row: SampleData) => row.name,
+  },
+  {
+    key: 'email',
+    header: 'Email',
+    align: undefined,
+    render: (row: SampleData) => row.email,
+  },
+  {
+    key: 'status',
+    header: 'Status',
+    align: 'center',
+    render: (row: SampleData) => row.status,
+  },
+];
+
+const createAlignmentColumns = (): ColumnDefinition<AlignmentData, never>[] => [
+  {
+    key: 'left',
+    header: <I18N l10n="table.left" />,
+    align: 'left',
+    render: (row: AlignmentData) => row.left,
+  },
+  {
+    key: 'center',
+    header: <I18N l10n="table.center" />,
+    align: 'center',
+    render: (row: AlignmentData) => row.center,
+  },
+  {
+    key: 'right',
+    header: <I18N l10n="table.right" />,
+    align: 'right',
+    render: (row: AlignmentData) => row.right,
+  },
+];
 
 export function TablePage() {
-  const sampleData = [
+  const sampleData: SampleData[] = [
     { id: 1, name: 'John Doe', email: 'john@example.com', role: 'Admin', status: 'Active' },
     { id: 2, name: 'Jane Smith', email: 'jane@example.com', role: 'User', status: 'Active' },
     { id: 3, name: 'Bob Johnson', email: 'bob@example.com', role: 'User', status: 'Inactive' },
@@ -20,195 +105,120 @@ export function TablePage() {
     { id: 5, name: 'Charlie Brown', email: 'charlie@example.com', role: 'User', status: 'Active' },
   ];
 
+  const columns = createColumns();
+  const compactColumns = createCompactColumns();
+
+  const alignmentData: AlignmentData[] = [
+    {
+      id: 1,
+      left: <I18N l10n="table.leftAligned" />,
+      center: <I18N l10n="table.centerAligned" />,
+      right: <I18N l10n="table.rightAligned" />,
+    },
+    {
+      id: 2,
+      left: '$1,234.56',
+      center: 'Status: Active',
+      right: '100%',
+    },
+  ];
+  const alignmentColumns = createAlignmentColumns();
+
   return (
     <>
-      <AxCard padding="large" style={{ marginBottom: 'var(--spacing-2xl)' }}>
-        <AxHeading3 style={{ marginBottom: 'var(--spacing-sm)' }}><I18N l10n="table.default" /></AxHeading3>
-        <AxParagraph style={{ marginBottom: 'var(--spacing-xl)' }}>
+      <Card padding="large">
+        <Heading><I18N l10n="table.default" /></Heading>
+        <Description>
           <I18N l10n="table.defaultDescription" />
-        </AxParagraph>
-        <AxTable fullWidth>
-          <AxTableHead>
-            <AxTableRow>
-              <AxTableHeader>ID</AxTableHeader>
-              <AxTableHeader>Name</AxTableHeader>
-              <AxTableHeader>Email</AxTableHeader>
-              <AxTableHeader>Role</AxTableHeader>
-              <AxTableHeader>Status</AxTableHeader>
-            </AxTableRow>
-          </AxTableHead>
-          <AxTableBody>
-            {sampleData.map((row) => (
-              <AxTableRow key={row.id}>
-                <AxTableCell>{row.id}</AxTableCell>
-                <AxTableCell>{row.name}</AxTableCell>
-                <AxTableCell>{row.email}</AxTableCell>
-                <AxTableCell>{row.role}</AxTableCell>
-                <AxTableCell>{row.status}</AxTableCell>
-              </AxTableRow>
-            ))}
-          </AxTableBody>
-        </AxTable>
-      </AxCard>
+        </Description>
+        <AxTable
+          fullWidth
+          data={sampleData}
+          columns={columns}
+          getRowKey={(row: SampleData) => row.id.toString()}
+        />
+      </Card>
 
-      <AxCard padding="large" style={{ marginBottom: 'var(--spacing-2xl)' }}>
-        <AxHeading3 style={{ marginBottom: 'var(--spacing-sm)' }}><I18N l10n="table.bordered" /></AxHeading3>
-        <AxParagraph style={{ marginBottom: 'var(--spacing-xl)' }}>
+      <Card padding="large">
+        <Heading><I18N l10n="table.bordered" /></Heading>
+        <Description>
           <I18N l10n="table.borderedDescription" />
-        </AxParagraph>
-        <AxTable fullWidth variant="bordered">
-          <AxTableHead>
-            <AxTableRow variant="bordered">
-              <AxTableHeader variant="bordered">ID</AxTableHeader>
-              <AxTableHeader variant="bordered">Name</AxTableHeader>
-              <AxTableHeader variant="bordered">Email</AxTableHeader>
-              <AxTableHeader variant="bordered">Role</AxTableHeader>
-              <AxTableHeader variant="bordered">Status</AxTableHeader>
-            </AxTableRow>
-          </AxTableHead>
-          <AxTableBody>
-            {sampleData.map((row) => (
-              <AxTableRow key={row.id} variant="bordered">
-                <AxTableCell variant="bordered">{row.id}</AxTableCell>
-                <AxTableCell variant="bordered">{row.name}</AxTableCell>
-                <AxTableCell variant="bordered">{row.email}</AxTableCell>
-                <AxTableCell variant="bordered">{row.role}</AxTableCell>
-                <AxTableCell variant="bordered">{row.status}</AxTableCell>
-              </AxTableRow>
-            ))}
-          </AxTableBody>
-        </AxTable>
-      </AxCard>
+        </Description>
+        <AxTable
+          fullWidth
+          variant="bordered"
+          data={sampleData}
+          columns={columns}
+          getRowKey={(row: SampleData) => row.id.toString()}
+        />
+      </Card>
 
-      <AxCard padding="large" style={{ marginBottom: 'var(--spacing-2xl)' }}>
-        <AxHeading3 style={{ marginBottom: 'var(--spacing-sm)' }}><I18N l10n="table.striped" /></AxHeading3>
-        <AxParagraph style={{ marginBottom: 'var(--spacing-xl)' }}>
+      <Card padding="large">
+        <Heading><I18N l10n="table.striped" /></Heading>
+        <Description>
           <I18N l10n="table.stripedDescription" />
-        </AxParagraph>
-        <AxTable fullWidth variant="striped">
-          <AxTableHead>
-            <AxTableRow>
-              <AxTableHeader>ID</AxTableHeader>
-              <AxTableHeader>Name</AxTableHeader>
-              <AxTableHeader>Email</AxTableHeader>
-              <AxTableHeader>Role</AxTableHeader>
-              <AxTableHeader>Status</AxTableHeader>
-            </AxTableRow>
-          </AxTableHead>
-          <AxTableBody>
-            {sampleData.map((row) => (
-              <AxTableRow key={row.id}>
-                <AxTableCell>{row.id}</AxTableCell>
-                <AxTableCell>{row.name}</AxTableCell>
-                <AxTableCell>{row.email}</AxTableCell>
-                <AxTableCell>{row.role}</AxTableCell>
-                <AxTableCell>{row.status}</AxTableCell>
-              </AxTableRow>
-            ))}
-          </AxTableBody>
-        </AxTable>
-      </AxCard>
+        </Description>
+        <AxTable
+          fullWidth
+          variant="striped"
+          data={sampleData}
+          columns={columns}
+          getRowKey={(row: SampleData) => row.id.toString()}
+        />
+      </Card>
 
-      <AxCard padding="large" style={{ marginBottom: 'var(--spacing-2xl)' }}>
-        <AxHeading3 style={{ marginBottom: 'var(--spacing-sm)' }}><I18N l10n="table.sizes" /></AxHeading3>
-        <AxParagraph style={{ marginBottom: 'var(--spacing-xl)' }}>
+      <Card padding="large">
+        <Heading><I18N l10n="table.sizes" /></Heading>
+        <Description>
           <I18N l10n="table.sizesDescription" />
-        </AxParagraph>
+        </Description>
         
-        <div style={{ marginBottom: 'var(--spacing-2xl)' }}>
-          <AxParagraph style={{ marginBottom: 'var(--spacing-md)' }}><I18N l10n="table.smallSize" /></AxParagraph>
-          <AxTable fullWidth size="small">
-            <AxTableHead>
-              <AxTableRow>
-                <AxTableHeader>Name</AxTableHeader>
-                <AxTableHeader>Email</AxTableHeader>
-                <AxTableHeader align="center">Status</AxTableHeader>
-              </AxTableRow>
-            </AxTableHead>
-            <AxTableBody>
-              {sampleData.slice(0, 3).map((row) => (
-                <AxTableRow key={row.id}>
-                  <AxTableCell>{row.name}</AxTableCell>
-                  <AxTableCell>{row.email}</AxTableCell>
-                  <AxTableCell align="center">{row.status}</AxTableCell>
-                </AxTableRow>
-              ))}
-            </AxTableBody>
-          </AxTable>
-        </div>
+        <SizeSection>
+          <SizeLabel><I18N l10n="table.smallSize" /></SizeLabel>
+          <AxTable
+            fullWidth
+            size="small"
+            data={sampleData.slice(0, 3)}
+            columns={compactColumns}
+            getRowKey={(row: SampleData) => row.id.toString()}
+          />
+        </SizeSection>
 
-        <div style={{ marginBottom: 'var(--spacing-2xl)' }}>
-          <AxParagraph style={{ marginBottom: 'var(--spacing-md)' }}><I18N l10n="table.mediumSize" /></AxParagraph>
-          <AxTable fullWidth size="medium">
-            <AxTableHead>
-              <AxTableRow>
-                <AxTableHeader>Name</AxTableHeader>
-                <AxTableHeader>Email</AxTableHeader>
-                <AxTableHeader align="center">Status</AxTableHeader>
-              </AxTableRow>
-            </AxTableHead>
-            <AxTableBody>
-              {sampleData.slice(0, 3).map((row) => (
-                <AxTableRow key={row.id}>
-                  <AxTableCell>{row.name}</AxTableCell>
-                  <AxTableCell>{row.email}</AxTableCell>
-                  <AxTableCell align="center">{row.status}</AxTableCell>
-                </AxTableRow>
-              ))}
-            </AxTableBody>
-          </AxTable>
-        </div>
+        <SizeSection>
+          <SizeLabel><I18N l10n="table.mediumSize" /></SizeLabel>
+          <AxTable
+            fullWidth
+            size="medium"
+            data={sampleData.slice(0, 3)}
+            columns={compactColumns}
+            getRowKey={(row: SampleData) => row.id.toString()}
+          />
+        </SizeSection>
 
         <div>
-          <AxParagraph style={{ marginBottom: 'var(--spacing-md)' }}><I18N l10n="table.largeSize" /></AxParagraph>
-          <AxTable fullWidth size="large">
-            <AxTableHead>
-              <AxTableRow>
-                <AxTableHeader>Name</AxTableHeader>
-                <AxTableHeader>Email</AxTableHeader>
-                <AxTableHeader align="center">Status</AxTableHeader>
-              </AxTableRow>
-            </AxTableHead>
-            <AxTableBody>
-              {sampleData.slice(0, 3).map((row) => (
-                <AxTableRow key={row.id}>
-                  <AxTableCell>{row.name}</AxTableCell>
-                  <AxTableCell>{row.email}</AxTableCell>
-                  <AxTableCell align="center">{row.status}</AxTableCell>
-                </AxTableRow>
-              ))}
-            </AxTableBody>
-          </AxTable>
+          <SizeLabel><I18N l10n="table.largeSize" /></SizeLabel>
+          <AxTable
+            fullWidth
+            size="large"
+            data={sampleData.slice(0, 3)}
+            columns={compactColumns}
+            getRowKey={(row: SampleData) => row.id.toString()}
+          />
         </div>
-      </AxCard>
+      </Card>
 
-      <AxCard padding="large">
-        <AxHeading3 style={{ marginBottom: 'var(--spacing-sm)' }}><I18N l10n="table.textAlignment" /></AxHeading3>
-        <AxParagraph style={{ marginBottom: 'var(--spacing-xl)' }}>
+      <Card padding="large">
+        <Heading><I18N l10n="table.textAlignment" /></Heading>
+        <Description>
           <I18N l10n="table.textAlignmentDescription" />
-        </AxParagraph>
-        <AxTable fullWidth>
-          <AxTableHead>
-            <AxTableRow>
-              <AxTableHeader align="left"><I18N l10n="table.left" /></AxTableHeader>
-              <AxTableHeader align="center"><I18N l10n="table.center" /></AxTableHeader>
-              <AxTableHeader align="right"><I18N l10n="table.right" /></AxTableHeader>
-            </AxTableRow>
-          </AxTableHead>
-          <AxTableBody>
-            <AxTableRow>
-              <AxTableCell align="left"><I18N l10n="table.leftAligned" /></AxTableCell>
-              <AxTableCell align="center"><I18N l10n="table.centerAligned" /></AxTableCell>
-              <AxTableCell align="right"><I18N l10n="table.rightAligned" /></AxTableCell>
-            </AxTableRow>
-            <AxTableRow>
-              <AxTableCell align="left">$1,234.56</AxTableCell>
-              <AxTableCell align="center">Status: Active</AxTableCell>
-              <AxTableCell align="right">100%</AxTableCell>
-            </AxTableRow>
-          </AxTableBody>
-        </AxTable>
-      </AxCard>
+        </Description>
+        <AxTable
+          fullWidth
+          data={alignmentData}
+          columns={alignmentColumns}
+          getRowKey={(row: AlignmentData) => row.id.toString()}
+        />
+      </Card>
     </>
   );
 }
