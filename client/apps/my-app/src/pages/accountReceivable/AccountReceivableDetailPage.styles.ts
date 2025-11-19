@@ -1,5 +1,5 @@
 import styled from '@emotion/styled';
-import { AxCard, AxTable } from '@ui/components';
+import { AxCard, AxTable, AxParagraph, AxHeading3, AxButton, AxInput, AxListbox } from '@ui/components';
 
 export const PageContainer = styled.div`
   display: flex;
@@ -113,5 +113,130 @@ export const InfoRow = styled.div`
 
 export const ItemsTable = styled(AxTable)`
   margin-top: var(--spacing-sm);
+`;
+
+export const InfoBoxContainer = styled.div`
+  display: flex;
+  gap: var(--spacing-md);
+  flex-wrap: wrap;
+  align-items: flex-start;
+`;
+
+export const InfoBox = styled.div`
+  padding: var(--spacing-sm);
+  background-color: var(--color-background-secondary);
+  border-radius: var(--radius-md);
+`;
+
+export const InfoBoxLabel = styled(AxParagraph)`
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+  margin-bottom: var(--spacing-xs);
+`;
+
+export const InfoBoxValue = styled(AxParagraph)<{ $color?: string }>`
+  font-weight: var(--font-weight-bold);
+  ${props => props.$color ? `color: ${props.$color};` : ''}
+`;
+
+export const LoadingContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  gap: var(--spacing-md);
+`;
+
+export const BackButton = styled(AxButton)`
+  min-width: auto;
+  padding: var(--spacing-sm) var(--spacing-md);
+`;
+
+export const HeaderTitleContainer = styled.div`
+  flex: 1;
+`;
+
+export const HeadingWithMarginBottom = styled(AxHeading3)<{ $marginBottom?: string }>`
+  margin-bottom: ${props => props.$marginBottom || 'var(--spacing-sm)'};
+`;
+
+export const ParagraphSecondary = styled(AxParagraph)`
+  color: var(--color-text-secondary);
+`;
+
+export const ParagraphWithMargin = styled(AxParagraph)<{ $marginBottom?: string }>`
+  margin-bottom: ${props => props.$marginBottom || 'var(--spacing-md)'};
+  color: var(--color-text-secondary);
+`;
+
+export const ParagraphBold = styled(AxParagraph)`
+  font-weight: var(--font-weight-bold);
+`;
+
+export const ParagraphBoldLarge = styled(AxParagraph)`
+  font-weight: var(--font-weight-bold);
+  font-size: var(--font-size-lg);
+`;
+
+export const ParagraphLargeBold = styled(AxParagraph)`
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-bold);
+`;
+
+export const ParagraphLarge = styled(AxParagraph)`
+  font-size: var(--font-size-lg);
+`;
+
+export const FormContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xsm);
+`;
+
+export const InputWithWidth = styled(AxInput)`
+  width: 220px;
+`;
+
+export const ListboxWithWidth = styled(AxListbox)`
+  width: 220px;
+`;
+
+export const OutstandingParagraph = styled(AxParagraph)<{ $outstandingAmount: number }>`
+  font-weight: var(--font-weight-bold);
+  color: ${props => props.$outstandingAmount > 0 ? 'var(--color-warning)' : 'var(--color-success)'};
+`;
+
+export const OutstandingParagraphLarge = styled(AxParagraph)<{ $outstandingAmount: number }>`
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-bold);
+  color: ${props => props.$outstandingAmount > 0 ? 'var(--color-warning)' : 'var(--color-success)'};
+`;
+
+export const EmptyStateContainer = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 200px;
+`;
+
+export const ScrollableContainer = styled.div`
+  max-height: calc(100vh - 400px);
+  overflow-y: auto;
+  overflow-x: hidden;
+`;
+
+export const DataContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+`;
+
+export const DataItem = styled.div`
+  font-size: var(--font-size-sm);
+`;
+
+export const ErrorParagraph = styled(AxParagraph)`
+  color: var(--color-danger);
 `;
 

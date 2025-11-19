@@ -273,7 +273,7 @@ export function AccountReceivableDetailPage(props: AccountReceivableDetailPagePr
       onStepChange={setCurrentStep}
       onPaymentAmountChange={setPaymentAmount}
       onPaymentDateChange={setPaymentDate}
-      onPaymentMethodChange={setPaymentMethod}
+      onPaymentMethodChange={(value) => setPaymentMethod(Array.isArray(value) ? value[0] || '' : value)}
       onPaymentSubmit={handlePayment}
       formatDate={formatDate}
       formatDateTime={formatDateTime}

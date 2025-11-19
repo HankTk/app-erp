@@ -57,10 +57,10 @@ export function AccountPayableListingPage({ onViewInvoice, onNavigateBack }: Acc
     ? invoices.filter(invoice => invoice.status === statusFilter)
     : invoices;
 
-  const getSupplierName = (supplierId?: string) => {
+  const getSupplierName = (supplierId?: string): string => {
     if (!supplierId) return 'N/A';
     const supplier = suppliers.find(s => s.id === supplierId);
-    return supplier ? (supplier.companyName || `${supplier.lastName} ${supplier.firstName}` || supplier.email) : supplierId;
+    return supplier ? (supplier.companyName || `${supplier.lastName} ${supplier.firstName}` || supplier.email || 'N/A') : (supplierId || 'N/A');
   };
 
   const formatDate = (dateString?: string) => {

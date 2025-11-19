@@ -1,5 +1,4 @@
 import {
-  AxCard,
   AxHeading3,
   AxParagraph,
   AxButton,
@@ -32,6 +31,29 @@ import {
   InfoSection,
   InfoRow,
   ItemsTable,
+  InfoBoxContainer,
+  InfoBox,
+  InfoBoxLabel,
+  InfoBoxValue,
+  LoadingContainer,
+  BackButton,
+  HeaderTitleContainer,
+  HeadingWithMarginBottom,
+  ParagraphSecondary,
+  ParagraphWithMargin,
+  ParagraphBold,
+  ParagraphBoldLarge,
+  ParagraphLargeBold,
+  ParagraphLarge,
+  FormContainer,
+  InputWithWidth,
+  ListboxWithWidth,
+  OutstandingParagraph,
+  OutstandingParagraphLarge,
+  EmptyStateContainer,
+  ScrollableContainer,
+  DataContainer,
+  DataItem,
 } from './AccountReceivableDetailPage.styles';
 
 const COMPONENT_NAME = 'AccountReceivableDetailPage';
@@ -67,7 +89,7 @@ interface AccountReceivableDetailPageRenderProps {
   onStepChange: (step: AccountReceivableStep) => void;
   onPaymentAmountChange: (value: number) => void;
   onPaymentDateChange: (value: string) => void;
-  onPaymentMethodChange: (value: string) => void;
+  onPaymentMethodChange: (value: string | string[]) => void;
   onPaymentSubmit: () => void;
   
   // Helpers
@@ -114,9 +136,9 @@ export function AccountReceivableDetailPageRender(props: AccountReceivableDetail
     return (
       <PageContainer {...debugProps(COMPONENT_NAME, 'PageContainer')}>
         <ContentCard padding="large" {...debugProps(COMPONENT_NAME, 'ContentCard')}>
-          <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', height: '100%', gap: 'var(--spacing-md)' }}>
+          <LoadingContainer>
             <AxParagraph>Loading invoice...</AxParagraph>
-          </div>
+          </LoadingContainer>
         </ContentCard>
       </PageContainer>
     );
@@ -126,14 +148,14 @@ export function AccountReceivableDetailPageRender(props: AccountReceivableDetail
     return (
       <PageContainer {...debugProps(COMPONENT_NAME, 'PageContainer')}>
         <ContentCard padding="large" {...debugProps(COMPONENT_NAME, 'ContentCard')}>
-          <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', height: '100%', gap: 'var(--spacing-md)' }}>
+          <LoadingContainer>
             <AxParagraph>Invoice not found</AxParagraph>
             {onNavigateBack && (
               <AxButton variant="secondary" onClick={onNavigateBack}>
                 {l10n('accountsReceivable.back')}
               </AxButton>
             )}
-          </div>
+          </LoadingContainer>
         </ContentCard>
       </PageContainer>
     );
@@ -145,79 +167,59 @@ export function AccountReceivableDetailPageRender(props: AccountReceivableDetail
         <HeaderSection {...debugProps(COMPONENT_NAME, 'HeaderSection')}>
           <HeaderLeft {...debugProps(COMPONENT_NAME, 'HeaderLeft')}>
             {onNavigateBack && (
-              <AxButton 
+              <BackButton 
                 variant="secondary" 
                 onClick={onNavigateBack}
-                style={{ minWidth: 'auto', padding: 'var(--spacing-sm) var(--spacing-md)' }}
               >
                 {l10n('accountsReceivable.back')}
-              </AxButton>
+              </BackButton>
             )}
-            <div style={{ flex: 1 }}>
-              <AxHeading3 style={{ marginBottom: 'var(--spacing-xs)' }}>
+            <HeaderTitleContainer>
+              <HeadingWithMarginBottom $marginBottom="var(--spacing-xs)">
                 {l10n('module.accountsReceivable')}
-              </AxHeading3>
-              <AxParagraph style={{ color: 'var(--color-text-secondary)' }}>
+              </HeadingWithMarginBottom>
+              <ParagraphSecondary>
                 {l10n('accountsReceivable.subtitle')}
-              </AxParagraph>
-            </div>
+              </ParagraphSecondary>
+            </HeaderTitleContainer>
           </HeaderLeft>
           <HeaderRight {...debugProps(COMPONENT_NAME, 'HeaderRight')}>
-            <div style={{ display: 'flex', gap: 'var(--spacing-md)', flexWrap: 'wrap', alignItems: 'flex-start' }}>
+            <InfoBoxContainer {...debugProps(COMPONENT_NAME, 'InfoBoxContainer')}>
               {order.invoiceNumber && (
-                <div style={{ 
-                  padding: 'var(--spacing-sm)', 
-                  backgroundColor: 'var(--color-background-secondary)', 
-                  borderRadius: 'var(--radius-md)',
-                }}>
-                  <AxParagraph style={{ fontSize: 'var(--font-size-sm)', color: 'var(--color-text-secondary)', marginBottom: 'var(--spacing-xs)' }}>
+                <InfoBox {...debugProps(COMPONENT_NAME, 'InfoBox')}>
+                  <InfoBoxLabel>
                     {l10n('accountsReceivable.invoice.invoiceNumber')}
-                  </AxParagraph>
-                  <AxParagraph style={{ fontWeight: 'var(--font-weight-bold)' }}>
+                  </InfoBoxLabel>
+                  <InfoBoxValue>
                     {order.invoiceNumber}
-                  </AxParagraph>
-                </div>
+                  </InfoBoxValue>
+                </InfoBox>
               )}
-              <div style={{ 
-                padding: 'var(--spacing-sm)', 
-                backgroundColor: 'var(--color-background-secondary)', 
-                borderRadius: 'var(--radius-md)',
-              }}>
-                <AxParagraph style={{ fontSize: 'var(--font-size-sm)', color: 'var(--color-text-secondary)', marginBottom: 'var(--spacing-xs)' }}>
+              <InfoBox {...debugProps(COMPONENT_NAME, 'InfoBox')}>
+                <InfoBoxLabel>
                   {l10n('accountsReceivable.customer')}
-                </AxParagraph>
-                <AxParagraph style={{ fontWeight: 'var(--font-weight-bold)' }}>
+                </InfoBoxLabel>
+                <InfoBoxValue>
                   {selectedCustomerName}
-                </AxParagraph>
-              </div>
-              <div style={{ 
-                padding: 'var(--spacing-sm)', 
-                backgroundColor: 'var(--color-background-secondary)', 
-                borderRadius: 'var(--radius-md)',
-              }}>
-                <AxParagraph style={{ fontSize: 'var(--font-size-sm)', color: 'var(--color-text-secondary)', marginBottom: 'var(--spacing-xs)' }}>
+                </InfoBoxValue>
+              </InfoBox>
+              <InfoBox {...debugProps(COMPONENT_NAME, 'InfoBox')}>
+                <InfoBoxLabel>
                   {l10n('accountsReceivable.total')}
-                </AxParagraph>
-                <AxParagraph style={{ fontWeight: 'var(--font-weight-bold)' }}>
+                </InfoBoxLabel>
+                <InfoBoxValue>
                   ${order.total?.toFixed(2) || '0.00'}
-                </AxParagraph>
-              </div>
-              <div style={{ 
-                padding: 'var(--spacing-sm)', 
-                backgroundColor: 'var(--color-background-secondary)', 
-                borderRadius: 'var(--radius-md)',
-              }}>
-                <AxParagraph style={{ fontSize: 'var(--font-size-sm)', color: 'var(--color-text-secondary)', marginBottom: 'var(--spacing-xs)' }}>
+                </InfoBoxValue>
+              </InfoBox>
+              <InfoBox {...debugProps(COMPONENT_NAME, 'InfoBox')}>
+                <InfoBoxLabel>
                   {l10n('accountsReceivable.outstanding')}
-                </AxParagraph>
-                <AxParagraph style={{ 
-                  fontWeight: 'var(--font-weight-bold)',
-                  color: outstandingAmount > 0 ? 'var(--color-warning)' : 'var(--color-success)'
-                }}>
+                </InfoBoxLabel>
+                <InfoBoxValue $color={outstandingAmount > 0 ? 'var(--color-warning)' : 'var(--color-success)'}>
                   ${outstandingAmount.toFixed(2)}
-                </AxParagraph>
-              </div>
-            </div>
+                </InfoBoxValue>
+              </InfoBox>
+            </InfoBoxContainer>
           </HeaderRight>
         </HeaderSection>
       </HeaderCard>
@@ -253,36 +255,36 @@ export function AccountReceivableDetailPageRender(props: AccountReceivableDetail
         <StepContent {...debugProps(COMPONENT_NAME, 'StepContent')}>
           {currentStep === 'invoice' && (
             <>
-              <AxHeading3 style={{ marginBottom: 'var(--spacing-sm)' }}>
+              <HeadingWithMarginBottom>
                 {l10n('accountsReceivable.invoice.title')}
-              </AxHeading3>
-              <AxParagraph style={{ marginBottom: 'var(--spacing-md)', color: 'var(--color-text-secondary)' }}>
+              </HeadingWithMarginBottom>
+              <ParagraphWithMargin>
                 {l10n('accountsReceivable.invoice.description')}
-              </AxParagraph>
+              </ParagraphWithMargin>
 
               <InfoSection {...debugProps(COMPONENT_NAME, 'InfoSection')}>
                 <InfoRow>
-                  <AxParagraph style={{ fontWeight: 'var(--font-weight-bold)' }}>
+                  <ParagraphBold>
                     {l10n('accountsReceivable.invoice.invoiceNumber')}
-                  </AxParagraph>
+                  </ParagraphBold>
                   <AxParagraph>{order.invoiceNumber || 'N/A'}</AxParagraph>
                 </InfoRow>
                 <InfoRow>
-                  <AxParagraph style={{ fontWeight: 'var(--font-weight-bold)' }}>
+                  <ParagraphBold>
                     {l10n('accountsReceivable.invoice.invoiceDate')}
-                  </AxParagraph>
+                  </ParagraphBold>
                   <AxParagraph>{formatDate(order.invoiceDate)}</AxParagraph>
                 </InfoRow>
                 <InfoRow>
-                  <AxParagraph style={{ fontWeight: 'var(--font-weight-bold)' }}>
+                  <ParagraphBold>
                     {l10n('accountsReceivable.invoice.orderNumber')}
-                  </AxParagraph>
+                  </ParagraphBold>
                   <AxParagraph>{order.orderNumber || 'N/A'}</AxParagraph>
                 </InfoRow>
                 <InfoRow>
-                  <AxParagraph style={{ fontWeight: 'var(--font-weight-bold)' }}>
+                  <ParagraphBold>
                     {l10n('accountsReceivable.invoice.customer')}
-                  </AxParagraph>
+                  </ParagraphBold>
                   <AxParagraph>
                     {selectedCustomer ? (selectedCustomer.companyName || `${selectedCustomer.lastName} ${selectedCustomer.firstName}` || selectedCustomer.email) : 'N/A'}
                   </AxParagraph>
@@ -314,30 +316,30 @@ export function AccountReceivableDetailPageRender(props: AccountReceivableDetail
 
               <InfoSection>
                 <InfoRow>
-                  <AxParagraph style={{ fontWeight: 'var(--font-weight-bold)' }}>
+                  <ParagraphBold>
                     {l10n('accountsReceivable.invoice.subtotal')}
-                  </AxParagraph>
+                  </ParagraphBold>
                   <AxParagraph>${order.subtotal?.toFixed(2) || '0.00'}</AxParagraph>
                 </InfoRow>
                 <InfoRow>
-                  <AxParagraph style={{ fontWeight: 'var(--font-weight-bold)' }}>
+                  <ParagraphBold>
                     {l10n('accountsReceivable.invoice.tax')}
-                  </AxParagraph>
+                  </ParagraphBold>
                   <AxParagraph>${order.tax?.toFixed(2) || '0.00'}</AxParagraph>
                 </InfoRow>
                 <InfoRow>
-                  <AxParagraph style={{ fontWeight: 'var(--font-weight-bold)' }}>
+                  <ParagraphBold>
                     {l10n('accountsReceivable.invoice.shipping')}
-                  </AxParagraph>
+                  </ParagraphBold>
                   <AxParagraph>${order.shippingCost?.toFixed(2) || '0.00'}</AxParagraph>
                 </InfoRow>
                 <InfoRow>
-                  <AxParagraph style={{ fontWeight: 'var(--font-weight-bold)', fontSize: 'var(--font-size-lg)' }}>
+                  <ParagraphBoldLarge>
                     {l10n('accountsReceivable.invoice.total')}
-                  </AxParagraph>
-                  <AxParagraph style={{ fontSize: 'var(--font-size-lg)', fontWeight: 'var(--font-weight-bold)' }}>
+                  </ParagraphBoldLarge>
+                  <ParagraphLargeBold>
                     ${order.total?.toFixed(2) || '0.00'}
-                  </AxParagraph>
+                  </ParagraphLargeBold>
                 </InfoRow>
               </InfoSection>
             </>
@@ -345,22 +347,21 @@ export function AccountReceivableDetailPageRender(props: AccountReceivableDetail
 
           {currentStep === 'payment' && (
             <>
-              <AxHeading3 style={{ marginBottom: 'var(--spacing-sm)' }}>
+              <HeadingWithMarginBottom>
                 {l10n('accountsReceivable.payment.title')}
-              </AxHeading3>
-              <AxParagraph style={{ marginBottom: 'var(--spacing-md)', color: 'var(--color-text-secondary)' }}>
+              </HeadingWithMarginBottom>
+              <ParagraphWithMargin>
                 {l10n('accountsReceivable.payment.description')}
-              </AxParagraph>
+              </ParagraphWithMargin>
 
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-xsm)' }}>
+              <FormContainer>
                 <AxFormGroup>
                   <AxLabel>{l10n('accountsReceivable.payment.paymentAmount')}</AxLabel>
-                  <AxInput
+                  <InputWithWidth
                     type="number"
                     value={paymentAmount || ''}
                     onChange={e => onPaymentAmountChange(parseFloat(e.target.value) || 0)}
                     placeholder="0.00"
-                    style={{ width: '220px' }}
                   />
                 </AxFormGroup>
 
@@ -375,7 +376,7 @@ export function AccountReceivableDetailPageRender(props: AccountReceivableDetail
 
                 <AxFormGroup>
                   <AxLabel>{l10n('accountsReceivable.payment.paymentMethod')}</AxLabel>
-                  <AxListbox
+                  <ListboxWithWidth
                     options={[
                       { value: 'BANK_TRANSFER', label: l10n('accountsReceivable.payment.method.bankTransfer') },
                       { value: 'CREDIT_CARD', label: l10n('accountsReceivable.payment.method.creditCard') },
@@ -386,46 +387,38 @@ export function AccountReceivableDetailPageRender(props: AccountReceivableDetail
                     value={paymentMethod}
                     onChange={onPaymentMethodChange}
                     placeholder={l10n('accountsReceivable.payment.paymentMethodPlaceholder')}
-                    style={{ width: '220px' }}
                   />
                 </AxFormGroup>
 
                 <InfoSection {...debugProps(COMPONENT_NAME, 'InfoSection')}>
                   <InfoRow>
-                    <AxParagraph style={{ fontWeight: 'var(--font-weight-bold)' }}>
+                    <ParagraphBold>
                       {l10n('accountsReceivable.payment.invoiceAmount')}
-                    </AxParagraph>
-                    <AxParagraph style={{ fontSize: 'var(--font-size-lg)' }}>
+                    </ParagraphBold>
+                    <ParagraphLarge>
                       ${order.total?.toFixed(2) || '0.00'}
-                    </AxParagraph>
+                    </ParagraphLarge>
                   </InfoRow>
                   {paymentAmount > 0 && (
                     <InfoRow>
-                      <AxParagraph style={{ fontWeight: 'var(--font-weight-bold)' }}>
+                      <ParagraphBold>
                         {l10n('accountsReceivable.payment.paidAmount')}
-                      </AxParagraph>
-                      <AxParagraph style={{ fontSize: 'var(--font-size-lg)' }}>
+                      </ParagraphBold>
+                      <ParagraphLarge>
                         ${paymentAmount.toFixed(2)}
-                      </AxParagraph>
+                      </ParagraphLarge>
                     </InfoRow>
                   )}
                   <InfoRow>
-                    <AxParagraph style={{ 
-                      fontWeight: 'var(--font-weight-bold)',
-                      color: outstandingAmount > 0 ? 'var(--color-warning)' : 'var(--color-success)'
-                    }}>
+                    <OutstandingParagraph $outstandingAmount={outstandingAmount}>
                       {l10n('accountsReceivable.payment.outstanding')}
-                    </AxParagraph>
-                    <AxParagraph style={{ 
-                      fontSize: 'var(--font-size-lg)',
-                      fontWeight: 'var(--font-weight-bold)',
-                      color: outstandingAmount > 0 ? 'var(--color-warning)' : 'var(--color-success)'
-                    }}>
+                    </OutstandingParagraph>
+                    <OutstandingParagraphLarge $outstandingAmount={outstandingAmount}>
                       ${outstandingAmount.toFixed(2)}
-                    </AxParagraph>
+                    </OutstandingParagraphLarge>
                   </InfoRow>
                 </InfoSection>
-              </div>
+              </FormContainer>
 
               <ButtonGroup {...debugProps(COMPONENT_NAME, 'ButtonGroup')}>
                 <AxButton
@@ -447,19 +440,19 @@ export function AccountReceivableDetailPageRender(props: AccountReceivableDetail
 
           {currentStep === 'history' && (
             <>
-              <AxHeading3 style={{ marginBottom: 'var(--spacing-sm)' }}>
+              <HeadingWithMarginBottom>
                 {l10n('accountsReceivable.history.title')}
-              </AxHeading3>
-              <AxParagraph style={{ marginBottom: 'var(--spacing-md)', color: 'var(--color-text-secondary)' }}>
+              </HeadingWithMarginBottom>
+              <ParagraphWithMargin>
                 {l10n('accountsReceivable.history.description')}
-              </AxParagraph>
+              </ParagraphWithMargin>
 
               {historyRecords.length === 0 ? (
-                <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '200px' }}>
+                <EmptyStateContainer>
                   <AxParagraph>{l10n('accountsReceivable.history.empty')}</AxParagraph>
-                </div>
+                </EmptyStateContainer>
               ) : (
-                <div style={{ maxHeight: 'calc(100vh - 400px)', overflowY: 'auto', overflowX: 'hidden' }}>
+                <ScrollableContainer>
                   <AxTable fullWidth>
                     <AxTableHead>
                       <AxTableRow>
@@ -479,20 +472,20 @@ export function AccountReceivableDetailPageRender(props: AccountReceivableDetail
                           <AxTableCell>{record.note || 'N/A'}</AxTableCell>
                           <AxTableCell>
                             {record.data && Object.keys(record.data).length > 0 ? (
-                              <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-xs)' }}>
+                              <DataContainer>
                                 {Object.entries(record.data).map(([key, value]) => (
-                                  <div key={key} style={{ fontSize: 'var(--font-size-sm)' }}>
+                                  <DataItem key={key}>
                                     <strong>{getDataKeyLabel(key)}:</strong> {formatDataValue(key, value)}
-                                  </div>
+                                  </DataItem>
                                 ))}
-                              </div>
+                              </DataContainer>
                             ) : 'N/A'}
                           </AxTableCell>
                         </AxTableRow>
                       ))}
                     </AxTableBody>
                   </AxTable>
-                </div>
+                </ScrollableContainer>
               )}
 
               <ButtonGroup {...debugProps(COMPONENT_NAME, 'ButtonGroup')}>

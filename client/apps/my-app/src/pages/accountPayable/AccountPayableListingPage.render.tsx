@@ -22,6 +22,16 @@ import {
   HeaderLeft,
   HeaderRight,
   TableCard,
+  BackButton,
+  HeaderTitleContainer,
+  HeadingWithMargin,
+  ParagraphSecondary,
+  ParagraphDanger,
+  FormGroupNoMargin,
+  TableContainer,
+  LoadingContainer,
+  OutstandingCell,
+  StatusBadge,
 } from './AccountPayableListingPage.styles';
 
 const COMPONENT_NAME = 'AccountPayableListingPage';
@@ -63,25 +73,24 @@ export function AccountPayableListingPageRender(props: AccountPayableListingPage
         <HeaderSection {...debugProps(COMPONENT_NAME, 'HeaderSection')}>
           <HeaderLeft {...debugProps(COMPONENT_NAME, 'HeaderLeft')}>
             {onNavigateBack && (
-              <AxButton 
+              <BackButton 
                 variant="secondary" 
                 onClick={onNavigateBack}
-                style={{ minWidth: 'auto', padding: 'var(--spacing-sm) var(--spacing-md)' }}
               >
                 {l10n('accountsPayable.back')}
-              </AxButton>
+              </BackButton>
             )}
-            <div>
-              <AxHeading3 style={{ marginBottom: 'var(--spacing-xs)' }}>
+            <HeaderTitleContainer>
+              <HeadingWithMargin>
                 {l10n('module.accountsPayable')}
-              </AxHeading3>
-              <AxParagraph style={{ color: 'var(--color-text-secondary)' }}>
+              </HeadingWithMargin>
+              <ParagraphSecondary>
                 {l10n('accountsPayable.subtitle')}
-              </AxParagraph>
-            </div>
+              </ParagraphSecondary>
+            </HeaderTitleContainer>
           </HeaderLeft>
           <HeaderRight {...debugProps(COMPONENT_NAME, 'HeaderRight')}>
-            <AxFormGroup style={{ margin: 0, minWidth: '200px' }}>
+            <FormGroupNoMargin>
               <AxListbox
                 value={statusFilter || ''}
                 onChange={(value: string | null) => onStatusFilterChange(value || null)}
@@ -92,27 +101,27 @@ export function AccountPayableListingPageRender(props: AccountPayableListingPage
                 ]}
                 placeholder={l10n('accountsPayable.filter.placeholder')}
               />
-            </AxFormGroup>
+            </FormGroupNoMargin>
           </HeaderRight>
         </HeaderSection>
       </HeaderCard>
 
       {error && (
         <AxCard padding="large">
-          <AxParagraph style={{ color: 'var(--color-danger)' }}>{error}</AxParagraph>
+          <ParagraphDanger>{error}</ParagraphDanger>
         </AxCard>
       )}
 
       <TableCard padding="large" {...debugProps(COMPONENT_NAME, 'TableCard')}>
-        <div style={{ flex: 1, overflow: 'auto', minHeight: 0, height: 0, maxHeight: '100%' }}>
+        <TableContainer>
           {loading ? (
-            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '200px' }}>
+            <LoadingContainer>
               <AxParagraph>{l10n('accountsPayable.loading')}</AxParagraph>
-            </div>
+            </LoadingContainer>
           ) : filteredInvoices.length === 0 ? (
-            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '200px' }}>
+            <LoadingContainer>
               <AxParagraph>{l10n('accountsPayable.noData')}</AxParagraph>
-            </div>
+            </LoadingContainer>
           ) : (
             <AxTable fullWidth stickyHeader>
             <AxTableHead>
@@ -146,25 +155,13 @@ export function AccountPayableListingPageRender(props: AccountPayableListingPage
                     <AxTableCell align="right">
                       ${paidAmount.toFixed(2)}
                     </AxTableCell>
-                    <AxTableCell align="right" style={{ 
-                      color: outstanding > 0 ? 'var(--color-warning)' : 'var(--color-success)',
-                      fontWeight: outstanding > 0 ? 'var(--font-weight-bold)' : 'normal'
-                    }}>
+                    <OutstandingCell align="right" $outstanding={outstanding}>
                       ${outstanding.toFixed(2)}
-                    </AxTableCell>
+                    </OutstandingCell>
                     <AxTableCell>
-                      <span
-                        style={{
-                          padding: 'var(--spacing-xs) var(--spacing-sm)',
-                          borderRadius: 'var(--radius-sm)',
-                          backgroundColor: invoice.status === 'PAID' ? '#05966920' : '#EC489920',
-                          color: invoice.status === 'PAID' ? '#059669' : '#EC4899',
-                          fontSize: 'var(--font-size-sm)',
-                          fontWeight: 'var(--font-weight-medium)',
-                        }}
-                      >
+                      <StatusBadge $status={invoice.status as 'PAID' | 'INVOICED'}>
                         {invoice.status === 'PAID' ? l10n('accountsPayable.status.paid') : l10n('accountsPayable.status.invoiced')}
-                      </span>
+                      </StatusBadge>
                     </AxTableCell>
                     <AxTableCell>
                       {onViewInvoice && invoice.id && (
@@ -179,7 +176,7 @@ export function AccountPayableListingPageRender(props: AccountPayableListingPage
             </AxTableBody>
           </AxTable>
           )}
-        </div>
+        </TableContainer>
       </TableCard>
     </PageContainer>
   );
