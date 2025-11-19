@@ -13,6 +13,7 @@ import { debugProps } from '../../utils/emotionCache';
 import { Customer } from '../../api/customerApi';
 import { Address } from '../../api/addressApi';
 import { CustomerAddressAssociation } from '../../components/CustomerAddressAssociation';
+import { useI18n } from '../../i18n/I18nProvider';
 import {
   PageContainer,
   HeaderCard,
@@ -33,46 +34,46 @@ type ListingRenderContext = {
   formatAddress: (address: Address) => string;
 };
 
-const createColumns = (): ColumnDefinition<Customer, ListingRenderContext>[] => [
+const createColumns = (t: (key: string, params?: Record<string, string | number | undefined>) => string): ColumnDefinition<Customer, ListingRenderContext>[] => [
   { 
     key: 'customer.customerNumber',
-    header: 'Customer Number',
+    header: t('customerListing.table.customerNumber'),
     align: undefined,
     render: (customer: Customer) => customer.customerNumber || ''
   },
   { 
     key: 'customer.companyName',
-    header: 'Company Name',
+    header: t('customerListing.table.companyName'),
     align: undefined,
     render: (customer: Customer) => customer.companyName || ''
   },
   { 
     key: 'customer.firstName',
-    header: 'First Name',
+    header: t('customerListing.table.firstName'),
     align: undefined,
     render: (customer: Customer) => customer.firstName || ''
   },
   { 
     key: 'customer.lastName',
-    header: 'Last Name',
+    header: t('customerListing.table.lastName'),
     align: undefined,
     render: (customer: Customer) => customer.lastName || ''
   },
   { 
     key: 'customer.email',
-    header: 'Email',
+    header: t('customerListing.table.email'),
     align: undefined,
     render: (customer: Customer) => customer.email || ''
   },
   { 
     key: 'customer.phone',
-    header: 'Phone',
+    header: t('customerListing.table.phone'),
     align: undefined,
     render: (customer: Customer) => customer.phone || ''
   },
   { 
     key: 'customer.actions',
-    header: 'Actions',
+    header: t('generalLedger.table.actions'),
     align: 'center',
     render: (customer: Customer, context) => (
       <div style={{ display: 'flex', gap: 'var(--spacing-sm)', justifyContent: 'center' }}>
@@ -82,7 +83,7 @@ const createColumns = (): ColumnDefinition<Customer, ListingRenderContext>[] => 
           onClick={() => context?.onEdit(customer)}
           style={{ minWidth: '80px' }}
         >
-          Edit
+          {t('customerListing.table.edit')}
         </AxButton>
         <AxButton 
           variant="danger" 
@@ -90,7 +91,7 @@ const createColumns = (): ColumnDefinition<Customer, ListingRenderContext>[] => 
           onClick={() => context?.onDeleteClick(customer)}
           style={{ minWidth: '80px' }}
         >
-          Delete
+          {t('common.delete')}
         </AxButton>
       </div>
     )
@@ -155,7 +156,8 @@ export function CustomerListingPageRender(props: CustomerListingPageRenderProps)
     getCustomerAddresses,
   } = props;
 
-  const columns = createColumns();
+  const { l10n } = useI18n();
+  const columns = createColumns(l10n);
   const tableContext: ListingRenderContext = {
     onEdit,
     onDeleteClick,
@@ -170,7 +172,7 @@ export function CustomerListingPageRender(props: CustomerListingPageRenderProps)
     }
     return (
       <div style={{ paddingLeft: 'var(--spacing-md)', fontSize: 'var(--font-size-sm)', color: 'var(--color-text-secondary)' }}>
-        <strong style={{ color: 'var(--color-text-primary)', marginRight: 'var(--spacing-sm)' }}>Addresses:</strong>
+        <strong style={{ color: 'var(--color-text-primary)', marginRight: 'var(--spacing-sm)' }}>{l10n('customerListing.expandedRow.addresses')}</strong>
         {customerAddresses.map((addr, index) => (
           <span key={addr.id}>
             {index > 0 && <span style={{ margin: '0 var(--spacing-xs)' }}>|</span>}
@@ -195,26 +197,26 @@ export function CustomerListingPageRender(props: CustomerListingPageRenderProps)
                   onClick={onNavigateBack}
                   style={{ minWidth: 'auto', padding: 'var(--spacing-sm) var(--spacing-md)' }}
                 >
-                  ← Back
+                  {l10n('customerListing.back')}
                 </AxButton>
               )}
               <div>
                 <AxHeading3 style={{ marginBottom: 'var(--spacing-xs)' }}>
-                  Customers
+                  {l10n('customerListing.title')}
                 </AxHeading3>
                 <AxParagraph color="secondary">
-                  Manage customer accounts
+                  {l10n('customerListing.subtitle')}
                 </AxParagraph>
               </div>
             </HeaderLeft>
             <HeaderRight {...debugProps(COMPONENT_NAME, 'HeaderRight')}>
-              <AxButton variant="primary" onClick={onAdd}>Add New</AxButton>
+              <AxButton variant="primary" onClick={onAdd}>{l10n('customerListing.addNew')}</AxButton>
             </HeaderRight>
           </HeaderSection>
         </HeaderCard>
         <TableCard padding="large" {...debugProps(COMPONENT_NAME, 'TableCard')}>
           <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '200px' }}>
-            <AxParagraph>Loading customers...</AxParagraph>
+            <AxParagraph>{l10n('customerListing.loading')}</AxParagraph>
           </div>
         </TableCard>
       </PageContainer>
@@ -233,28 +235,28 @@ export function CustomerListingPageRender(props: CustomerListingPageRenderProps)
                   onClick={onNavigateBack}
                   style={{ minWidth: 'auto', padding: 'var(--spacing-sm) var(--spacing-md)' }}
                 >
-                  ← Back
+                  {l10n('customerListing.back')}
                 </AxButton>
               )}
               <div>
                 <AxHeading3 style={{ marginBottom: 'var(--spacing-xs)' }}>
-                  Customers
+                  {l10n('customerListing.title')}
                 </AxHeading3>
                 <AxParagraph color="secondary">
-                  Manage customer accounts
+                  {l10n('customerListing.subtitle')}
                 </AxParagraph>
               </div>
             </HeaderLeft>
             <HeaderRight {...debugProps(COMPONENT_NAME, 'HeaderRight')}>
-              <AxButton variant="primary" onClick={onAdd}>Add New</AxButton>
+              <AxButton variant="primary" onClick={onAdd}>{l10n('customerListing.addNew')}</AxButton>
             </HeaderRight>
           </HeaderSection>
         </HeaderCard>
         <TableCard padding="large" {...debugProps(COMPONENT_NAME, 'TableCard')}>
           <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '200px', flexDirection: 'column', gap: 'var(--spacing-md)' }}>
-            <AxParagraph color="error">Error: {error}</AxParagraph>
+            <AxParagraph color="error">{l10n('customerListing.error')}: {error}</AxParagraph>
             <AxButton variant="secondary" onClick={onRetry}>
-              Retry
+              {l10n('common.retry')}
             </AxButton>
           </div>
         </TableCard>
@@ -294,7 +296,7 @@ export function CustomerListingPageRender(props: CustomerListingPageRenderProps)
       <TableCard padding="large" {...debugProps(COMPONENT_NAME, 'TableCard')}>
         {customers.length === 0 ? (
           <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '200px' }}>
-            <AxParagraph>No customers found</AxParagraph>
+            <AxParagraph>{l10n('customerListing.noCustomers')}</AxParagraph>
           </div>
         ) : (
           <AxTable
@@ -313,7 +315,7 @@ export function CustomerListingPageRender(props: CustomerListingPageRenderProps)
       <AxDialog
         open={dialogMode !== null}
         onClose={onDialogClose}
-        title={dialogMode === 'add' ? 'Add Customer' : 'Edit Customer'}
+        title={dialogMode === 'add' ? l10n('customerListing.dialog.addTitle') : l10n('customerListing.dialog.editTitle')}
         size="large"
         footer={
           <div style={{ display: 'flex', gap: 'var(--spacing-sm)', justifyContent: 'space-between' }}>
@@ -324,7 +326,7 @@ export function CustomerListingPageRender(props: CustomerListingPageRenderProps)
                   onClick={onManageAddresses}
                   disabled={submitting}
                 >
-                  Manage Addresses
+                  {l10n('customerListing.dialog.manageAddresses')}
                 </AxButton>
               )}
             </div>
@@ -334,14 +336,14 @@ export function CustomerListingPageRender(props: CustomerListingPageRenderProps)
                 onClick={onDialogClose}
                 disabled={submitting}
               >
-                Cancel
+                {l10n('common.cancel')}
               </AxButton>
               <AxButton 
                 variant="primary" 
                 onClick={onSave}
                 disabled={submitting}
               >
-                {submitting ? 'Saving...' : 'Save'}
+                {submitting ? l10n('common.saving') : l10n('common.save')}
               </AxButton>
             </div>
           </div>
@@ -349,7 +351,7 @@ export function CustomerListingPageRender(props: CustomerListingPageRenderProps)
       >
         <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-lg)' }}>
           <AxFormGroup>
-            <AxLabel>Customer Number</AxLabel>
+            <AxLabel>{l10n('customerListing.form.customerNumber')}</AxLabel>
             <AxInput
               type="text"
               value={formData.customerNumber || ''}
@@ -360,7 +362,7 @@ export function CustomerListingPageRender(props: CustomerListingPageRenderProps)
             />
           </AxFormGroup>
           <AxFormGroup>
-            <AxLabel>Company Name</AxLabel>
+            <AxLabel>{l10n('customerListing.form.companyName')}</AxLabel>
             <AxInput
               type="text"
               value={formData.companyName || ''}
@@ -371,7 +373,7 @@ export function CustomerListingPageRender(props: CustomerListingPageRenderProps)
             />
           </AxFormGroup>
           <AxFormGroup>
-            <AxLabel>First Name</AxLabel>
+            <AxLabel>{l10n('customerListing.form.firstName')}</AxLabel>
             <AxInput
               type="text"
               value={formData.firstName || ''}
@@ -382,7 +384,7 @@ export function CustomerListingPageRender(props: CustomerListingPageRenderProps)
             />
           </AxFormGroup>
           <AxFormGroup>
-            <AxLabel>Last Name</AxLabel>
+            <AxLabel>{l10n('customerListing.form.lastName')}</AxLabel>
             <AxInput
               type="text"
               value={formData.lastName || ''}
@@ -393,7 +395,7 @@ export function CustomerListingPageRender(props: CustomerListingPageRenderProps)
             />
           </AxFormGroup>
           <AxFormGroup>
-            <AxLabel>Email</AxLabel>
+            <AxLabel>{l10n('customerListing.form.email')}</AxLabel>
             <AxInput
               type="email"
               value={formData.email || ''}
@@ -404,7 +406,7 @@ export function CustomerListingPageRender(props: CustomerListingPageRenderProps)
             />
           </AxFormGroup>
           <AxFormGroup>
-            <AxLabel>Phone</AxLabel>
+            <AxLabel>{l10n('customerListing.form.phone')}</AxLabel>
             <AxInput
               type="tel"
               value={formData.phone || ''}
@@ -416,14 +418,14 @@ export function CustomerListingPageRender(props: CustomerListingPageRenderProps)
           </AxFormGroup>
           {dialogMode === 'edit' && selectedCustomer?.id && (
             <AxFormGroup>
-              <AxLabel>Associated Addresses</AxLabel>
+              <AxLabel>{l10n('customerListing.form.associatedAddresses')}</AxLabel>
               <div style={{ marginTop: 'var(--spacing-xs)' }}>
                 {(() => {
                   const customerAddresses = getCustomerAddresses(selectedCustomer.id);
                   if (customerAddresses.length === 0) {
                     return (
                       <AxParagraph color="secondary" italic>
-                        No addresses associated with this customer
+                        {l10n('customer.noAddresses')}
                       </AxParagraph>
                     );
                   }
@@ -440,7 +442,11 @@ export function CustomerListingPageRender(props: CustomerListingPageRenderProps)
                           }}
                         >
                           <div style={{ fontWeight: 'var(--font-weight-medium)', marginBottom: 'var(--spacing-xs)' }}>
-                            {addr.addressType || 'Both (Shipping & Billing)'}
+                            {addr.addressType ? 
+                              (addr.addressType === 'SHIPPING' ? l10n('customer.addressType.shipping') :
+                               addr.addressType === 'BILLING' ? l10n('customer.addressType.billing') :
+                               l10n('customer.addressType.both')) :
+                              l10n('customer.addressType.both')}
                           </div>
                           <div>{formatAddress(addr)}</div>
                         </div>
@@ -458,7 +464,7 @@ export function CustomerListingPageRender(props: CustomerListingPageRenderProps)
       <AxDialog
         open={deleteDialogOpen}
         onClose={onDeleteCancel}
-        title="Delete Customer"
+        title={l10n('customerListing.dialog.deleteTitle')}
         size="medium"
         footer={
           <div style={{ display: 'flex', gap: 'var(--spacing-sm)', justifyContent: 'flex-end' }}>
@@ -467,23 +473,23 @@ export function CustomerListingPageRender(props: CustomerListingPageRenderProps)
               onClick={onDeleteCancel}
               disabled={submitting}
             >
-              Cancel
+              {l10n('common.cancel')}
             </AxButton>
             <AxButton 
               variant="danger" 
               onClick={onDeleteConfirm}
               disabled={submitting}
             >
-              {submitting ? 'Deleting...' : 'Delete'}
+              {submitting ? l10n('common.deleting') : l10n('common.delete')}
             </AxButton>
           </div>
         }
       >
         <AxParagraph marginBottom="md">
-          Are you sure you want to delete this customer?
+          {l10n('customerListing.dialog.deleteConfirm')}
         </AxParagraph>
         <AxParagraph color="secondary" size="sm">
-          This action cannot be undone.
+          {l10n('customerListing.dialog.deleteWarning')}
         </AxParagraph>
       </AxDialog>
 
@@ -492,7 +498,7 @@ export function CustomerListingPageRender(props: CustomerListingPageRenderProps)
         <AxDialog
           open={showAddressDialog}
           onClose={onAddressDialogClose}
-          title="Manage Addresses"
+          title={l10n('customerListing.dialog.manageAddresses')}
           size="large"
           footer={
             <div style={{ display: 'flex', gap: 'var(--spacing-sm)', justifyContent: 'flex-end' }}>
@@ -500,7 +506,7 @@ export function CustomerListingPageRender(props: CustomerListingPageRenderProps)
                 variant="secondary" 
                 onClick={onAddressDialogClose}
               >
-                Close
+                {l10n('customer.close')}
               </AxButton>
             </div>
           }

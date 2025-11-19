@@ -85,7 +85,7 @@ const createColumns = (l10n: (key: string) => string): ColumnDefinition<Inventor
             value={context?.adjustQuantities[itemKey] || ''}
             onChange={(e) => context?.onAdjustQuantityChange(itemKey, parseInt(e.target.value) || 0)}
             style={{ width: '80px' }}
-            placeholder="±Qty"
+            placeholder={l10n('inventory.adjustQuantityPlaceholder')}
           />
           <AxButton
             variant="primary"
@@ -223,7 +223,7 @@ export function InventoryListingPageRender(props: InventoryListingPageRenderProp
         </HeaderCard>
         <TableCard padding="large" {...debugProps(COMPONENT_NAME, 'TableCard')}>
           <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '200px', flexDirection: 'column', gap: 'var(--spacing-md)' }}>
-            <AxParagraph color="error">Error: {error}</AxParagraph>
+            <AxParagraph color="error">{l10n('inventory.error')}: {error}</AxParagraph>
             <AxButton variant="secondary" onClick={onRetry}>
               {l10n('common.retry')}
             </AxButton>

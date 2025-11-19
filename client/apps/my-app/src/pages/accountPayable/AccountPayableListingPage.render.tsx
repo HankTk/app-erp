@@ -41,31 +41,31 @@ const createColumns = (l10n: (key: string) => string): ColumnDefinition<Purchase
     key: 'accountsPayable.invoiceNumber',
     header: l10n('accountsPayable.invoiceNumber'),
     align: undefined,
-    render: (invoice: PurchaseOrder) => invoice.invoiceNumber || 'N/A'
+    render: (invoice: PurchaseOrder) => invoice.invoiceNumber || l10n('generalLedger.notAvailable')
   },
   { 
     key: 'accountsPayable.orderNumber',
     header: l10n('accountsPayable.orderNumber'),
     align: undefined,
-    render: (invoice: PurchaseOrder) => invoice.orderNumber || invoice.id?.substring(0, 8) || 'N/A'
+    render: (invoice: PurchaseOrder) => invoice.orderNumber || invoice.id?.substring(0, 8) || l10n('generalLedger.notAvailable')
   },
   { 
     key: 'accountsPayable.supplier',
     header: l10n('accountsPayable.supplier'),
     align: undefined,
-    render: (invoice: PurchaseOrder, context) => context?.getSupplierName(invoice.supplierId) || 'N/A'
+    render: (invoice: PurchaseOrder, context) => context?.getSupplierName(invoice.supplierId) || l10n('generalLedger.notAvailable')
   },
   { 
     key: 'accountsPayable.invoiceDate',
     header: l10n('accountsPayable.invoiceDate'),
     align: undefined,
-    render: (invoice: PurchaseOrder, context) => context?.formatDate(invoice.invoiceDate) || 'N/A'
+    render: (invoice: PurchaseOrder, context) => context?.formatDate(invoice.invoiceDate) || l10n('generalLedger.notAvailable')
   },
   { 
     key: 'accountsPayable.dueDate',
     header: l10n('accountsPayable.dueDate'),
     align: undefined,
-    render: (invoice: PurchaseOrder, context) => context?.formatDate(invoice.invoiceDate) || 'N/A'
+    render: (invoice: PurchaseOrder, context) => context?.formatDate(invoice.invoiceDate) || l10n('generalLedger.notAvailable')
   },
   { 
     key: 'accountsPayable.total',

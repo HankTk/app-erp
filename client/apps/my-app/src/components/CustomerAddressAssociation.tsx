@@ -20,6 +20,7 @@ import { fetchCustomerById, updateCustomer, Customer } from '../api/customerApi'
 import styled from '@emotion/styled';
 import { debugProps } from '../utils/emotionCache';
 import { AddressFormDialog } from './AddressFormDialog';
+import { useI18n } from '../i18n/I18nProvider';
 
 const COMPONENT_NAME = 'CustomerAddressAssociation';
 
@@ -45,6 +46,7 @@ interface CustomerAddressAssociationProps {
 }
 
 export function CustomerAddressAssociation({ customerId, onAddressesUpdated }: CustomerAddressAssociationProps) {
+  const { l10n } = useI18n();
   const [allAddresses, setAllAddresses] = useState<Address[]>([]);
   const [customer, setCustomer] = useState<Customer | null>(null);
   const [associatedAddresses, setAssociatedAddresses] = useState<Address[]>([]);
@@ -119,7 +121,7 @@ export function CustomerAddressAssociation({ customerId, onAddressesUpdated }: C
         }
       } catch (err) {
         console.error('Error associating new address:', err);
-        alert('Address created but failed to associate with customer');
+        alert(l10n('address.createdButFailedToAssociate'));
       } finally {
         setLoading(false);
       }
@@ -161,7 +163,7 @@ export function CustomerAddressAssociation({ customerId, onAddressesUpdated }: C
       }
     } catch (err) {
       console.error('Error associating address:', err);
-      alert('Failed to associate address');
+      alert(l10n('address.failedToAssociate'));
     } finally {
       setLoading(false);
     }
@@ -195,7 +197,7 @@ export function CustomerAddressAssociation({ customerId, onAddressesUpdated }: C
       }
     } catch (err) {
       console.error('Error removing address association:', err);
-      alert('Failed to remove address association');
+      alert(l10n('address.failedToRemove'));
     } finally {
       setLoading(false);
     }
@@ -223,7 +225,7 @@ export function CustomerAddressAssociation({ customerId, onAddressesUpdated }: C
       }
     } catch (err) {
       console.error('Error deleting address:', err);
-      alert('Failed to delete address');
+      alert(l10n('address.failedToDelete'));
     } finally {
       setDeleting(false);
     }
@@ -255,17 +257,17 @@ export function CustomerAddressAssociation({ customerId, onAddressesUpdated }: C
   return (
     <Container {...debugProps(COMPONENT_NAME, 'Container')}>
       <Section {...debugProps(COMPONENT_NAME, 'Section')}>
-        <AxHeading3 style={{ marginBottom: 'var(--spacing-sm)' }}>Associate Address</AxHeading3>
+        <AxHeading3 style={{ marginBottom: 'var(--spacing-sm)' }}>{l10n('address.associate')}</AxHeading3>
         <AddressCard padding="medium">
           <AxFormGroup>
-            <AxLabel>Select Address to Associate</AxLabel>
+            <AxLabel>{l10n('address.selectToAssociate')}</AxLabel>
             <div style={{ display: 'flex', gap: 'var(--spacing-sm)', alignItems: 'flex-end' }}>
               <div style={{ flex: 1 }}>
                 <AxListbox
                   options={addressOptions}
                   value={selectedAddressId}
                   onChange={setSelectedAddressId}
-                  placeholder="Select an unassociated address"
+                  placeholder={l10n('address.selectUnassociated')}
                   fullWidth
                   disabled={loading || addressOptions.length === 0}
                 />
@@ -273,7 +275,7 @@ export function CustomerAddressAssociation({ customerId, onAddressesUpdated }: C
               <AxButton
                 onClick={() => setAddressDialogOpen(true)}
                 disabled={loading}
-                title="Create new address"
+                title={l10n('address.createNew')}
                 style={{ 
                   width: '44px',
                   height: '44px',
@@ -296,12 +298,12 @@ export function CustomerAddressAssociation({ customerId, onAddressesUpdated }: C
                 onClick={handleAssociateAddress}
                 disabled={!selectedAddressId || loading || addressOptions.length === 0}
               >
-                Associate
+                {l10n('address.associateButton')}
               </AxButton>
             </div>
             {addressOptions.length === 0 && (
               <AxParagraph marginTop="xs" color="secondary" size="sm">
-                No addresses available to associate. Click ... to create a new address.
+                {l10n('address.noAddressesAvailable')}
               </AxParagraph>
             )}
           </AxFormGroup>
@@ -309,11 +311,11 @@ export function CustomerAddressAssociation({ customerId, onAddressesUpdated }: C
       </Section>
 
       <Section>
-        <AxHeading3 style={{ marginBottom: 'var(--spacing-sm)' }}>Associated Addresses</AxHeading3>
+        <AxHeading3 style={{ marginBottom: 'var(--spacing-sm)' }}>{l10n('address.associatedAddresses')}</AxHeading3>
         {associatedAddresses.length === 0 ? (
           <AddressCard padding="medium">
             <AxParagraph color="secondary" textAlign="center">
-              No addresses associated with this customer
+              {l10n('address.noAddressesAssociated')}
             </AxParagraph>
           </AddressCard>
         ) : (
@@ -364,7 +366,7 @@ export function CustomerAddressAssociation({ customerId, onAddressesUpdated }: C
                           onClick={() => handleRemoveAssociation(address.id!)}
                           disabled={loading}
                         >
-                          Remove
+                          {l10n('address.remove')}
                         </AxButton>
                         <AxButton
                           variant="danger"
@@ -372,7 +374,7 @@ export function CustomerAddressAssociation({ customerId, onAddressesUpdated }: C
                           onClick={() => handleDeleteClick(address)}
                           disabled={loading}
                         >
-                          Delete
+                          {l10n('common.delete')}
                         </AxButton>
                       </div>
                     </AxTableCell>
@@ -416,7 +418,7 @@ export function CustomerAddressAssociation({ customerId, onAddressesUpdated }: C
         }
       >
         <AxParagraph marginBottom="md">
-          Are you sure you want to delete this address?
+          {l10n('address.deleteConfirm')}
         </AxParagraph>
         {addressToDelete && (
           <AxParagraph color="secondary" size="sm" marginBottom="md">
@@ -424,7 +426,7 @@ export function CustomerAddressAssociation({ customerId, onAddressesUpdated }: C
           </AxParagraph>
         )}
         <AxParagraph color="secondary" size="sm">
-          This action cannot be undone. The address will be permanently deleted.
+          {l10n('address.deleteWarning')}
         </AxParagraph>
       </AxDialog>
 

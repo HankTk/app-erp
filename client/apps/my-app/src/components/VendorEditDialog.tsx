@@ -50,7 +50,7 @@ export function VendorEditDialog({
       setFormData(vendorData);
     } catch (err) {
       console.error('Error loading vendor:', err);
-      alert('Failed to load vendor');
+      alert(l10n('vendor.failedToLoad'));
     } finally {
       setLoading(false);
     }
@@ -103,7 +103,7 @@ export function VendorEditDialog({
       }
     } catch (err) {
       console.error('Error updating vendor:', err);
-      alert(err instanceof Error ? err.message : 'Failed to update vendor');
+      alert(err instanceof Error ? err.message : l10n('vendor.failedToUpdate'));
     } finally {
       setSubmitting(false);
     }
@@ -264,7 +264,9 @@ export function VendorEditDialog({
                       }}
                     >
                       <div style={{ fontWeight: 'var(--font-weight-medium)', marginBottom: 'var(--spacing-xs)' }}>
-                        {addr.addressType || 'Both (Shipping & Billing)'}
+                        {addr.addressType === 'SHIPPING' ? l10n('vendor.addressType.shipping') :
+                         addr.addressType === 'BILLING' ? l10n('vendor.addressType.billing') :
+                         l10n('vendor.addressType.both')}
                       </div>
                       <div>{formatAddress(addr)}</div>
                     </div>

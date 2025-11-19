@@ -21,11 +21,11 @@ import { StepContent, ItemsTable, SubStepIndicator, SubStep } from './OrderEntry
 
 const COMPONENT_NAME = 'OrderEntryStepPage';
 
-const entrySubSteps: { key: EntrySubStep; label: string }[] = [
-  { key: 'customer', label: 'Customer' },
-  { key: 'products', label: 'Products' },
-  { key: 'shipping', label: 'Shipping' },
-  { key: 'review', label: 'Review' },
+const createEntrySubSteps = (l10n: (key: string) => string): { key: EntrySubStep; label: string }[] => [
+  { key: 'customer', label: l10n('orderEntry.subStep.customer') },
+  { key: 'products', label: l10n('orderEntry.subStep.products') },
+  { key: 'shipping', label: l10n('orderEntry.subStep.shipping') },
+  { key: 'review', label: l10n('orderEntry.subStep.review') },
 ];
 
 interface OrderEntryStepPageRenderProps extends OrderEntryStepProps {
@@ -66,6 +66,7 @@ export function OrderEntryStepPageRender(props: OrderEntryStepPageRenderProps) {
     handleAddressesUpdated,
   } = props;
   const { l10n } = useI18n();
+  const entrySubSteps = createEntrySubSteps(l10n);
 
   const renderCustomerStep = () => {
     const customerOptions = customers.map(c => ({
@@ -75,14 +76,14 @@ export function OrderEntryStepPageRender(props: OrderEntryStepPageRenderProps) {
 
     return (
       <div>
-        <AxHeading3 style={{ marginBottom: 'var(--spacing-md)' }}>Select Customer</AxHeading3>
+        <AxHeading3 style={{ marginBottom: 'var(--spacing-md)' }}>{l10n('orderEntry.customer.selectCustomer')}</AxHeading3>
         {!order?.id && (
           <AxParagraph marginBottom="md" color="warning">
-            Initializing order... Please wait.
+            {l10n('orderEntry.customer.initializing')}
           </AxParagraph>
         )}
         <AxFormGroup>
-          <AxLabel>Customer</AxLabel>
+          <AxLabel>{l10n('orderEntry.customer.label')}</AxLabel>
           <AxListbox
             options={customerOptions}
             value={order?.customerId || undefined}
@@ -91,17 +92,17 @@ export function OrderEntryStepPageRender(props: OrderEntryStepPageRenderProps) {
               if (customerId && order?.id) {
                 await onCustomerSelect(customerId);
               } else if (customerId && !order?.id) {
-                alert('Order is not ready yet. Please wait a moment and try again.');
+                alert(l10n('orderEntry.customer.notReady'));
               }
             }}
-            placeholder="Select a customer"
+            placeholder={l10n('orderEntry.customer.placeholder')}
             fullWidth
             disabled={loading || !order?.id || readOnly}
           />
         </AxFormGroup>
         {order?.customerId && (
           <AxParagraph marginTop="md" color="secondary">
-            Customer selected. You can proceed to the next step.
+            {l10n('orderEntry.customer.selected')}
           </AxParagraph>
         )}
       </div>
@@ -116,7 +117,7 @@ export function OrderEntryStepPageRender(props: OrderEntryStepPageRenderProps) {
 
     return (
       <div>
-        <AxHeading3 style={{ marginBottom: 'var(--spacing-md)' }}>Add Products</AxHeading3>
+        <AxHeading3 style={{ marginBottom: 'var(--spacing-md)' }}>{l10n('orderEntry.products.addProducts')}</AxHeading3>
 
         <div
           style={{
@@ -128,7 +129,7 @@ export function OrderEntryStepPageRender(props: OrderEntryStepPageRenderProps) {
         >
           <div style={{ flex: 1 }}>
             <AxFormGroup style={{ marginBottom: 0 }}>
-              <AxLabel>Product</AxLabel>
+              <AxLabel>{l10n('orderEntry.products.product')}</AxLabel>
               <AxListbox
                 options={productOptions}
                 value={selectedProduct || undefined}
@@ -136,7 +137,7 @@ export function OrderEntryStepPageRender(props: OrderEntryStepPageRenderProps) {
                   const productId = Array.isArray(value) ? value[0] : value;
                   onSetSelectedProduct(productId || null);
                 }}
-                placeholder="Select a product"
+                placeholder={l10n('orderEntry.products.selectProduct')}
                 fullWidth
                 disabled={loading || readOnly}
               />
@@ -144,7 +145,7 @@ export function OrderEntryStepPageRender(props: OrderEntryStepPageRenderProps) {
           </div>
           <div style={{ width: '150px' }}>
             <AxFormGroup style={{ marginBottom: 0 }}>
-              <AxLabel>Quantity</AxLabel>
+              <AxLabel>{l10n('orderEntry.products.quantity')}</AxLabel>
               <AxInput
                 type="number"
                 min="1"
@@ -166,7 +167,7 @@ export function OrderEntryStepPageRender(props: OrderEntryStepPageRenderProps) {
             }}
             disabled={!selectedProduct || loading || readOnly}
           >
-            Add
+            {l10n('orderEntry.products.add')}
           </AxButton>
         </div>
 
@@ -174,11 +175,11 @@ export function OrderEntryStepPageRender(props: OrderEntryStepPageRenderProps) {
           <AxTable fullWidth>
             <AxTableHead>
               <AxTableRow>
-                <AxTableHeader>Product</AxTableHeader>
-                <AxTableHeader>Quantity</AxTableHeader>
-                <AxTableHeader align="right">Unit Price</AxTableHeader>
-                <AxTableHeader align="right">Line Total</AxTableHeader>
-                <AxTableHeader align="center">Actions</AxTableHeader>
+                <AxTableHeader>{l10n('orderEntry.products.table.product')}</AxTableHeader>
+                <AxTableHeader>{l10n('orderEntry.products.table.quantity')}</AxTableHeader>
+                <AxTableHeader align="right">{l10n('orderEntry.products.table.unitPrice')}</AxTableHeader>
+                <AxTableHeader align="right">{l10n('orderEntry.products.table.lineTotal')}</AxTableHeader>
+                <AxTableHeader align="center">{l10n('orderEntry.products.table.actions')}</AxTableHeader>
               </AxTableRow>
             </AxTableHead>
             <AxTableBody>
@@ -216,7 +217,7 @@ export function OrderEntryStepPageRender(props: OrderEntryStepPageRenderProps) {
                         onClick={() => onRemoveItem(item.id!)}
                         disabled={loading}
                       >
-                        Delete
+                        {l10n('orderEntry.products.delete')}
                       </AxButton>
                     </AxTableCell>
                   </AxTableRow>
@@ -225,7 +226,7 @@ export function OrderEntryStepPageRender(props: OrderEntryStepPageRenderProps) {
                 <AxTableRow>
                   <AxTableCell colSpan={5} align="center">
                     <AxParagraph color="secondary">
-                      No products added yet
+                      {l10n('orderEntry.products.noProducts')}
                     </AxParagraph>
                   </AxTableCell>
                 </AxTableRow>
@@ -245,7 +246,7 @@ export function OrderEntryStepPageRender(props: OrderEntryStepPageRenderProps) {
           >
             <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 'var(--spacing-sm)' }}>
               <AxParagraph>
-                <strong>Subtotal:</strong>
+                <strong>{l10n('orderEntry.products.subtotal')}</strong>
               </AxParagraph>
               <AxParagraph>
                 <strong>${order.subtotal?.toFixed(2) || '0.00'}</strong>
@@ -265,7 +266,7 @@ export function OrderEntryStepPageRender(props: OrderEntryStepPageRenderProps) {
 
     return (
       <div>
-        <AxHeading3 style={{ marginBottom: 'var(--spacing-md)' }}>Shipping Information</AxHeading3>
+        <AxHeading3 style={{ marginBottom: 'var(--spacing-md)' }}>{l10n('orderEntry.shipping.shippingInformation')}</AxHeading3>
 
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--spacing-md)' }}>
           <AxFormGroup>
@@ -284,7 +285,7 @@ export function OrderEntryStepPageRender(props: OrderEntryStepPageRenderProps) {
                       await onShippingInfoUpdate(addressId, billingId || addressId);
                     }
                   }}
-                  placeholder="Select shipping address"
+                  placeholder={l10n('orderEntry.shipping.selectShippingAddress')}
                   fullWidth
                   disabled={loading || addressOptions.length === 0 || readOnly}
                 />
@@ -294,7 +295,7 @@ export function OrderEntryStepPageRender(props: OrderEntryStepPageRenderProps) {
                   setCustomerDialogOpen(true);
                 }}
                 disabled={loading || readOnly || !order?.customerId}
-                title="Edit customer and manage addresses"
+                title={l10n('orderEntry.shipping.editCustomer')}
                 style={{ 
                   width: '44px',
                   height: '44px',
@@ -321,7 +322,7 @@ export function OrderEntryStepPageRender(props: OrderEntryStepPageRenderProps) {
                   fontSize: 'var(--font-size-sm)',
                 }}
               >
-                No addresses found for this customer. Click ... to create a new address.
+                {l10n('orderEntry.shipping.noAddresses')}
               </AxParagraph>
             )}
           </AxFormGroup>
@@ -342,7 +343,7 @@ export function OrderEntryStepPageRender(props: OrderEntryStepPageRenderProps) {
                       await onShippingInfoUpdate(shippingId || addressId, addressId);
                     }
                   }}
-                  placeholder="Select billing address (can be same as shipping)"
+                  placeholder={l10n('orderEntry.shipping.selectBillingAddress')}
                   fullWidth
                   disabled={loading || addressOptions.length === 0 || readOnly}
                 />
@@ -352,7 +353,7 @@ export function OrderEntryStepPageRender(props: OrderEntryStepPageRenderProps) {
                   setCustomerDialogOpen(true);
                 }}
                 disabled={loading || readOnly || !order?.customerId}
-                title="Edit customer and manage addresses"
+                title={l10n('orderEntry.shipping.editCustomer')}
                 style={{ 
                   width: '44px',
                   height: '44px',
@@ -379,7 +380,7 @@ export function OrderEntryStepPageRender(props: OrderEntryStepPageRenderProps) {
                   fontSize: 'var(--font-size-sm)',
                 }}
               >
-                No addresses found for this customer. Click ... to create a new address.
+                {l10n('orderEntry.shipping.noAddresses')}
               </AxParagraph>
             )}
           </AxFormGroup>
@@ -391,7 +392,7 @@ export function OrderEntryStepPageRender(props: OrderEntryStepPageRenderProps) {
             fontSize: 'var(--font-size-sm)',
           }}
         >
-          You can select the same address for both shipping and billing.
+          {l10n('orderEntry.shipping.sameAddress')}
         </AxParagraph>
         {order?.customerId && (
           <CustomerEditDialog
@@ -411,22 +412,22 @@ export function OrderEntryStepPageRender(props: OrderEntryStepPageRenderProps) {
   const renderReviewStep = () => {
     return (
       <div>
-        <AxHeading3 style={{ marginBottom: 'var(--spacing-md)' }}>Review Order</AxHeading3>
+        <AxHeading3 style={{ marginBottom: 'var(--spacing-md)' }}>{l10n('orderEntry.review.reviewOrder')}</AxHeading3>
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-lg)' }}>
 
           <div>
             <AxParagraph weight="bold" marginBottom="sm">
-              Order Items
+              {l10n('orderEntry.review.orderItems')}
             </AxParagraph>
             <ItemsTable {...debugProps(COMPONENT_NAME, 'ItemsTable')}>
               <AxTable fullWidth>
                 <AxTableHead>
                   <AxTableRow>
-                    <AxTableHeader>Product</AxTableHeader>
-                    <AxTableHeader>Quantity</AxTableHeader>
-                    <AxTableHeader align="right">Unit Price</AxTableHeader>
-                    <AxTableHeader align="right">Line Total</AxTableHeader>
+                    <AxTableHeader>{l10n('orderEntry.products.table.product')}</AxTableHeader>
+                    <AxTableHeader>{l10n('orderEntry.products.table.quantity')}</AxTableHeader>
+                    <AxTableHeader align="right">{l10n('orderEntry.products.table.unitPrice')}</AxTableHeader>
+                    <AxTableHeader align="right">{l10n('orderEntry.products.table.lineTotal')}</AxTableHeader>
                   </AxTableRow>
                 </AxTableHead>
                 <AxTableBody>
@@ -451,15 +452,15 @@ export function OrderEntryStepPageRender(props: OrderEntryStepPageRenderProps) {
             }}
           >
             <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 'var(--spacing-sm)' }}>
-              <AxParagraph>Subtotal:</AxParagraph>
+              <AxParagraph>{l10n('orderEntry.review.subtotal')}</AxParagraph>
               <AxParagraph>${order?.subtotal?.toFixed(2) || '0.00'}</AxParagraph>
             </div>
             <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 'var(--spacing-sm)' }}>
-              <AxParagraph>Tax:</AxParagraph>
+              <AxParagraph>{l10n('orderEntry.review.tax')}</AxParagraph>
               <AxParagraph>${order?.tax?.toFixed(2) || '0.00'}</AxParagraph>
             </div>
             <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 'var(--spacing-sm)' }}>
-              <AxParagraph>Shipping:</AxParagraph>
+              <AxParagraph>{l10n('orderEntry.review.shipping')}</AxParagraph>
               <AxParagraph>${order?.shippingCost?.toFixed(2) || '0.00'}</AxParagraph>
             </div>
             <div
@@ -470,7 +471,7 @@ export function OrderEntryStepPageRender(props: OrderEntryStepPageRenderProps) {
                 borderTop: '2px solid var(--color-border-default)',
               }}
             >
-              <AxParagraph weight="bold">Total:</AxParagraph>
+              <AxParagraph weight="bold">{l10n('orderEntry.review.total')}</AxParagraph>
               <AxParagraph weight="bold">
                 ${order?.total?.toFixed(2) || '0.00'}
               </AxParagraph>

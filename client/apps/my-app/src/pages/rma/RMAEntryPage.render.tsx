@@ -16,6 +16,7 @@ import {
 } from '@ui/components';
 import { debugProps } from '../../utils/emotionCache';
 import { RMA, RMAItem } from '../../api/rmaApi';
+import { useI18n } from '../../i18n/I18nProvider';
 import { Customer } from '../../api/customerApi';
 import { Order } from '../../api/orderApi';
 import { Product } from '../../api/productApi';
@@ -101,11 +102,13 @@ export function RMAEntryPageRender(props: RMAEntryPageRenderProps) {
     getProductName,
   } = props;
 
+  const { l10n } = useI18n();
+
   if (loading) {
     return (
       <PageContainer {...debugProps(COMPONENT_NAME, 'PageContainer')}>
         <HeaderCard padding="large" {...debugProps(COMPONENT_NAME, 'HeaderCard')}>
-          <AxParagraph>Loading RMA...</AxParagraph>
+          <AxParagraph>{l10n('rma.loadingRMA')}</AxParagraph>
         </HeaderCard>
       </PageContainer>
     );
@@ -115,7 +118,7 @@ export function RMAEntryPageRender(props: RMAEntryPageRenderProps) {
     return (
       <PageContainer {...debugProps(COMPONENT_NAME, 'PageContainer')}>
         <HeaderCard padding="large" {...debugProps(COMPONENT_NAME, 'HeaderCard')}>
-          <AxParagraph>RMA not found</AxParagraph>
+          <AxParagraph>{l10n('rma.notFound')}</AxParagraph>
         </HeaderCard>
       </PageContainer>
     );
@@ -132,15 +135,15 @@ export function RMAEntryPageRender(props: RMAEntryPageRenderProps) {
                 onClick={onNavigateBack}
                 style={{ minWidth: 'auto', padding: 'var(--spacing-sm) var(--spacing-md)' }}
               >
-                ← Back
+                {l10n('rma.back')}
               </AxButton>
             )}
             <div>
               <AxHeading3 style={{ marginBottom: 'var(--spacing-xs)' }}>
-                {rma.id ? `RMA ${rma.rmaNumber || rma.id}` : 'New RMA'}
+                {rma.id ? `RMA ${rma.rmaNumber || rma.id}` : l10n('rma.newRMA')}
               </AxHeading3>
               <AxParagraph style={{ color: 'var(--color-text-secondary)' }}>
-                {rma.id ? 'Edit RMA' : 'Create new return merchandise authorization'}
+                {rma.id ? l10n('rma.editRMA') : l10n('rma.createNew')}
               </AxParagraph>
             </div>
           </HeaderLeft>
@@ -155,11 +158,11 @@ export function RMAEntryPageRender(props: RMAEntryPageRenderProps) {
                   maxWidth: '220px'
                 }}>
                   <AxParagraph style={{ fontWeight: 'var(--font-weight-bold)', marginBottom: 'var(--spacing-xs)', fontSize: 'var(--font-size-sm)' }}>
-                    Customer
+                    {l10n('rma.customer')}
                   </AxParagraph>
                   <AxListbox
                     options={[
-                      { value: null, label: 'Select Customer' },
+                      { value: null, label: l10n('rma.selectCustomer') },
                       ...customers.map(customer => ({
                         value: customer.id || '',
                         label: customer.companyName || `${customer.lastName} ${customer.firstName}` || customer.email,
@@ -179,11 +182,11 @@ export function RMAEntryPageRender(props: RMAEntryPageRenderProps) {
                   maxWidth: '220px'
                 }}>
                   <AxParagraph style={{ fontWeight: 'var(--font-weight-bold)', marginBottom: 'var(--spacing-xs)', fontSize: 'var(--font-size-sm)' }}>
-                    Order Number
+                    {l10n('rma.orderNumber')}
                   </AxParagraph>
                   <AxListbox
                     options={[
-                      { value: null, label: 'Select Order' },
+                      { value: null, label: l10n('rma.selectOrder') },
                       ...orders.map(order => {
                         const orderCustomer = customers.find(c => c.id === order.customerId);
                         const customerName = orderCustomer 
@@ -216,7 +219,7 @@ export function RMAEntryPageRender(props: RMAEntryPageRenderProps) {
                       maxWidth: '220px'
                     }}>
                       <AxParagraph style={{ fontWeight: 'var(--font-weight-bold)', marginBottom: 'var(--spacing-xs)', fontSize: 'var(--font-size-sm)' }}>
-                        Customer
+                        {l10n('rma.customer')}
                       </AxParagraph>
                       <AxParagraph style={{ fontSize: 'var(--font-size-sm)', lineHeight: 'var(--line-height-tight)' }}>
                         {customer.companyName || `${customer.lastName} ${customer.firstName}` || customer.email}
@@ -235,7 +238,7 @@ export function RMAEntryPageRender(props: RMAEntryPageRenderProps) {
                       maxWidth: '220px'
                     }}>
                       <AxParagraph style={{ fontWeight: 'var(--font-weight-bold)', marginBottom: 'var(--spacing-xs)', fontSize: 'var(--font-size-sm)' }}>
-                        Order Number
+                        {l10n('rma.orderNumber')}
                       </AxParagraph>
                       <AxParagraph style={{ fontSize: 'var(--font-size-sm)', lineHeight: 'var(--line-height-tight)' }}>
                         {order.orderNumber || order.id}
@@ -253,17 +256,17 @@ export function RMAEntryPageRender(props: RMAEntryPageRenderProps) {
               maxWidth: '220px'
             }}>
               <AxParagraph style={{ fontWeight: 'var(--font-weight-bold)', marginBottom: 'var(--spacing-xs)', fontSize: 'var(--font-size-sm)' }}>
-                Status
+                {l10n('rma.table.status')}
               </AxParagraph>
               <AxListbox
                 key={`status-${rma?.id || 'new'}-${rma?.status || 'DRAFT'}`}
                 options={[
-                  { value: 'DRAFT', label: 'Draft' },
-                  { value: 'PENDING_APPROVAL', label: 'Pending Approval' },
-                  { value: 'APPROVED', label: 'Approved' },
-                  { value: 'RECEIVED', label: 'Received' },
-                  { value: 'PROCESSED', label: 'Processed' },
-                  { value: 'CANCELLED', label: 'Cancelled' },
+                  { value: 'DRAFT', label: l10n('rma.status.draft') },
+                  { value: 'PENDING_APPROVAL', label: l10n('rma.status.pendingApproval') },
+                  { value: 'APPROVED', label: l10n('rma.status.approved') },
+                  { value: 'RECEIVED', label: l10n('rma.status.received') },
+                  { value: 'PROCESSED', label: l10n('rma.status.processed') },
+                  { value: 'CANCELLED', label: l10n('rma.status.cancelled') },
                 ]}
                 value={rma?.status || 'DRAFT'}
                 onChange={(value: string | null) => {
@@ -271,7 +274,7 @@ export function RMAEntryPageRender(props: RMAEntryPageRenderProps) {
                     onStatusChange(value as RMA['status']);
                   }
                 }}
-                placeholder="Select Status"
+                placeholder={l10n('rma.selectStatus')}
                 fullWidth
                 disabled={loading || readOnly || submitting}
               />
@@ -282,7 +285,7 @@ export function RMAEntryPageRender(props: RMAEntryPageRenderProps) {
                 onClick={() => onNavigateToShopFloorControl(rma.id!)}
                 style={{ minWidth: 'auto', whiteSpace: 'nowrap', height: 'fit-content' }}
               >
-                Shop Floor Control
+                {l10n('rma.shopFloorControl')}
               </AxButton>
             )}
           </HeaderRight>
@@ -292,7 +295,7 @@ export function RMAEntryPageRender(props: RMAEntryPageRenderProps) {
       <ContentCard padding="large" {...debugProps(COMPONENT_NAME, 'ContentCard')}>
         <FormSection>
           <AxHeading3 style={{ marginBottom: 'var(--spacing-sm)', fontSize: 'var(--font-size-md)', fontWeight: 'var(--font-weight-semibold)' }}>
-            Return Items
+            {l10n('rma.returnItems')}
           </AxHeading3>
           
           {!readOnly && (
@@ -304,10 +307,10 @@ export function RMAEntryPageRender(props: RMAEntryPageRenderProps) {
             }}>
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 'var(--spacing-sm)', alignItems: 'end' }}>
                 <AxFormGroup>
-                  <AxLabel>Product</AxLabel>
+                  <AxLabel>{l10n('rma.product')}</AxLabel>
                   <AxListbox
                     options={[
-                      { value: null, label: 'Select Product' },
+                      { value: null, label: l10n('rma.selectProduct') },
                       ...products.map(product => ({
                         value: product.id || '',
                         label: product.productName || product.productCode,
@@ -318,7 +321,7 @@ export function RMAEntryPageRender(props: RMAEntryPageRenderProps) {
                   />
                 </AxFormGroup>
                 <AxFormGroup>
-                  <AxLabel>Quantity</AxLabel>
+                  <AxLabel>{l10n('rma.quantity')}</AxLabel>
                   <AxInput
                     type="number"
                     value={quantity}
@@ -327,11 +330,11 @@ export function RMAEntryPageRender(props: RMAEntryPageRenderProps) {
                   />
                 </AxFormGroup>
                 <AxFormGroup>
-                  <AxLabel>Reason</AxLabel>
+                  <AxLabel>{l10n('rma.reason')}</AxLabel>
                   <AxInput
                     value={reason}
                     onChange={(e) => onReasonChange(e.target.value)}
-                    placeholder="Reason for return"
+                    placeholder={l10n('rma.reasonPlaceholder')}
                   />
                 </AxFormGroup>
                 <AxFormGroup>
@@ -341,7 +344,7 @@ export function RMAEntryPageRender(props: RMAEntryPageRenderProps) {
                     disabled={!selectedProduct || !quantity || submitting}
                     style={{ width: '100%' }}
                   >
-                    Add Item
+                    {l10n('rma.addItem')}
                   </AxButton>
                 </AxFormGroup>
               </div>
@@ -352,13 +355,13 @@ export function RMAEntryPageRender(props: RMAEntryPageRenderProps) {
             <AxTable fullWidth>
               <AxTableHead>
                 <AxTableRow>
-                  <AxTableHeader>Product</AxTableHeader>
-                  <AxTableHeader align="right">Quantity</AxTableHeader>
-                  <AxTableHeader align="right">Returned Qty</AxTableHeader>
-                  <AxTableHeader align="right">Unit Price</AxTableHeader>
-                  <AxTableHeader align="right">Line Total</AxTableHeader>
-                  <AxTableHeader>Reason</AxTableHeader>
-                  {!readOnly && <AxTableHeader align="center">Actions</AxTableHeader>}
+                  <AxTableHeader>{l10n('rma.product')}</AxTableHeader>
+                  <AxTableHeader align="right">{l10n('rma.quantity')}</AxTableHeader>
+                  <AxTableHeader align="right">{l10n('rma.table.returnedQty')}</AxTableHeader>
+                  <AxTableHeader align="right">{l10n('rma.table.unitPrice')}</AxTableHeader>
+                  <AxTableHeader align="right">{l10n('rma.table.lineTotal')}</AxTableHeader>
+                  <AxTableHeader>{l10n('rma.reason')}</AxTableHeader>
+                  {!readOnly && <AxTableHeader align="center">{l10n('generalLedger.table.actions')}</AxTableHeader>}
                 </AxTableRow>
               </AxTableHead>
               <AxTableBody>
@@ -396,7 +399,7 @@ export function RMAEntryPageRender(props: RMAEntryPageRenderProps) {
                           onClick={() => item.id && onRemoveItem(item.id)}
                           disabled={submitting}
                         >
-                          Remove
+                          {l10n('rma.remove')}
                         </AxButton>
                       </AxTableCell>
                     )}
@@ -406,18 +409,18 @@ export function RMAEntryPageRender(props: RMAEntryPageRenderProps) {
             </AxTable>
           ) : (
             <AxParagraph style={{ color: 'var(--color-text-secondary)' }}>
-              No items added yet
+              {l10n('rma.noItems')}
             </AxParagraph>
           )}
         </FormSection>
 
         <FormSection>
           <AxHeading3 style={{ marginBottom: 'var(--spacing-sm)', fontSize: 'var(--font-size-md)', fontWeight: 'var(--font-weight-semibold)' }}>
-            Financial Information
+            {l10n('rma.financialInformation')}
           </AxHeading3>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: 'var(--spacing-sm)' }}>
             <AxFormGroup>
-              <AxLabel>Restocking Fee</AxLabel>
+              <AxLabel>{l10n('rma.restockingFee')}</AxLabel>
               <AxInput
                 type="number"
                 value={restockingFee}
@@ -428,7 +431,7 @@ export function RMAEntryPageRender(props: RMAEntryPageRenderProps) {
               />
             </AxFormGroup>
             <AxFormGroup>
-              <AxLabel>Notes</AxLabel>
+              <AxLabel>{l10n('rma.notes')}</AxLabel>
               <AxInput
                 value={notes}
                 onChange={(e) => onNotesChange(e.target.value)}
@@ -446,15 +449,15 @@ export function RMAEntryPageRender(props: RMAEntryPageRenderProps) {
             flexShrink: 0
           }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 'var(--spacing-xs)' }}>
-              <AxParagraph style={{ fontSize: 'var(--font-size-sm)' }}><strong>Subtotal:</strong></AxParagraph>
+              <AxParagraph style={{ fontSize: 'var(--font-size-sm)' }}><strong>{l10n('rma.subtotal')}</strong></AxParagraph>
               <AxParagraph style={{ fontSize: 'var(--font-size-sm)' }}><strong>${rma.subtotal?.toFixed(2) || '0.00'}</strong></AxParagraph>
             </div>
             <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 'var(--spacing-xs)' }}>
-              <AxParagraph style={{ fontSize: 'var(--font-size-sm)' }}><strong>Restocking Fee:</strong></AxParagraph>
+              <AxParagraph style={{ fontSize: 'var(--font-size-sm)' }}><strong>{l10n('rma.restockingFee')}:</strong></AxParagraph>
               <AxParagraph style={{ fontSize: 'var(--font-size-sm)' }}><strong>-${restockingFee.toFixed(2)}</strong></AxParagraph>
             </div>
             <div style={{ display: 'flex', justifyContent: 'space-between', borderTop: '2px solid var(--color-border-default)', paddingTop: 'var(--spacing-xs)', marginTop: 'var(--spacing-xs)' }}>
-              <AxParagraph style={{ fontSize: 'var(--font-size-sm)' }}><strong>Total Refund:</strong></AxParagraph>
+              <AxParagraph style={{ fontSize: 'var(--font-size-sm)' }}><strong>{l10n('rma.totalRefund')}</strong></AxParagraph>
               <AxParagraph style={{ fontSize: 'var(--font-size-sm)' }}><strong>${rma.total?.toFixed(2) || '0.00'}</strong></AxParagraph>
             </div>
           </div>
@@ -463,14 +466,14 @@ export function RMAEntryPageRender(props: RMAEntryPageRenderProps) {
         {!readOnly && (
           <ButtonGroup>
             <AxButton variant="secondary" onClick={onNavigateToRMAs || onNavigateBack}>
-              Cancel
+              {l10n('rma.cancel')}
             </AxButton>
             <AxButton
               variant="primary"
               onClick={onSave}
               disabled={submitting}
             >
-              {submitting ? 'Saving...' : 'Save RMA'}
+              {submitting ? l10n('rma.saving') : l10n('rma.save')}
             </AxButton>
           </ButtonGroup>
         )}

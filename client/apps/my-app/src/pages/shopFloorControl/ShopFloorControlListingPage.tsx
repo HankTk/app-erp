@@ -43,7 +43,7 @@ export function ShopFloorControlListingPage({ onProcessRMA, onNavigateBack }: Sh
       }
       setSfcs(filteredSFCs);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to load SFC data');
+      setError(err instanceof Error ? err.message : l10n('sfc.failedToLoad'));
       console.error('Error loading shop floor control data:', err);
     } finally {
       setLoading(false);
@@ -51,9 +51,9 @@ export function ShopFloorControlListingPage({ onProcessRMA, onNavigateBack }: Sh
   };
 
   const getCustomerName = (customerId?: string) => {
-    if (!customerId) return 'N/A';
+    if (!customerId) return l10n('generalLedger.notAvailable');
     const customer = customers.find(c => c.id === customerId);
-    return customer?.companyName || `${customer?.lastName || ''} ${customer?.firstName || ''}`.trim() || customer?.email || 'Unknown Customer';
+    return customer?.companyName || `${customer?.lastName || ''} ${customer?.firstName || ''}`.trim() || customer?.email || l10n('generalLedger.unknown');
   };
 
   const handleProcess = async (sfc: SFC) => {

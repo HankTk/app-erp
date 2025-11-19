@@ -4,6 +4,7 @@ import { fetchPurchaseOrders } from '../../api/purchaseOrderApi';
 import { fetchCustomers } from '../../api/customerApi';
 import { fetchVendors } from '../../api/vendorApi';
 import { fetchProducts } from '../../api/productApi';
+import { useI18n } from '../../i18n/I18nProvider';
 import { GeneralLedgerListingPageRender } from './GeneralLedgerListingPage.render';
 
 interface GLEntry {
@@ -63,7 +64,7 @@ export function GeneralLedgerListingPage({ onViewEntry, onNavigateBack }: Genera
         const customer = customersData.find(c => c.id === order.customerId);
         const customerName = customer 
           ? (customer.companyName || `${customer.lastName} ${customer.firstName}` || customer.email)
-          : 'Unknown';
+          : l10n('generalLedger.unknown');
         
         const shipDate = order.shipDate || order.invoiceDate || order.orderDate;
         const invoiceDate = order.invoiceDate || order.orderDate;
@@ -89,7 +90,9 @@ export function GeneralLedgerListingPage({ onViewEntry, onNavigateBack }: Genera
             invoiceNumber: order.invoiceNumber,
             customerId: order.customerId || '',
             customerName,
-            description: `Revenue from Order ${order.orderNumber}${order.invoiceNumber ? ` / Invoice ${order.invoiceNumber}` : ''}`,
+            description: order.invoiceNumber 
+              ? l10n('generalLedger.description.revenueWithInvoice', { orderNumber: order.orderNumber || '', invoiceNumber: order.invoiceNumber })
+              : l10n('generalLedger.description.revenue', { orderNumber: order.orderNumber || '' }),
             quantity: totalQuantity,
             amount: order.total || 0,
             status: order.status,
@@ -111,7 +114,10 @@ export function GeneralLedgerListingPage({ onViewEntry, onNavigateBack }: Genera
               invoiceNumber: order.invoiceNumber,
               customerId: order.customerId || '',
               customerName,
-              description: `Cost for Order ${order.orderNumber}${order.invoiceNumber ? ` / Invoice ${order.invoiceNumber}` : ''} (Product: $${productCost.toFixed(2)}, Shipping: $${shippingCost.toFixed(2)})`,
+              description: (order.invoiceNumber 
+                ? l10n('generalLedger.description.costWithInvoice', { orderNumber: order.orderNumber || '', invoiceNumber: order.invoiceNumber })
+                : l10n('generalLedger.description.cost', { orderNumber: order.orderNumber || '' })) 
+                + l10n('generalLedger.description.costDetails', { productCost: productCost.toFixed(2), shippingCost: shippingCost.toFixed(2) }),
               quantity: totalQuantity,
               amount: totalCost,
               cost: totalCost,
@@ -135,7 +141,9 @@ export function GeneralLedgerListingPage({ onViewEntry, onNavigateBack }: Genera
               invoiceNumber: order.invoiceNumber,
               customerId: order.customerId || '',
               customerName,
-              description: `Payment received for Order ${order.orderNumber}${order.invoiceNumber ? ` / Invoice ${order.invoiceNumber}` : ''}`,
+              description: order.invoiceNumber 
+                ? l10n('generalLedger.description.paymentWithInvoice', { orderNumber: order.orderNumber || '', invoiceNumber: order.invoiceNumber })
+                : l10n('generalLedger.description.payment', { orderNumber: order.orderNumber || '' }),
               quantity: 0,
               amount: paymentAmount,
               status: 'PAID',
@@ -153,7 +161,7 @@ export function GeneralLedgerListingPage({ onViewEntry, onNavigateBack }: Genera
         const vendor = vendorsData.find(v => v.id === po.supplierId);
         const supplierName = vendor 
           ? (vendor.companyName || `${vendor.lastName} ${vendor.firstName}` || vendor.email)
-          : 'Unknown';
+          : l10n('generalLedger.unknown');
         
         // Handle receivedDate - it might be stored as a string in jsonData
         let receivedDate: string | null = null;
@@ -209,7 +217,10 @@ export function GeneralLedgerListingPage({ onViewEntry, onNavigateBack }: Genera
               invoiceNumber: po.invoiceNumber,
               supplierId: po.supplierId || '',
               supplierName,
-              description: `Purchase Expense for PO ${po.orderNumber}${po.invoiceNumber ? ` / Invoice ${po.invoiceNumber}` : ''} (Product: $${productCost.toFixed(2)}, Shipping: $${shippingCost.toFixed(2)})`,
+              description: (po.invoiceNumber 
+                ? l10n('generalLedger.description.expenseWithInvoice', { poNumber: po.orderNumber || '', invoiceNumber: po.invoiceNumber })
+                : l10n('generalLedger.description.expense', { poNumber: po.orderNumber || '' })) 
+                + l10n('generalLedger.description.expenseDetails', { productCost: productCost.toFixed(2), shippingCost: shippingCost.toFixed(2) }),
               quantity: totalQuantity,
               amount: totalCost,
               cost: totalCost,
@@ -229,7 +240,9 @@ export function GeneralLedgerListingPage({ onViewEntry, onNavigateBack }: Genera
             invoiceNumber: po.invoiceNumber,
             supplierId: po.supplierId || '',
             supplierName,
-            description: `Accounts Payable for PO ${po.orderNumber}${po.invoiceNumber ? ` / Invoice ${po.invoiceNumber}` : ''}`,
+            description: po.invoiceNumber 
+              ? l10n('generalLedger.description.apWithInvoice', { poNumber: po.orderNumber || '', invoiceNumber: po.invoiceNumber })
+              : l10n('generalLedger.description.ap', { poNumber: po.orderNumber || '' }),
             quantity: totalQuantity,
             amount: po.total || 0,
             status: po.status,
@@ -264,7 +277,9 @@ export function GeneralLedgerListingPage({ onViewEntry, onNavigateBack }: Genera
               invoiceNumber: po.invoiceNumber,
               supplierId: po.supplierId || '',
               supplierName,
-              description: `Payment made for PO ${po.orderNumber}${po.invoiceNumber ? ` / Invoice ${po.invoiceNumber}` : ''}`,
+              description: po.invoiceNumber 
+                ? l10n('generalLedger.description.poPaymentWithInvoice', { poNumber: po.orderNumber || '', invoiceNumber: po.invoiceNumber })
+                : l10n('generalLedger.description.poPayment', { poNumber: po.orderNumber || '' }),
               quantity: 0,
               amount: paymentAmount,
               status: 'PAID',
@@ -278,7 +293,7 @@ export function GeneralLedgerListingPage({ onViewEntry, onNavigateBack }: Genera
       
       setGlEntries(entries);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to load general ledger entries');
+      setError(err instanceof Error ? err.message : l10n('generalLedger.errorLoadFailed'));
       console.error('Error fetching GL entries:', err);
     } finally {
       setLoading(false);
@@ -296,8 +311,10 @@ export function GeneralLedgerListingPage({ onViewEntry, onNavigateBack }: Genera
     return true;
   });
 
+  const { l10n } = useI18n();
+
   const formatDate = (dateString: string) => {
-    if (!dateString) return 'N/A';
+    if (!dateString) return l10n('generalLedger.notAvailable');
     try {
       const date = new Date(dateString);
       return date.toLocaleDateString();
@@ -343,15 +360,15 @@ export function GeneralLedgerListingPage({ onViewEntry, onNavigateBack }: Genera
   const getTypeLabel = (type: string) => {
     switch (type) {
       case 'REVENUE':
-        return 'Revenue';
+        return l10n('generalLedger.type.revenue');
       case 'COST':
-        return 'Cost';
+        return l10n('generalLedger.type.cost');
       case 'PAYMENT':
-        return 'Payment';
+        return l10n('generalLedger.type.payment');
       case 'EXPENSE':
-        return 'Expense';
+        return l10n('generalLedger.type.expense');
       case 'ACCOUNTS_PAYABLE':
-        return 'A/P';
+        return l10n('generalLedger.type.ap');
       default:
         return type;
     }

@@ -237,14 +237,14 @@ export function PurchaseOrderListingPageRender(props: PurchaseOrderListingPageRe
         </HeaderCard>
         <TableCard padding="large" {...debugProps(COMPONENT_NAME, 'TableCard')}>
           <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '200px', flexDirection: 'column', gap: 'var(--spacing-md)' }}>
-            <AxParagraph color="error">Error: {error}</AxParagraph>
+            <AxParagraph color="error">{l10n('purchaseOrder.error')}: {error}</AxParagraph>
             {error.includes('404') && (
               <AxParagraph color="secondary" size="sm" textAlign="center">
                 {l10n('purchaseOrder.error.serverRestart')}
               </AxParagraph>
             )}
             <AxButton variant="secondary" onClick={() => window.location.reload()}>
-              Retry
+              {l10n('common.retry')}
             </AxButton>
           </div>
         </TableCard>

@@ -11,6 +11,7 @@ import {
 } from '@ui/components';
 import { debugProps } from '../../utils/emotionCache';
 import { RMA } from '../../api/rmaApi';
+import { useI18n } from '../../i18n/I18nProvider';
 import {
   PageContainer,
   HeaderCard,
@@ -34,28 +35,28 @@ type ListingRenderContext = {
   onNavigateToShopFloorControl?: (rmaId: string) => void;
 };
 
-const createColumns = (): ColumnDefinition<RMA, ListingRenderContext>[] => [
+const createColumns = (t: (key: string, params?: Record<string, string | number | undefined>) => string): ColumnDefinition<RMA, ListingRenderContext>[] => [
   { 
     key: 'rma.rmaNumber',
-    header: 'RMA Number',
+    header: t('rma.table.rmaNumber'),
     align: undefined,
-    render: (rma: RMA) => rma.rmaNumber || rma.id?.substring(0, 8) || 'N/A'
+    render: (rma: RMA) => rma.rmaNumber || rma.id?.substring(0, 8) || t('generalLedger.notAvailable')
   },
   { 
     key: 'rma.orderNumber',
-    header: 'Order Number',
+    header: t('rma.table.orderNumber'),
     align: undefined,
-    render: (rma: RMA) => rma.orderNumber || 'N/A'
+    render: (rma: RMA) => rma.orderNumber || t('generalLedger.notAvailable')
   },
   { 
     key: 'rma.customer',
-    header: 'Customer',
+    header: t('rma.table.customer'),
     align: undefined,
-    render: (rma: RMA, context) => context?.getCustomerName(rma) || 'N/A'
+    render: (rma: RMA, context) => context?.getCustomerName(rma) || t('generalLedger.notAvailable')
   },
   { 
     key: 'rma.status',
-    header: 'Status',
+    header: t('rma.table.status'),
     align: undefined,
     render: (rma: RMA, context) => (
       <span 
@@ -69,37 +70,37 @@ const createColumns = (): ColumnDefinition<RMA, ListingRenderContext>[] => [
           fontSize: 'var(--font-size-sm)',
         }}
       >
-        {context?.getStatusLabel(rma.status) || rma.status || 'N/A'}
+        {context?.getStatusLabel(rma.status) || rma.status || t('generalLedger.notAvailable')}
       </span>
     )
   },
   { 
     key: 'rma.rmaDate',
-    header: 'RMA Date',
+    header: t('rma.table.rmaDate'),
     align: undefined,
-    render: (rma: RMA, context) => context?.formatDate(rma.rmaDate) || 'N/A'
+    render: (rma: RMA, context) => context?.formatDate(rma.rmaDate) || t('generalLedger.notAvailable')
   },
   { 
     key: 'rma.receivedDate',
-    header: 'Received Date',
+    header: t('rma.table.receivedDate'),
     align: undefined,
-    render: (rma: RMA, context) => context?.formatDate(rma.receivedDate) || 'N/A'
+    render: (rma: RMA, context) => context?.formatDate(rma.receivedDate) || t('generalLedger.notAvailable')
   },
   { 
     key: 'rma.total',
-    header: 'Total',
+    header: t('rma.table.total'),
     align: 'right',
     render: (rma: RMA) => `$${(rma.total?.toFixed(2) || '0.00')}`
   },
   { 
     key: 'rma.items',
-    header: 'Items',
+    header: t('rma.table.items'),
     align: 'center',
     render: (rma: RMA) => rma.items?.length || 0
   },
   { 
     key: 'rma.actions',
-    header: 'Actions',
+    header: t('generalLedger.table.actions'),
     align: 'center',
     render: (rma: RMA, context) => (
       <div style={{ display: 'flex', gap: 'var(--spacing-sm)', justifyContent: 'center', flexWrap: 'wrap' }}>
@@ -110,7 +111,7 @@ const createColumns = (): ColumnDefinition<RMA, ListingRenderContext>[] => [
             onClick={() => context.onViewRMA!(rma.id!)}
             style={{ minWidth: '80px' }}
           >
-            View
+            {t('rma.table.view')}
           </AxButton>
         )}
         {context?.onEditRMA && (
@@ -121,7 +122,7 @@ const createColumns = (): ColumnDefinition<RMA, ListingRenderContext>[] => [
             disabled={rma.status === 'PROCESSED' || rma.status === 'CANCELLED'}
             style={{ minWidth: '80px' }}
           >
-            Edit
+            {t('rma.table.edit')}
           </AxButton>
         )}
         {rma.id && context?.onNavigateToShopFloorControl && (
@@ -131,7 +132,7 @@ const createColumns = (): ColumnDefinition<RMA, ListingRenderContext>[] => [
             onClick={() => context.onNavigateToShopFloorControl!(rma.id!)}
             style={{ minWidth: 'auto', whiteSpace: 'nowrap' }}
           >
-            Shop Floor
+            {t('rma.table.shopFloor')}
           </AxButton>
         )}
         <AxButton 
@@ -140,7 +141,7 @@ const createColumns = (): ColumnDefinition<RMA, ListingRenderContext>[] => [
           onClick={() => context?.onDeleteClick(rma)}
           style={{ minWidth: '80px' }}
         >
-          Delete
+          {t('rma.table.delete')}
         </AxButton>
       </div>
     )
@@ -198,7 +199,8 @@ export function RMAListingPageRender(props: RMAListingPageRenderProps) {
     getStatusLabel,
   } = props;
 
-  const columns = createColumns();
+  const { l10n } = useI18n();
+  const columns = createColumns(l10n);
   const tableContext: ListingRenderContext = {
     getCustomerName,
     formatDate,
@@ -223,15 +225,15 @@ export function RMAListingPageRender(props: RMAListingPageRenderProps) {
                   onClick={onNavigateBack}
                   style={{ minWidth: 'auto', padding: 'var(--spacing-sm) var(--spacing-md)' }}
                 >
-                  ← Back
+                  {l10n('rma.back')}
                 </AxButton>
               )}
               <div>
                 <AxHeading3 style={{ marginBottom: 'var(--spacing-xs)' }}>
-                  RMAs
+                  {l10n('rma.title')}
                 </AxHeading3>
                 <AxParagraph color="secondary">
-                  View and manage all return merchandise authorizations
+                  {l10n('rma.subtitle')}
                 </AxParagraph>
               </div>
             </HeaderLeft>
@@ -239,7 +241,7 @@ export function RMAListingPageRender(props: RMAListingPageRenderProps) {
         </HeaderCard>
         <TableCard padding="large" {...debugProps(COMPONENT_NAME, 'TableCard')}>
           <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '200px' }}>
-            <AxParagraph>Loading RMAs...</AxParagraph>
+            <AxParagraph>{l10n('rma.loading')}</AxParagraph>
           </div>
         </TableCard>
       </PageContainer>
@@ -258,15 +260,15 @@ export function RMAListingPageRender(props: RMAListingPageRenderProps) {
                   onClick={onNavigateBack}
                   style={{ minWidth: 'auto', padding: 'var(--spacing-sm) var(--spacing-md)' }}
                 >
-                  ← Back
+                  {l10n('rma.back')}
                 </AxButton>
               )}
               <div>
                 <AxHeading3 style={{ marginBottom: 'var(--spacing-xs)' }}>
-                  RMAs
+                  {l10n('rma.title')}
                 </AxHeading3>
                 <AxParagraph color="secondary">
-                  View and manage all return merchandise authorizations
+                  {l10n('rma.subtitle')}
                 </AxParagraph>
               </div>
             </HeaderLeft>
@@ -274,9 +276,9 @@ export function RMAListingPageRender(props: RMAListingPageRenderProps) {
         </HeaderCard>
         <TableCard padding="large" {...debugProps(COMPONENT_NAME, 'TableCard')}>
           <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '200px', flexDirection: 'column', gap: 'var(--spacing-md)' }}>
-            <AxParagraph color="error">Error: {error}</AxParagraph>
+            <AxParagraph color="error">{l10n('rma.error')}: {error}</AxParagraph>
             <AxButton variant="secondary" onClick={() => window.location.reload()}>
-              Retry
+              {l10n('common.retry')}
             </AxButton>
           </div>
         </TableCard>
@@ -311,22 +313,22 @@ export function RMAListingPageRender(props: RMAListingPageRenderProps) {
             <AxFormGroup style={{ margin: 0, minWidth: '200px' }}>
               <AxListbox
                 options={[
-                  { value: null, label: 'All Statuses' },
-                  { value: 'DRAFT', label: 'Draft' },
-                  { value: 'PENDING_APPROVAL', label: 'Pending Approval' },
-                  { value: 'APPROVED', label: 'Approved' },
-                  { value: 'RECEIVED', label: 'Received' },
-                  { value: 'PROCESSED', label: 'Processed' },
-                  { value: 'CANCELLED', label: 'Cancelled' },
+                  { value: null, label: l10n('rma.filter.allStatuses') },
+                  { value: 'DRAFT', label: l10n('rma.status.draft') },
+                  { value: 'PENDING_APPROVAL', label: l10n('rma.status.pendingApproval') },
+                  { value: 'APPROVED', label: l10n('rma.status.approved') },
+                  { value: 'RECEIVED', label: l10n('rma.status.received') },
+                  { value: 'PROCESSED', label: l10n('rma.status.processed') },
+                  { value: 'CANCELLED', label: l10n('rma.status.cancelled') },
                 ]}
                 value={statusFilter}
                 onChange={(value) => onStatusFilterChange(value)}
-                placeholder="Filter by status"
+                placeholder={l10n('rma.filter.byStatus')}
               />
             </AxFormGroup>
             {onNavigateToRMAEntry && (
               <AxButton variant="primary" onClick={onNavigateToRMAEntry}>
-                Create RMA
+                {l10n('rma.createRMA')}
               </AxButton>
             )}
           </HeaderRight>
@@ -337,7 +339,7 @@ export function RMAListingPageRender(props: RMAListingPageRenderProps) {
         <div style={{ flex: 1, overflow: 'auto', minHeight: 0, height: 0, maxHeight: '100%' }}>
           {filteredRMAs.length === 0 ? (
             <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '200px' }}>
-              <AxParagraph>No RMAs found</AxParagraph>
+              <AxParagraph>{l10n('rma.noRMAs')}</AxParagraph>
             </div>
           ) : (
             <AxTable
@@ -356,7 +358,7 @@ export function RMAListingPageRender(props: RMAListingPageRenderProps) {
       <AxDialog
         open={deleteDialogOpen}
         onClose={onDeleteCancel}
-        title="Delete RMA"
+        title={l10n('rma.deleteTitle')}
         size="medium"
         footer={
           <div style={{ display: 'flex', gap: 'var(--spacing-sm)', justifyContent: 'flex-end' }}>
@@ -365,23 +367,23 @@ export function RMAListingPageRender(props: RMAListingPageRenderProps) {
               onClick={onDeleteCancel}
               disabled={submitting}
             >
-              Cancel
+              {l10n('common.cancel')}
             </AxButton>
             <AxButton 
               variant="danger" 
               onClick={onDeleteConfirm}
               disabled={submitting}
             >
-              {submitting ? 'Deleting...' : 'Delete'}
+              {submitting ? l10n('rma.deleting') : l10n('common.delete')}
             </AxButton>
           </div>
         }
       >
         <AxParagraph marginBottom="md">
-          Are you sure you want to delete this RMA?
+          {l10n('rma.deleteConfirm')}
         </AxParagraph>
         <AxParagraph color="secondary" size="sm">
-          This action cannot be undone.
+          {l10n('rma.deleteWarning')}
         </AxParagraph>
       </AxDialog>
     </PageContainer>

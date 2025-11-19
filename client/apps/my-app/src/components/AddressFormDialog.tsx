@@ -9,6 +9,7 @@ import {
   AxParagraph,
 } from '@ui/components';
 import { createAddress, Address } from '../api/addressApi';
+import { useI18n } from '../i18n/I18nProvider';
 
 interface AddressFormDialogProps {
   open: boolean;
@@ -25,6 +26,7 @@ export function AddressFormDialog({
   customerId,
   vendorId,
 }: AddressFormDialogProps) {
+  const { l10n } = useI18n();
   const [formData, setFormData] = useState<Partial<Address>>({
     addressType: null,
   });
@@ -97,7 +99,7 @@ export function AddressFormDialog({
       onClose();
     } catch (err) {
       console.error('Error creating address:', err);
-      alert(err instanceof Error ? err.message : 'Failed to create address');
+      alert(err instanceof Error ? err.message : l10n('address.failedToCreate'));
     } finally {
       setSubmitting(false);
     }
@@ -114,7 +116,7 @@ export function AddressFormDialog({
     <AxDialog
       open={open}
       onClose={handleClose}
-      title="Create New Address"
+      title={l10n('address.createTitle')}
       size="large"
       footer={
         <div style={{ display: 'flex', gap: 'var(--spacing-sm)', justifyContent: 'flex-end' }}>
@@ -123,41 +125,41 @@ export function AddressFormDialog({
             onClick={handleClose}
             disabled={submitting}
           >
-            Cancel
+            {l10n('common.cancel')}
           </AxButton>
           <AxButton 
             variant="primary" 
             onClick={handleSave}
             disabled={submitting}
           >
-            {submitting ? 'Creating...' : 'Create'}
+            {submitting ? l10n('address.creating') : l10n('address.create')}
           </AxButton>
         </div>
       }
     >
       <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-lg)' }}>
         <AxFormGroup>
-          <AxLabel>Address Type (Optional)</AxLabel>
+          <AxLabel>{l10n('address.addressType')}</AxLabel>
           <AxListbox
             options={[
-              { value: null, label: 'Both (Shipping & Billing)' },
-              { value: 'SHIPPING', label: 'Shipping Only' },
-              { value: 'BILLING', label: 'Billing Only' },
+              { value: null, label: l10n('customer.addressType.both') },
+              { value: 'SHIPPING', label: l10n('customer.addressType.shipping') },
+              { value: 'BILLING', label: l10n('customer.addressType.billing') },
             ]}
             value={formData.addressType || null}
             onChange={(value) => {
               setFormData({ ...formData, addressType: value as 'SHIPPING' | 'BILLING' | null | undefined });
             }}
-            placeholder="Select address type (optional)"
+            placeholder={l10n('address.addressTypePlaceholder')}
             fullWidth
             disabled={submitting}
           />
           <AxParagraph marginTop="xs" color="secondary" size="sm">
-            Select "Both" to allow this address to be used for both shipping and billing. Leave as "Both" if not specified.
+            {l10n('address.addressTypeDescription')}
           </AxParagraph>
         </AxFormGroup>
         <AxFormGroup>
-          <AxLabel>Street Address 1</AxLabel>
+          <AxLabel>{l10n('address.streetAddress1')}</AxLabel>
           <AxInput
             type="text"
             value={formData.streetAddress1 || ''}
@@ -167,11 +169,11 @@ export function AddressFormDialog({
             style={{ marginTop: 'var(--spacing-xs)' }}
             disabled={submitting}
             fullWidth
-            placeholder="Street address line 1"
+            placeholder={l10n('address.streetAddress1Placeholder')}
           />
         </AxFormGroup>
         <AxFormGroup>
-          <AxLabel>Street Address 2</AxLabel>
+          <AxLabel>{l10n('address.streetAddress2')}</AxLabel>
           <AxInput
             type="text"
             value={formData.streetAddress2 || ''}
@@ -181,12 +183,12 @@ export function AddressFormDialog({
             style={{ marginTop: 'var(--spacing-xs)' }}
             disabled={submitting}
             fullWidth
-            placeholder="Street address line 2 (optional)"
+            placeholder={l10n('address.streetAddress2Placeholder')}
           />
         </AxFormGroup>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--spacing-md)' }}>
           <AxFormGroup>
-            <AxLabel>City</AxLabel>
+            <AxLabel>{l10n('address.city')}</AxLabel>
             <AxInput
               type="text"
               value={formData.city || ''}
@@ -199,7 +201,7 @@ export function AddressFormDialog({
             />
           </AxFormGroup>
           <AxFormGroup>
-            <AxLabel>State/Province</AxLabel>
+            <AxLabel>{l10n('address.state')}</AxLabel>
             <AxInput
               type="text"
               value={formData.state || ''}
@@ -214,7 +216,7 @@ export function AddressFormDialog({
         </div>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--spacing-md)' }}>
           <AxFormGroup>
-            <AxLabel>Postal Code</AxLabel>
+            <AxLabel>{l10n('address.postalCode')}</AxLabel>
             <AxInput
               type="text"
               value={formData.postalCode || ''}
@@ -227,7 +229,7 @@ export function AddressFormDialog({
             />
           </AxFormGroup>
           <AxFormGroup>
-            <AxLabel>Country</AxLabel>
+            <AxLabel>{l10n('address.country')}</AxLabel>
             <AxInput
               type="text"
               value={formData.country || ''}

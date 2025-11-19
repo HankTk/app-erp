@@ -47,7 +47,7 @@ export function GeneralLedgerDetailPage(props: GeneralLedgerDetailPageProps = {}
           const is404 = err.message.includes('404') || err.message.includes('HTTP 404');
           if (!is404) {
             console.error('Error loading order:', err);
-            alert('Failed to load order: ' + err.message);
+            alert(l10n('generalLedger.errorLoadFailed') + ': ' + err.message);
           }
         } else {
           console.error('Error loading order:', err);
@@ -65,7 +65,7 @@ export function GeneralLedgerDetailPage(props: GeneralLedgerDetailPageProps = {}
       <PageContainer {...debugProps(COMPONENT_NAME, 'PageContainer')}>
         <ContentCard padding="large" {...debugProps(COMPONENT_NAME, 'ContentCard')}>
           <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', height: '100%', gap: 'var(--spacing-md)' }}>
-            <AxParagraph>Loading general ledger entry...</AxParagraph>
+            <AxParagraph>{l10n('generalLedger.detail.loading')}</AxParagraph>
           </div>
         </ContentCard>
       </PageContainer>
@@ -77,7 +77,7 @@ export function GeneralLedgerDetailPage(props: GeneralLedgerDetailPageProps = {}
       <PageContainer {...debugProps(COMPONENT_NAME, 'PageContainer')}>
         <ContentCard padding="large" {...debugProps(COMPONENT_NAME, 'ContentCard')}>
           <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', height: '100%', gap: 'var(--spacing-md)' }}>
-            <AxParagraph>Order not found</AxParagraph>
+            <AxParagraph>{l10n('generalLedger.detail.notFound')}</AxParagraph>
             {onNavigateBack && (
               <AxButton variant="secondary" onClick={onNavigateBack}>
                 {l10n('generalLedger.back')}
@@ -91,11 +91,11 @@ export function GeneralLedgerDetailPage(props: GeneralLedgerDetailPageProps = {}
 
   const selectedCustomer = customers.find(c => c.id === order.customerId);
   const customerName = selectedCustomer 
-    ? (selectedCustomer.companyName || `${selectedCustomer.lastName || ''} ${selectedCustomer.firstName || ''}`.trim() || selectedCustomer.email || 'Unknown')
-    : 'Unknown';
+    ? (selectedCustomer.companyName || `${selectedCustomer.lastName || ''} ${selectedCustomer.firstName || ''}`.trim() || selectedCustomer.email || l10n('generalLedger.unknown'))
+    : l10n('generalLedger.unknown');
 
   const formatDate = (dateString?: string) => {
-    if (!dateString) return 'N/A';
+    if (!dateString) return l10n('generalLedger.notAvailable');
     try {
       const date = new Date(dateString);
       return date.toLocaleDateString();

@@ -10,6 +10,7 @@ import {
 import { fetchCustomerById, updateCustomer, Customer } from '../api/customerApi';
 import { fetchAddresses, Address } from '../api/addressApi';
 import { CustomerAddressAssociation } from './CustomerAddressAssociation';
+import { useI18n } from '../i18n/I18nProvider';
 
 interface CustomerEditDialogProps {
   open: boolean;
@@ -26,6 +27,7 @@ export function CustomerEditDialog({
   onCustomerUpdated,
   onAddressesUpdated,
 }: CustomerEditDialogProps) {
+  const { l10n } = useI18n();
   const [customer, setCustomer] = useState<Customer | null>(null);
   const [addresses, setAddresses] = useState<Address[]>([]);
   const [formData, setFormData] = useState<Partial<Customer>>({});
@@ -48,7 +50,7 @@ export function CustomerEditDialog({
       setFormData(customerData);
     } catch (err) {
       console.error('Error loading customer:', err);
-      alert('Failed to load customer');
+      alert(l10n('customer.failedToLoad'));
     } finally {
       setLoading(false);
     }
@@ -101,7 +103,7 @@ export function CustomerEditDialog({
       }
     } catch (err) {
       console.error('Error updating customer:', err);
-      alert(err instanceof Error ? err.message : 'Failed to update customer');
+      alert(err instanceof Error ? err.message : l10n('customer.failedToUpdate'));
     } finally {
       setSubmitting(false);
     }
@@ -126,7 +128,7 @@ export function CustomerEditDialog({
     <AxDialog
       open={open}
       onClose={handleClose}
-      title="Edit Customer"
+      title={l10n('customer.editTitle')}
       size="large"
       footer={
         <div style={{ display: 'flex', gap: 'var(--spacing-sm)', justifyContent: 'space-between' }}>
@@ -136,7 +138,7 @@ export function CustomerEditDialog({
               onClick={() => setShowAddressManagement(true)}
               disabled={submitting}
             >
-              Manage Addresses
+              {l10n('customer.manageAddresses')}
             </AxButton>
           </div>
           <div style={{ display: 'flex', gap: 'var(--spacing-sm)' }}>
@@ -145,14 +147,14 @@ export function CustomerEditDialog({
               onClick={handleClose}
               disabled={submitting}
             >
-              Cancel
+              {l10n('common.cancel')}
             </AxButton>
             <AxButton 
               variant="primary" 
               onClick={handleSave}
               disabled={submitting}
             >
-              {submitting ? 'Saving...' : 'Save'}
+              {submitting ? l10n('common.saving') : l10n('common.save')}
             </AxButton>
           </div>
         </div>
@@ -160,7 +162,7 @@ export function CustomerEditDialog({
     >
       <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-lg)' }}>
         <AxFormGroup>
-          <AxLabel>Customer Number</AxLabel>
+          <AxLabel>{l10n('customer.customerNumber')}</AxLabel>
           <AxInput
             type="text"
             value={formData.customerNumber || ''}
@@ -173,7 +175,7 @@ export function CustomerEditDialog({
           />
         </AxFormGroup>
         <AxFormGroup>
-          <AxLabel>Company Name</AxLabel>
+          <AxLabel>{l10n('customer.companyName')}</AxLabel>
           <AxInput
             type="text"
             value={formData.companyName || ''}
@@ -186,7 +188,7 @@ export function CustomerEditDialog({
           />
         </AxFormGroup>
         <AxFormGroup>
-          <AxLabel>First Name</AxLabel>
+          <AxLabel>{l10n('customer.firstName')}</AxLabel>
           <AxInput
             type="text"
             value={formData.firstName || ''}
@@ -199,7 +201,7 @@ export function CustomerEditDialog({
           />
         </AxFormGroup>
         <AxFormGroup>
-          <AxLabel>Last Name</AxLabel>
+          <AxLabel>{l10n('customer.lastName')}</AxLabel>
           <AxInput
             type="text"
             value={formData.lastName || ''}
@@ -212,7 +214,7 @@ export function CustomerEditDialog({
           />
         </AxFormGroup>
         <AxFormGroup>
-          <AxLabel>Email</AxLabel>
+          <AxLabel>{l10n('customer.email')}</AxLabel>
           <AxInput
             type="email"
             value={formData.email || ''}
@@ -225,7 +227,7 @@ export function CustomerEditDialog({
           />
         </AxFormGroup>
         <AxFormGroup>
-          <AxLabel>Phone</AxLabel>
+          <AxLabel>{l10n('customer.phone')}</AxLabel>
           <AxInput
             type="tel"
             value={formData.phone || ''}
@@ -238,14 +240,14 @@ export function CustomerEditDialog({
           />
         </AxFormGroup>
         <AxFormGroup>
-          <AxLabel>Associated Addresses</AxLabel>
+          <AxLabel>{l10n('customer.associatedAddresses')}</AxLabel>
           <div style={{ marginTop: 'var(--spacing-xs)' }}>
             {(() => {
               const customerAddresses = getCustomerAddresses(customerId);
               if (customerAddresses.length === 0) {
                 return (
                   <AxParagraph color="secondary" italic>
-                    No addresses associated with this customer
+                    {l10n('customer.noAddresses')}
                   </AxParagraph>
                 );
               }
@@ -262,7 +264,9 @@ export function CustomerEditDialog({
                       }}
                     >
                       <div style={{ fontWeight: 'var(--font-weight-medium)', marginBottom: 'var(--spacing-xs)' }}>
-                        {addr.addressType || 'Both (Shipping & Billing)'}
+                        {addr.addressType === 'SHIPPING' ? l10n('customer.addressType.shipping') :
+                         addr.addressType === 'BILLING' ? l10n('customer.addressType.billing') :
+                         l10n('customer.addressType.both')}
                       </div>
                       <div>{formatAddress(addr)}</div>
                     </div>
@@ -286,7 +290,7 @@ export function CustomerEditDialog({
               onAddressesUpdated();
             }
           }}
-          title="Manage Addresses"
+          title={l10n('customer.manageAddresses')}
           size="large"
           footer={
             <div style={{ display: 'flex', gap: 'var(--spacing-sm)', justifyContent: 'flex-end' }}>
@@ -301,7 +305,7 @@ export function CustomerEditDialog({
                   }
                 }}
               >
-                Close
+                {l10n('customer.close')}
               </AxButton>
             </div>
           }

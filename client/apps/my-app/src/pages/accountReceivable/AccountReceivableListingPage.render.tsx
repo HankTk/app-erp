@@ -1,6 +1,5 @@
 import {
   AxTable,
-  AxCard,
   AxHeading3,
   AxParagraph,
   AxButton,
@@ -9,6 +8,7 @@ import {
 } from '@ui/components';
 import { debugProps } from '../../utils/emotionCache';
 import { Order } from '../../api/orderApi';
+import { useI18n } from '../../i18n/I18nProvider';
 import {
   PageContainer,
   HeaderCard,
@@ -30,52 +30,52 @@ type ListingRenderContext = {
   onViewInvoice?: (orderId: string) => void;
 };
 
-const createColumns = (): ColumnDefinition<Order, ListingRenderContext>[] => [
+const createColumns = (t: (key: string, params?: Record<string, string | number | undefined>) => string): ColumnDefinition<Order, ListingRenderContext>[] => [
   { 
     key: 'accountsReceivable.invoiceNumber',
-    header: 'Invoice Number',
+    header: t('accountsReceivable.table.invoiceNumber'),
     align: undefined,
-    render: (invoice: Order) => invoice.invoiceNumber || 'N/A'
+    render: (invoice: Order) => invoice.invoiceNumber || t('generalLedger.notAvailable')
   },
   { 
     key: 'accountsReceivable.orderNumber',
-    header: 'Order Number',
+    header: t('accountsReceivable.table.orderNumber'),
     align: undefined,
-    render: (invoice: Order) => invoice.orderNumber || invoice.id?.substring(0, 8) || 'N/A'
+    render: (invoice: Order) => invoice.orderNumber || invoice.id?.substring(0, 8) || t('generalLedger.notAvailable')
   },
   { 
     key: 'accountsReceivable.customer',
-    header: 'Customer',
+    header: t('accountsReceivable.customer'),
     align: undefined,
-    render: (invoice: Order, context) => context?.getCustomerName(invoice.customerId) || 'N/A'
+    render: (invoice: Order, context) => context?.getCustomerName(invoice.customerId) || t('generalLedger.notAvailable')
   },
   { 
     key: 'accountsReceivable.invoiceDate',
-    header: 'Invoice Date',
+    header: t('accountsReceivable.table.invoiceDate'),
     align: undefined,
-    render: (invoice: Order, context) => context?.formatDate(invoice.invoiceDate) || 'N/A'
+    render: (invoice: Order, context) => context?.formatDate(invoice.invoiceDate) || t('generalLedger.notAvailable')
   },
   { 
     key: 'accountsReceivable.dueDate',
-    header: 'Due Date',
+    header: t('accountsReceivable.table.dueDate'),
     align: undefined,
-    render: (invoice: Order, context) => context?.formatDate(invoice.invoiceDate) || 'N/A'
+    render: (invoice: Order, context) => context?.formatDate(invoice.invoiceDate) || t('generalLedger.notAvailable')
   },
   { 
     key: 'accountsReceivable.invoiceAmount',
-    header: 'Invoice Amount',
+    header: t('accountsReceivable.table.invoiceAmount'),
     align: 'right',
     render: (invoice: Order) => `$${(invoice.total?.toFixed(2) || '0.00')}`
   },
   { 
     key: 'accountsReceivable.paidAmount',
-    header: 'Paid Amount',
+    header: t('accountsReceivable.table.paidAmount'),
     align: 'right',
     render: (invoice: Order) => `$${((invoice.jsonData?.paymentAmount || 0).toFixed(2))}`
   },
   { 
     key: 'accountsReceivable.outstanding',
-    header: 'Outstanding',
+    header: t('accountsReceivable.outstanding'),
     align: 'right',
     render: (invoice: Order, context) => {
       const outstanding = context?.calculateOutstandingAmount(invoice) || 0;
@@ -91,7 +91,7 @@ const createColumns = (): ColumnDefinition<Order, ListingRenderContext>[] => [
   },
   { 
     key: 'accountsReceivable.status',
-    header: 'Status',
+    header: t('accountsReceivable.table.status'),
     align: undefined,
     render: (invoice: Order, context) => (
       <span 
@@ -105,13 +105,13 @@ const createColumns = (): ColumnDefinition<Order, ListingRenderContext>[] => [
           fontSize: 'var(--font-size-sm)',
         }}
       >
-        {context?.getStatusLabel(invoice.status) || invoice.status || 'N/A'}
+        {context?.getStatusLabel(invoice.status) || invoice.status || t('generalLedger.notAvailable')}
       </span>
     )
   },
   { 
     key: 'accountsReceivable.actions',
-    header: 'Actions',
+    header: t('generalLedger.table.actions'),
     align: 'center',
     render: (invoice: Order, context) => {
       if (context?.onViewInvoice && invoice.id) {
@@ -122,7 +122,7 @@ const createColumns = (): ColumnDefinition<Order, ListingRenderContext>[] => [
             onClick={() => context.onViewInvoice!(invoice.id!)}
             style={{ minWidth: '80px' }}
           >
-            View
+            {t('accountsReceivable.table.view')}
           </AxButton>
         );
       }
@@ -165,7 +165,8 @@ export function AccountReceivableListingPageRender(props: AccountReceivableListi
     getStatusLabel,
   } = props;
 
-  const columns = createColumns();
+  const { l10n } = useI18n();
+  const columns = createColumns(l10n);
   const tableContext: ListingRenderContext = {
     getCustomerName,
     formatDate,
@@ -188,15 +189,15 @@ export function AccountReceivableListingPageRender(props: AccountReceivableListi
                   onClick={onNavigateBack}
                   style={{ minWidth: 'auto', padding: 'var(--spacing-sm) var(--spacing-md)' }}
                 >
-                  ← Back
+                  {l10n('accountsReceivable.back')}
                 </AxButton>
               )}
               <div>
                 <AxHeading3 style={{ marginBottom: 'var(--spacing-xs)' }}>
-                  Account Receivable
+                  {l10n('accountsReceivable.title')}
                 </AxHeading3>
                 <AxParagraph color="secondary">
-                  View and manage invoices
+                  {l10n('accountsReceivable.manageInvoices')}
                 </AxParagraph>
               </div>
             </HeaderLeft>
@@ -206,7 +207,7 @@ export function AccountReceivableListingPageRender(props: AccountReceivableListi
         </HeaderCard>
         <TableCard padding="large" {...debugProps(COMPONENT_NAME, 'TableCard')}>
           <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '200px' }}>
-            <AxParagraph>Loading invoices...</AxParagraph>
+            <AxParagraph>{l10n('accountsReceivable.loading')}</AxParagraph>
           </div>
         </TableCard>
       </PageContainer>
@@ -225,15 +226,15 @@ export function AccountReceivableListingPageRender(props: AccountReceivableListi
                   onClick={onNavigateBack}
                   style={{ minWidth: 'auto', padding: 'var(--spacing-sm) var(--spacing-md)' }}
                 >
-                  ← Back
+                  {l10n('accountsReceivable.back')}
                 </AxButton>
               )}
               <div>
                 <AxHeading3 style={{ marginBottom: 'var(--spacing-xs)' }}>
-                  Account Receivable
+                  {l10n('accountsReceivable.title')}
                 </AxHeading3>
                 <AxParagraph color="secondary">
-                  View and manage invoices
+                  {l10n('accountsReceivable.manageInvoices')}
                 </AxParagraph>
               </div>
             </HeaderLeft>
@@ -243,9 +244,9 @@ export function AccountReceivableListingPageRender(props: AccountReceivableListi
         </HeaderCard>
         <TableCard padding="large" {...debugProps(COMPONENT_NAME, 'TableCard')}>
           <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '200px', flexDirection: 'column', gap: 'var(--spacing-md)' }}>
-            <AxParagraph color="error">Error: {error}</AxParagraph>
+            <AxParagraph color="error">{l10n('accountsReceivable.error')}: {error}</AxParagraph>
             <AxButton variant="secondary" onClick={() => window.location.reload()}>
-              Retry
+              {l10n('common.retry')}
             </AxButton>
           </div>
         </TableCard>
@@ -280,13 +281,13 @@ export function AccountReceivableListingPageRender(props: AccountReceivableListi
             <div style={{ margin: 0, minWidth: '200px' }}>
               <AxListbox
                 options={[
-                  { value: '', label: 'All Statuses' },
-                  { value: 'INVOICED', label: 'Invoiced' },
-                  { value: 'PAID', label: 'Paid' },
+                  { value: '', label: l10n('accountsReceivable.filter.allStatuses') },
+                  { value: 'INVOICED', label: l10n('accountsReceivable.filter.invoiced') },
+                  { value: 'PAID', label: l10n('accountsReceivable.filter.paid') },
                 ]}
                 value={statusFilter || ''}
                 onChange={(value: string | string[]) => onStatusFilterChange(Array.isArray(value) ? value[0] || null : value || null)}
-                placeholder="Filter by status"
+                placeholder={l10n('accountsReceivable.filter.byStatus')}
               />
             </div>
           </HeaderRight>
@@ -297,7 +298,7 @@ export function AccountReceivableListingPageRender(props: AccountReceivableListi
         <div style={{ flex: 1, overflow: 'auto', minHeight: 0, height: 0, maxHeight: '100%' }}>
           {filteredInvoices.length === 0 ? (
             <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '200px' }}>
-              <AxParagraph>No invoices found</AxParagraph>
+              <AxParagraph>{l10n('accountsReceivable.noInvoices')}</AxParagraph>
             </div>
           ) : (
             <AxTable

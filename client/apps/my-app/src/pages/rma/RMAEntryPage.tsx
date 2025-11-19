@@ -72,7 +72,7 @@ export function RMAEntryPage(props: RMAEntryPageProps = {}) {
       setNotes(rmaData.notes || '');
     } catch (err) {
       console.error('Error loading RMA:', err);
-      alert(err instanceof Error ? err.message : 'Failed to load RMA');
+      alert(err instanceof Error ? err.message : l10n('rma.failedToLoad'));
     } finally {
       setLoading(false);
     }
@@ -255,7 +255,7 @@ export function RMAEntryPage(props: RMAEntryPageProps = {}) {
   };
 
   const getProductName = (productId?: string) => {
-    if (!productId) return 'N/A';
+    if (!productId) return l10n('generalLedger.notAvailable');
     const product = products.find(p => p.id === productId);
     return product ? (product.productName || product.productCode) : productId;
   };

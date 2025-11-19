@@ -32,16 +32,16 @@ export function OrderConfirmationStepPageRender(props: OrderConfirmationStepProp
 
         <div>
           <AxParagraph weight="bold" marginBottom="sm">
-            Order Items
+            {l10n('orderEntry.review.orderItems')}
           </AxParagraph>
           <ItemsTable {...debugProps(COMPONENT_NAME, 'ItemsTable')}>
             <AxTable fullWidth>
               <AxTableHead>
                 <AxTableRow>
-                  <AxTableHeader>Product</AxTableHeader>
-                  <AxTableHeader>Quantity</AxTableHeader>
-                  <AxTableHeader align="right">Unit Price</AxTableHeader>
-                  <AxTableHeader align="right">Line Total</AxTableHeader>
+                  <AxTableHeader>{l10n('orderEntry.products.table.product')}</AxTableHeader>
+                  <AxTableHeader>{l10n('orderEntry.products.table.quantity')}</AxTableHeader>
+                  <AxTableHeader align="right">{l10n('orderEntry.products.table.unitPrice')}</AxTableHeader>
+                  <AxTableHeader align="right">{l10n('orderEntry.products.table.lineTotal')}</AxTableHeader>
                 </AxTableRow>
               </AxTableHead>
               <AxTableBody>
@@ -58,7 +58,7 @@ export function OrderConfirmationStepPageRender(props: OrderConfirmationStepProp
                   <AxTableRow>
                     <AxTableCell colSpan={4} align="center">
                       <AxParagraph color="secondary">
-                        No items in this order
+                        {l10n('orderEntry.confirmation.noItems')}
                       </AxParagraph>
                     </AxTableCell>
                   </AxTableRow>
@@ -76,15 +76,15 @@ export function OrderConfirmationStepPageRender(props: OrderConfirmationStepProp
           }}
         >
           <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 'var(--spacing-sm)' }}>
-            <AxParagraph>Subtotal:</AxParagraph>
+            <AxParagraph>{l10n('orderEntry.review.subtotal')}</AxParagraph>
             <AxParagraph>${order?.subtotal?.toFixed(2) || '0.00'}</AxParagraph>
           </div>
           <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 'var(--spacing-sm)' }}>
-            <AxParagraph>Tax:</AxParagraph>
+            <AxParagraph>{l10n('orderEntry.review.tax')}</AxParagraph>
             <AxParagraph>${order?.tax?.toFixed(2) || '0.00'}</AxParagraph>
           </div>
           <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 'var(--spacing-sm)' }}>
-            <AxParagraph>Shipping:</AxParagraph>
+            <AxParagraph>{l10n('orderEntry.review.shipping')}</AxParagraph>
             <AxParagraph>${order?.shippingCost?.toFixed(2) || '0.00'}</AxParagraph>
           </div>
           <div
@@ -95,7 +95,7 @@ export function OrderConfirmationStepPageRender(props: OrderConfirmationStepProp
               borderTop: '2px solid var(--color-border-default)',
             }}
           >
-            <AxParagraph weight="bold">Total:</AxParagraph>
+            <AxParagraph weight="bold">{l10n('orderEntry.review.total')}</AxParagraph>
             <AxParagraph weight="bold">
               ${order?.total?.toFixed(2) || '0.00'}
             </AxParagraph>

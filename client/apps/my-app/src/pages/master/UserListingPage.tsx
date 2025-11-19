@@ -68,9 +68,23 @@ export function UserListingPage({ onNoUsersRemaining, onNavigateBack }: UserList
       // Generate label with special handling for created_date
       let label = key.charAt(0).toUpperCase() + key.slice(1).replace(/([A-Z])/g, ' $1').trim();
       if (key.toLowerCase() === 'created_date') {
-        label = 'Created Date';
+        label = l10n('user.table.createdDate');
       } else if (key.toLowerCase().includes('created') && key.toLowerCase().includes('date')) {
-        label = 'Created Date';
+        label = l10n('user.table.createdDate');
+      } else if (key.toLowerCase() === 'userid') {
+        label = l10n('user.form.userId');
+      } else if (key.toLowerCase() === 'firstname') {
+        label = l10n('user.form.firstName');
+      } else if (key.toLowerCase() === 'lastname') {
+        label = l10n('user.form.lastName');
+      } else if (key.toLowerCase() === 'email') {
+        label = l10n('user.form.email');
+      } else if (key.toLowerCase() === 'role') {
+        label = l10n('user.form.role');
+      } else if (key.toLowerCase() === 'status') {
+        label = l10n('user.table.status');
+      } else if (key.toLowerCase() === 'jsondata') {
+        label = l10n('user.form.jsonData');
       }
       
       const column: ColumnConfig = {
@@ -135,7 +149,7 @@ export function UserListingPage({ onNoUsersRemaining, onNavigateBack }: UserList
       if (key === 'jsonData') {
         column.render = (value) => {
           if (value === null || value === undefined) {
-            return <span style={{ color: 'var(--color-text-tertiary)', fontStyle: 'italic' }}>null</span>;
+            return <span style={{ color: 'var(--color-text-tertiary)', fontStyle: 'italic' }}>{l10n('user.table.null')}</span>;
           }
           if (typeof value === 'object') {
             try {
@@ -235,7 +249,7 @@ export function UserListingPage({ onNoUsersRemaining, onNavigateBack }: UserList
       const usersData = await fetchUsers();
       updateUsersAndColumns(usersData);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to load users');
+      setError(err instanceof Error ? err.message : l10n('user.error.loadFailed'));
       console.error('Error fetching users:', err);
     } finally {
       setLoading(false);
@@ -274,7 +288,7 @@ export function UserListingPage({ onNoUsersRemaining, onNavigateBack }: UserList
       setSelectedUser(null);
     } catch (err) {
       console.error('Error deleting user:', err);
-      alert(err instanceof Error ? err.message : 'Failed to delete user');
+      alert(err instanceof Error ? err.message : l10n('user.error.deleteFailed'));
     } finally {
       setSubmitting(false);
     }
@@ -298,7 +312,7 @@ export function UserListingPage({ onNoUsersRemaining, onNavigateBack }: UserList
           try {
             dataToSave.jsonData = JSON.parse(dataToSave.jsonData);
           } catch (e) {
-            alert('Invalid JSON format in Json Data field. Please check your JSON syntax.');
+            alert(l10n('user.error.invalidJson'));
             setSubmitting(false);
             return;
           }
@@ -324,7 +338,7 @@ export function UserListingPage({ onNoUsersRemaining, onNavigateBack }: UserList
       setSelectedUser(null);
     } catch (err) {
       console.error('Error saving user:', err);
-      alert(err instanceof Error ? err.message : `Failed to ${dialogMode === 'edit' ? 'update' : 'create'} user`);
+      alert(err instanceof Error ? err.message : (dialogMode === 'edit' ? l10n('user.error.updateFailed') : l10n('user.error.createFailed')));
     } finally {
       setSubmitting(false);
     }

@@ -95,10 +95,10 @@ export function OrderEntryPage(props: OrderEntryPageProps = {}) {
   ];
 
   const entrySubSteps: { key: EntrySubStep; label: string }[] = [
-    { key: 'customer', label: 'Customer' },
-    { key: 'products', label: 'Products' },
-    { key: 'shipping', label: 'Shipping' },
-    { key: 'review', label: 'Review' },
+    { key: 'customer', label: l10n('orderEntry.subStep.customer') },
+    { key: 'products', label: l10n('orderEntry.subStep.products') },
+    { key: 'shipping', label: l10n('orderEntry.subStep.shipping') },
+    { key: 'review', label: l10n('orderEntry.subStep.review') },
   ];
 
   useEffect(() => {

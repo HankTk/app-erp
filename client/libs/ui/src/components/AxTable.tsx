@@ -11,6 +11,7 @@ export interface ColumnDefinition<T = any, C = any> {
   headerAlign?: 'left' | 'center' | 'right';
   render?: (item: T, context?: C) => React.ReactNode;
   variant?: 'default' | 'bordered' | 'striped';
+  width?: string | number;
 }
 
 export interface AxTableProps<T = any, C = any> extends Omit<React.TableHTMLAttributes<HTMLTableElement>, 'children'> {
@@ -187,6 +188,7 @@ export function AxTable<T = any, C = any>({
                   key={column.key}
                   align={column.headerAlign ?? column.align}
                   variant={column.variant ?? variant}
+                  style={column.width ? { width: typeof column.width === 'number' ? `${column.width}px` : column.width } : undefined}
                 >
                   {column.header ?? column.label ?? column.key}
                 </AxTableHeader>
@@ -209,6 +211,7 @@ export function AxTable<T = any, C = any>({
                           key={column.key}
                           align={column.align}
                           variant={column.variant ?? variant}
+                          style={column.width ? { width: typeof column.width === 'number' ? `${column.width}px` : column.width } : undefined}
                         >
                           {cellContent}
                         </AxTableCell>

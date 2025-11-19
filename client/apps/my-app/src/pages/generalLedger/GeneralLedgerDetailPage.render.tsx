@@ -63,7 +63,7 @@ export function GeneralLedgerDetailPageRender(props: GeneralLedgerDetailPageRend
       <PageContainer {...debugProps(COMPONENT_NAME, 'PageContainer')}>
         <ContentCard padding="large" {...debugProps(COMPONENT_NAME, 'ContentCard')}>
           <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', height: '100%', gap: 'var(--spacing-md)' }}>
-            <AxParagraph>Loading general ledger entry...</AxParagraph>
+            <AxParagraph>{l10n('generalLedger.detail.loading')}</AxParagraph>
           </div>
         </ContentCard>
       </PageContainer>
@@ -75,7 +75,7 @@ export function GeneralLedgerDetailPageRender(props: GeneralLedgerDetailPageRend
       <PageContainer {...debugProps(COMPONENT_NAME, 'PageContainer')}>
         <ContentCard padding="large" {...debugProps(COMPONENT_NAME, 'ContentCard')}>
           <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', height: '100%', gap: 'var(--spacing-md)' }}>
-            <AxParagraph>Order not found</AxParagraph>
+            <AxParagraph>{l10n('generalLedger.detail.notFound')}</AxParagraph>
             {onNavigateBack && (
               <AxButton variant="secondary" onClick={onNavigateBack}>
                 {l10n('generalLedger.back')}
@@ -123,7 +123,7 @@ export function GeneralLedgerDetailPageRender(props: GeneralLedgerDetailPageRend
             <AxParagraph weight="bold">
               {l10n('generalLedger.detail.orderNumber')}
             </AxParagraph>
-            <AxParagraph>{order.orderNumber || 'N/A'}</AxParagraph>
+            <AxParagraph>{order.orderNumber || l10n('generalLedger.notAvailable')}</AxParagraph>
           </InfoRow>
           {order.invoiceNumber && (
             <InfoRow>
@@ -171,11 +171,11 @@ export function GeneralLedgerDetailPageRender(props: GeneralLedgerDetailPageRend
             <AxTable fullWidth style={{ marginBottom: 'var(--spacing-lg)' }}>
               <AxTableHead>
                 <AxTableRow>
-                  <AxTableHeader>Product</AxTableHeader>
-                  <AxTableHeader align="right">Quantity</AxTableHeader>
-                  <AxTableHeader align="right">Unit Price</AxTableHeader>
-                  <AxTableHeader align="right">Line Total</AxTableHeader>
-                  <AxTableHeader align="right">Cost (Est.)</AxTableHeader>
+                  <AxTableHeader>{l10n('generalLedger.detail.product')}</AxTableHeader>
+                  <AxTableHeader align="right">{l10n('generalLedger.table.quantity')}</AxTableHeader>
+                  <AxTableHeader align="right">{l10n('generalLedger.detail.unitPrice')}</AxTableHeader>
+                  <AxTableHeader align="right">{l10n('generalLedger.detail.lineTotal')}</AxTableHeader>
+                  <AxTableHeader align="right">{l10n('generalLedger.detail.costEst')}</AxTableHeader>
                 </AxTableRow>
               </AxTableHead>
               <AxTableBody>
@@ -185,7 +185,7 @@ export function GeneralLedgerDetailPageRender(props: GeneralLedgerDetailPageRend
                   const lineCost = itemCost * (item.quantity || 0);
                   return (
                     <AxTableRow key={index}>
-                      <AxTableCell>{item.productName || item.productCode || 'N/A'}</AxTableCell>
+                      <AxTableCell>{item.productName || item.productCode || l10n('generalLedger.notAvailable')}</AxTableCell>
                       <AxTableCell align="right">{item.quantity || 0}</AxTableCell>
                       <AxTableCell align="right">${item.unitPrice?.toFixed(2) || '0.00'}</AxTableCell>
                       <AxTableCell align="right">${item.lineTotal?.toFixed(2) || '0.00'}</AxTableCell>

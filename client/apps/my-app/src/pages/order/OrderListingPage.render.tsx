@@ -19,6 +19,7 @@ import {
   HeaderRight,
   TableCard,
 } from './OrderListingPage.styles';
+import { useI18n } from '../../i18n/I18nProvider';
 
 const COMPONENT_NAME = 'OrderListingPage';
 
@@ -33,22 +34,22 @@ type ListingRenderContext = {
   onDeleteClick: (order: Order) => void;
 };
 
-const createColumns = (): ColumnDefinition<Order, ListingRenderContext>[] => [
+const createColumns = (l10n: (key: string) => string): ColumnDefinition<Order, ListingRenderContext>[] => [
   { 
     key: 'order.orderNumber',
-    header: 'Order Number',
+    header: l10n('order.table.orderNumber'),
     align: undefined,
     render: (order: Order) => order.orderNumber || order.id?.substring(0, 8) || 'N/A'
   },
   { 
     key: 'order.customer',
-    header: 'Customer',
+    header: l10n('order.table.customer'),
     align: undefined,
     render: (order: Order, context) => context?.getCustomerName(order.customerId) || 'N/A'
   },
   { 
     key: 'order.status',
-    header: 'Status',
+    header: l10n('order.table.status'),
     align: undefined,
     render: (order: Order, context) => (
       <span 
@@ -68,31 +69,31 @@ const createColumns = (): ColumnDefinition<Order, ListingRenderContext>[] => [
   },
   { 
     key: 'order.orderDate',
-    header: 'Order Date',
+    header: l10n('order.table.orderDate'),
     align: undefined,
     render: (order: Order, context) => context?.formatDate(order.orderDate) || 'N/A'
   },
   { 
     key: 'order.shipDate',
-    header: 'Ship Date',
+    header: l10n('order.table.shipDate'),
     align: undefined,
     render: (order: Order, context) => context?.formatDate(order.shipDate) || 'N/A'
   },
   { 
     key: 'order.total',
-    header: 'Total',
+    header: l10n('order.table.total'),
     align: 'right',
     render: (order: Order) => `$${(order.total?.toFixed(2) || '0.00')}`
   },
   { 
     key: 'order.items',
-    header: 'Items',
+    header: l10n('order.table.items'),
     align: 'center',
     render: (order: Order) => order.items?.length || 0
   },
   { 
     key: 'order.actions',
-    header: 'Actions',
+    header: l10n('order.table.actions'),
     align: 'center',
     render: (order: Order, context) => (
       <div style={{ display: 'flex', gap: 'var(--spacing-sm)', justifyContent: 'center' }}>
@@ -103,7 +104,7 @@ const createColumns = (): ColumnDefinition<Order, ListingRenderContext>[] => [
             onClick={() => context.onViewOrder!(order.id!)}
             style={{ minWidth: '80px' }}
           >
-            View
+            {l10n('order.actions.view')}
           </AxButton>
         )}
         {context?.onEditOrder && (
@@ -114,7 +115,7 @@ const createColumns = (): ColumnDefinition<Order, ListingRenderContext>[] => [
             disabled={order.status === 'PAID' || order.status === 'CANCELLED'}
             style={{ minWidth: '80px' }}
           >
-            Edit
+            {l10n('order.actions.edit')}
           </AxButton>
         )}
         <AxButton 
@@ -124,7 +125,7 @@ const createColumns = (): ColumnDefinition<Order, ListingRenderContext>[] => [
           disabled={order.status === 'PAID' || order.status === 'CANCELLED'}
           style={{ minWidth: '80px' }}
         >
-          Delete
+          {l10n('order.actions.delete')}
         </AxButton>
       </div>
     )
@@ -180,7 +181,8 @@ export function OrderListingPageRender(props: OrderListingPageRenderProps) {
     getStatusLabel,
   } = props;
 
-  const columns = createColumns();
+  const { l10n } = useI18n();
+  const columns = createColumns(l10n);
   const tableContext: ListingRenderContext = {
     getCustomerName,
     formatDate,
@@ -222,7 +224,7 @@ export function OrderListingPageRender(props: OrderListingPageRenderProps) {
         </HeaderCard>
         <TableCard padding="large" {...debugProps(COMPONENT_NAME, 'TableCard')}>
           <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '200px' }}>
-            <AxParagraph>Loading orders...</AxParagraph>
+            <AxParagraph>{l10n('order.loading')}</AxParagraph>
           </div>
         </TableCard>
       </PageContainer>
@@ -241,15 +243,15 @@ export function OrderListingPageRender(props: OrderListingPageRenderProps) {
                   onClick={onNavigateBack}
                   style={{ minWidth: 'auto', padding: 'var(--spacing-sm) var(--spacing-md)' }}
                 >
-                  ← Back
+                  {l10n('order.back')}
                 </AxButton>
               )}
               <div>
                 <AxHeading3 style={{ marginBottom: 'var(--spacing-xs)' }}>
-                  Orders
+                  {l10n('order.title')}
                 </AxHeading3>
                 <AxParagraph color="secondary">
-                  View and manage all orders
+                  {l10n('order.subtitle')}
                 </AxParagraph>
               </div>
             </HeaderLeft>
@@ -259,9 +261,9 @@ export function OrderListingPageRender(props: OrderListingPageRenderProps) {
         </HeaderCard>
         <TableCard padding="large" {...debugProps(COMPONENT_NAME, 'TableCard')}>
           <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '200px', flexDirection: 'column', gap: 'var(--spacing-md)' }}>
-            <AxParagraph color="error">Error: {error}</AxParagraph>
+            <AxParagraph color="error">{l10n('order.error')}: {error}</AxParagraph>
             <AxButton variant="secondary" onClick={() => window.location.reload()}>
-              Retry
+              {l10n('order.retry')}
             </AxButton>
           </div>
         </TableCard>
@@ -280,15 +282,15 @@ export function OrderListingPageRender(props: OrderListingPageRenderProps) {
                 onClick={onNavigateBack}
                 style={{ minWidth: 'auto', padding: 'var(--spacing-sm) var(--spacing-md)' }}
               >
-                ← Back
+                {l10n('order.back')}
               </AxButton>
             )}
             <div>
               <AxHeading3 style={{ marginBottom: 'var(--spacing-xs)' }}>
-                Orders
+                {l10n('order.title')}
               </AxHeading3>
               <AxParagraph style={{ color: 'var(--color-text-secondary)' }}>
-                View and manage all orders
+                {l10n('order.subtitle')}
               </AxParagraph>
             </div>
           </HeaderLeft>
@@ -296,24 +298,24 @@ export function OrderListingPageRender(props: OrderListingPageRenderProps) {
             <div style={{ margin: 0, minWidth: '200px' }}>
               <AxListbox
                 options={[
-                  { value: '', label: 'All Statuses' },
-                  { value: 'DRAFT', label: 'Draft' },
-                  { value: 'PENDING_APPROVAL', label: 'Pending Approval' },
-                  { value: 'APPROVED', label: 'Approved' },
-                  { value: 'SHIPPING_INSTRUCTED', label: 'Shipping Instructed' },
-                  { value: 'SHIPPED', label: 'Shipped' },
-                  { value: 'INVOICED', label: 'Invoiced' },
-                  { value: 'PAID', label: 'Paid' },
-                  { value: 'CANCELLED', label: 'Cancelled' },
+                  { value: '', label: l10n('order.filter.allStatuses') },
+                  { value: 'DRAFT', label: l10n('order.status.draft') },
+                  { value: 'PENDING_APPROVAL', label: l10n('order.status.pendingApproval') },
+                  { value: 'APPROVED', label: l10n('order.status.approved') },
+                  { value: 'SHIPPING_INSTRUCTED', label: l10n('order.status.shippingInstructed') },
+                  { value: 'SHIPPED', label: l10n('order.status.shipped') },
+                  { value: 'INVOICED', label: l10n('order.status.invoiced') },
+                  { value: 'PAID', label: l10n('order.status.paid') },
+                  { value: 'CANCELLED', label: l10n('order.status.cancelled') },
                 ]}
                 value={statusFilter || ''}
                 onChange={(value: string | string[]) => onStatusFilterChange(Array.isArray(value) ? value[0] || null : value || null)}
-                placeholder="Filter by status"
+                placeholder={l10n('order.filter.byStatus')}
               />
             </div>
             {onNavigateToOrderEntry && (
               <AxButton variant="primary" onClick={onNavigateToOrderEntry}>
-                Create Order
+                {l10n('order.create')}
               </AxButton>
             )}
           </HeaderRight>
@@ -324,7 +326,7 @@ export function OrderListingPageRender(props: OrderListingPageRenderProps) {
         <div style={{ flex: 1, overflow: 'auto', minHeight: 0, height: 0, maxHeight: '100%' }}>
           {filteredOrders.length === 0 ? (
             <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '200px' }}>
-              <AxParagraph>No orders found</AxParagraph>
+              <AxParagraph>{l10n('order.noOrders')}</AxParagraph>
             </div>
           ) : (
             <AxTable
@@ -343,7 +345,7 @@ export function OrderListingPageRender(props: OrderListingPageRenderProps) {
       <AxDialog
         open={deleteDialogOpen}
         onClose={onDeleteCancel}
-        title="Delete Order"
+        title={l10n('order.dialog.deleteTitle')}
         size="medium"
         footer={
           <div style={{ display: 'flex', gap: 'var(--spacing-sm)', justifyContent: 'flex-end' }}>
@@ -352,23 +354,23 @@ export function OrderListingPageRender(props: OrderListingPageRenderProps) {
               onClick={onDeleteCancel}
               disabled={submitting}
             >
-              Cancel
+              {l10n('order.dialog.cancel')}
             </AxButton>
             <AxButton 
               variant="danger" 
               onClick={onDeleteConfirm}
               disabled={submitting}
             >
-              {submitting ? 'Deleting...' : 'Delete'}
+              {submitting ? l10n('order.dialog.deleting') : l10n('order.dialog.delete')}
             </AxButton>
           </div>
         }
       >
         <AxParagraph marginBottom="md">
-          Are you sure you want to delete this order?
+          {l10n('order.dialog.deleteConfirm')}
         </AxParagraph>
         <AxParagraph color="secondary" size="sm">
-          This action cannot be undone.
+          {l10n('order.dialog.deleteWarning')}
         </AxParagraph>
       </AxDialog>
     </PageContainer>

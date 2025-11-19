@@ -106,7 +106,7 @@ export function UserListingPageRender(props: UserListingPageRenderProps) {
                   onClick={onNavigateBack}
                   style={{ minWidth: 'auto', padding: 'var(--spacing-sm) var(--spacing-md)' }}
                 >
-                  ← Back
+                  {l10n('master.back')}
                 </AxButton>
               )}
               <div>
@@ -125,7 +125,7 @@ export function UserListingPageRender(props: UserListingPageRenderProps) {
         </HeaderCard>
         <TableCard padding="large" {...debugProps(COMPONENT_NAME, 'TableCard')}>
           <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '200px' }}>
-            <AxParagraph>Loading users...</AxParagraph>
+            <AxParagraph>{l10n('user.loading')}</AxParagraph>
           </div>
         </TableCard>
       </PageContainer>
@@ -144,7 +144,7 @@ export function UserListingPageRender(props: UserListingPageRenderProps) {
                   onClick={onNavigateBack}
                   style={{ minWidth: 'auto', padding: 'var(--spacing-sm) var(--spacing-md)' }}
                 >
-                  ← Back
+                  {l10n('master.back')}
                 </AxButton>
               )}
               <div>
@@ -163,9 +163,9 @@ export function UserListingPageRender(props: UserListingPageRenderProps) {
         </HeaderCard>
         <TableCard padding="large" {...debugProps(COMPONENT_NAME, 'TableCard')}>
           <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '200px', flexDirection: 'column', gap: 'var(--spacing-md)' }}>
-            <AxParagraph color="error">Error: {error}</AxParagraph>
+            <AxParagraph color="error">{l10n('user.error')}: {error}</AxParagraph>
             <AxButton variant="secondary" onClick={onRetry}>
-              Retry
+              {l10n('common.retry')}
             </AxButton>
           </div>
         </TableCard>
@@ -184,7 +184,7 @@ export function UserListingPageRender(props: UserListingPageRenderProps) {
                 onClick={onNavigateBack}
                 style={{ minWidth: 'auto', padding: 'var(--spacing-sm) var(--spacing-md)' }}
               >
-                ← Back
+                  {l10n('master.back')}
               </AxButton>
             )}
             <div>
@@ -206,7 +206,7 @@ export function UserListingPageRender(props: UserListingPageRenderProps) {
         <div style={{ flex: 1, overflow: 'auto', minHeight: 0 }}>
           {users.length === 0 ? (
             <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '200px' }}>
-              <AxParagraph>No users found</AxParagraph>
+              <AxParagraph>{l10n('user.noUsers')}</AxParagraph>
             </div>
           ) : (
             <AxTable
@@ -249,15 +249,26 @@ export function UserListingPageRender(props: UserListingPageRenderProps) {
           {getFormFields().map((key) => {
             // Generate user-friendly labels
             const labels: Record<string, string> = {
-              userid: 'User ID',
-              password: 'Password',
-              role: 'Role',
-              firstName: 'First Name',
-              lastName: 'Last Name',
-              email: 'Email',
-              jsonData: 'JSON Data',
+              userid: l10n('user.form.userId'),
+              password: l10n('user.form.password'),
+              role: l10n('user.form.role'),
+              firstName: l10n('user.form.firstName'),
+              lastName: l10n('user.form.lastName'),
+              email: l10n('user.form.email'),
+              jsonData: l10n('user.form.jsonData'),
             };
-            const label = labels[key] || key.charAt(0).toUpperCase() + key.slice(1).replace(/([A-Z])/g, ' $1').trim();
+            // Fallback label generation with internationalization
+            const fallbackLabel = labels[key] || (() => {
+              const keyLower = key.toLowerCase();
+              if (keyLower === 'userid') return l10n('user.form.userId');
+              if (keyLower === 'firstname') return l10n('user.form.firstName');
+              if (keyLower === 'lastname') return l10n('user.form.lastName');
+              if (keyLower === 'email') return l10n('user.form.email');
+              if (keyLower === 'role') return l10n('user.form.role');
+              if (keyLower === 'jsondata') return l10n('user.form.jsonData');
+              return key.charAt(0).toUpperCase() + key.slice(1).replace(/([A-Z])/g, ' $1').trim();
+            })();
+            const label = labels[key] || fallbackLabel;
             
             const value = formData[key] ?? '';
             
@@ -269,7 +280,7 @@ export function UserListingPageRender(props: UserListingPageRenderProps) {
                   <StyledTextarea
                     value={value}
                     onChange={(e) => onFormDataChange({ ...formData, [key]: e.target.value })}
-                    placeholder='{"key": "value"}'
+                    placeholder={l10n('user.form.jsonDataPlaceholder')}
                     style={{ marginTop: 'var(--spacing-xs)' }}
                     disabled={submitting}
                   />
@@ -280,8 +291,8 @@ export function UserListingPageRender(props: UserListingPageRenderProps) {
             // Handle role as listbox
             if (key === 'role') {
               const roleOptions = [
-                { value: 'user', label: 'User' },
-                { value: 'admin', label: 'Admin' },
+                { value: 'user', label: l10n('user.form.roleUser') },
+                { value: 'admin', label: l10n('user.form.roleAdmin') },
               ];
               return (
                 <AxFormGroup key={key}>
@@ -290,7 +301,7 @@ export function UserListingPageRender(props: UserListingPageRenderProps) {
                     options={roleOptions}
                     value={value || null}
                     onChange={(selectedValue) => onFormDataChange({ ...formData, [key]: selectedValue || '' })}
-                    placeholder="Select role"
+                    placeholder={l10n('user.form.selectRole')}
                     style={{ marginTop: 'var(--spacing-xs)' }}
                     disabled={submitting}
                     fullWidth
@@ -309,7 +320,7 @@ export function UserListingPageRender(props: UserListingPageRenderProps) {
                     type="password"
                     value={value || ''}
                     onChange={(e) => onFormDataChange({ ...formData, [key]: e.target.value })}
-                    placeholder={dialogMode === 'edit' ? 'Enter new password (leave blank to keep current)' : 'Enter password'}
+                    placeholder={dialogMode === 'edit' ? l10n('user.form.passwordEditPlaceholder') : l10n('user.form.passwordPlaceholder')}
                     autoComplete={dialogMode === 'edit' ? 'new-password' : 'new-password'}
                     disabled={submitting}
                     style={{

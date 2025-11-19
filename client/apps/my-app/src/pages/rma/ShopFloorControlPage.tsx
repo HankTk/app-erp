@@ -47,7 +47,7 @@ export function ShopFloorControlPage({ rmaId, onNavigateBack, backButtonLabel = 
       setRma(rmaData);
       setProducts(productsData);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to load data');
+      setError(err instanceof Error ? err.message : l10n('sfc.failedToLoad'));
       console.error('Error loading shop floor control data:', err);
     } finally {
       setLoading(false);
@@ -55,9 +55,9 @@ export function ShopFloorControlPage({ rmaId, onNavigateBack, backButtonLabel = 
   };
 
   const getProductName = (productId?: string) => {
-    if (!productId) return 'N/A';
+    if (!productId) return l10n('generalLedger.notAvailable');
     const product = products.find(p => p.id === productId);
-    return product?.productName || product?.productCode || 'Unknown Product';
+    return product?.productName || product?.productCode || l10n('generalLedger.unknown');
   };
 
   const handleUpdateReturnedQuantity = async (itemId: string, returnedQuantity: number) => {

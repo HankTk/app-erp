@@ -69,16 +69,16 @@ type ListingRenderContext = {
   onViewEntry?: (orderId: string) => void;
 };
 
-const createColumns = (): ColumnDefinition<GLEntry, ListingRenderContext>[] => [
+const createColumns = (t: (key: string, params?: Record<string, string | number | undefined>) => string): ColumnDefinition<GLEntry, ListingRenderContext>[] => [
   { 
     key: 'gl.date',
-    header: 'Date',
+    header: t('generalLedger.table.date'),
     align: undefined,
-    render: (entry: GLEntry, context) => context?.formatDate(entry.date) || 'N/A'
+    render: (entry: GLEntry, context) => context?.formatDate(entry.date) || t('generalLedger.notAvailable')
   },
   { 
     key: 'gl.type',
-    header: 'Type',
+    header: t('generalLedger.table.type'),
     align: undefined,
     render: (entry: GLEntry, context) => (
       <span 
@@ -98,34 +98,36 @@ const createColumns = (): ColumnDefinition<GLEntry, ListingRenderContext>[] => [
   },
   { 
     key: 'gl.orderPoInvoice',
-    header: 'Order/PO/Invoice',
+    header: t('generalLedger.table.orderPoInvoice'),
     align: undefined,
     render: (entry: GLEntry) => {
-      const orderOrPO = entry.poNumber ? `PO: ${entry.poNumber}` : entry.orderNumber ? `Order: ${entry.orderNumber}` : 'N/A';
+      const orderOrPO = entry.poNumber ? `${t('generalLedger.poPrefix')} ${entry.poNumber}` : entry.orderNumber ? `${t('generalLedger.orderPrefix')} ${entry.orderNumber}` : t('generalLedger.notAvailable');
       return entry.invoiceNumber ? `${orderOrPO} / ${entry.invoiceNumber}` : orderOrPO;
     }
   },
   { 
     key: 'gl.customerSupplier',
-    header: 'Customer/Supplier',
+    header: t('generalLedger.table.customerSupplier'),
     align: undefined,
-    render: (entry: GLEntry) => entry.customerName || entry.supplierName || 'N/A'
+    width: '150px',
+    render: (entry: GLEntry) => entry.customerName || entry.supplierName || t('generalLedger.notAvailable')
   },
   { 
     key: 'gl.description',
-    header: 'Description',
+    header: t('generalLedger.table.description'),
     align: undefined,
     render: (entry: GLEntry) => entry.description
   },
   { 
     key: 'gl.quantity',
-    header: 'Quantity',
+    header: t('generalLedger.table.quantity'),
     align: 'right',
+    width: '100px',
     render: (entry: GLEntry) => entry.quantity
   },
   { 
     key: 'gl.debit',
-    header: 'Debit',
+    header: t('generalLedger.table.debit'),
     align: 'right',
     render: (entry: GLEntry) => {
       const debitAmount = entry.type === 'COST' || entry.type === 'EXPENSE' || entry.type === 'ACCOUNTS_PAYABLE' ? entry.amount : 0;
@@ -141,7 +143,7 @@ const createColumns = (): ColumnDefinition<GLEntry, ListingRenderContext>[] => [
   },
   { 
     key: 'gl.credit',
-    header: 'Credit',
+    header: t('generalLedger.table.credit'),
     align: 'right',
     render: (entry: GLEntry) => {
       const creditAmount = entry.type === 'REVENUE' || entry.type === 'PAYMENT' ? entry.amount : 0;
@@ -157,7 +159,7 @@ const createColumns = (): ColumnDefinition<GLEntry, ListingRenderContext>[] => [
   },
   { 
     key: 'gl.actions',
-    header: 'Actions',
+    header: t('generalLedger.table.actions'),
     align: 'center',
     render: (entry: GLEntry, context) => {
       if (context?.onViewEntry && (entry.orderId || entry.poId)) {
@@ -168,7 +170,7 @@ const createColumns = (): ColumnDefinition<GLEntry, ListingRenderContext>[] => [
             onClick={() => context.onViewEntry!(entry.orderId || entry.poId || '')}
             style={{ minWidth: '80px' }}
           >
-            View
+            {t('generalLedger.table.view')}
           </AxButton>
         );
       }
@@ -232,7 +234,7 @@ export function GeneralLedgerListingPageRender(props: GeneralLedgerListingPageRe
   } = props;
 
   const { l10n } = useI18n();
-  const columns = createColumns();
+  const columns = createColumns(l10n);
   const tableContext: ListingRenderContext = {
     formatDate,
     getTypeColor,
@@ -253,15 +255,15 @@ export function GeneralLedgerListingPageRender(props: GeneralLedgerListingPageRe
                   onClick={onNavigateBack}
                   style={{ minWidth: 'auto', padding: 'var(--spacing-sm) var(--spacing-md)' }}
                 >
-                  ← Back
+                  {l10n('generalLedger.back')}
                 </AxButton>
               )}
               <div>
                 <AxHeading3 style={{ marginBottom: 'var(--spacing-xs)' }}>
-                  General Ledger
+                  {l10n('generalLedger.title')}
                 </AxHeading3>
                 <AxParagraph color="secondary">
-                  Financial transactions based on shipping and payments
+                  {l10n('generalLedger.subtitle')}
                 </AxParagraph>
               </div>
             </HeaderLeft>
@@ -269,7 +271,7 @@ export function GeneralLedgerListingPageRender(props: GeneralLedgerListingPageRe
         </HeaderCard>
         <TableCard padding="large" {...debugProps(COMPONENT_NAME, 'TableCard')}>
           <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '200px' }}>
-            <AxParagraph>Loading general ledger entries...</AxParagraph>
+            <AxParagraph>{l10n('generalLedger.loading')}</AxParagraph>
           </div>
         </TableCard>
       </PageContainer>
@@ -288,15 +290,15 @@ export function GeneralLedgerListingPageRender(props: GeneralLedgerListingPageRe
                   onClick={onNavigateBack}
                   style={{ minWidth: 'auto', padding: 'var(--spacing-sm) var(--spacing-md)' }}
                 >
-                  ← Back
+                  {l10n('generalLedger.back')}
                 </AxButton>
               )}
               <div>
                 <AxHeading3 style={{ marginBottom: 'var(--spacing-xs)' }}>
-                  General Ledger
+                  {l10n('generalLedger.title')}
                 </AxHeading3>
                 <AxParagraph color="secondary">
-                  Financial transactions based on shipping and payments
+                  {l10n('generalLedger.subtitle')}
                 </AxParagraph>
               </div>
             </HeaderLeft>
@@ -304,9 +306,9 @@ export function GeneralLedgerListingPageRender(props: GeneralLedgerListingPageRe
         </HeaderCard>
         <TableCard padding="large" {...debugProps(COMPONENT_NAME, 'TableCard')}>
           <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '200px', flexDirection: 'column', gap: 'var(--spacing-md)' }}>
-            <AxParagraph color="error">Error: {error}</AxParagraph>
+            <AxParagraph color="error">{l10n('generalLedger.error')}: {error}</AxParagraph>
             <AxButton variant="secondary" onClick={() => window.location.reload()}>
-              Retry
+              {l10n('common.retry')}
             </AxButton>
           </div>
         </TableCard>
@@ -330,10 +332,10 @@ export function GeneralLedgerListingPageRender(props: GeneralLedgerListingPageRe
             )}
             <div>
               <AxHeading3 style={{ marginBottom: 'var(--spacing-xs)' }}>
-                General Ledger
+                {l10n('generalLedger.title')}
               </AxHeading3>
               <AxParagraph style={{ color: 'var(--color-text-secondary)' }}>
-                Financial transactions based on shipping and payments
+                {l10n('generalLedger.subtitle')}
               </AxParagraph>
             </div>
           </HeaderLeft>
@@ -343,7 +345,7 @@ export function GeneralLedgerListingPageRender(props: GeneralLedgerListingPageRe
                 type="date"
                 value={dateFrom}
                 onChange={e => onDateFromChange(e.target.value)}
-                placeholder="From Date"
+                placeholder={l10n('generalLedger.filter.fromDate')}
               />
             </AxFormGroup>
             <AxFormGroup style={{ margin: 0 }}>
@@ -351,22 +353,22 @@ export function GeneralLedgerListingPageRender(props: GeneralLedgerListingPageRe
                 type="date"
                 value={dateTo}
                 onChange={e => onDateToChange(e.target.value)}
-                placeholder="To Date"
+                placeholder={l10n('generalLedger.filter.toDate')}
               />
             </AxFormGroup>
             <AxFormGroup style={{ margin: 0 }}>
               <AxListbox
                 options={[
-                  { value: '', label: 'All Types' },
-                  { value: 'REVENUE', label: 'Revenue' },
-                  { value: 'COST', label: 'Cost' },
-                  { value: 'EXPENSE', label: 'Expense' },
-                  { value: 'ACCOUNTS_PAYABLE', label: 'Accounts Payable' },
-                  { value: 'PAYMENT', label: 'Payment' },
+                  { value: '', label: l10n('generalLedger.filter.allTypes') },
+                  { value: 'REVENUE', label: l10n('generalLedger.type.revenue') },
+                  { value: 'COST', label: l10n('generalLedger.type.cost') },
+                  { value: 'EXPENSE', label: l10n('generalLedger.type.expense') },
+                  { value: 'ACCOUNTS_PAYABLE', label: l10n('generalLedger.type.accountsPayable') },
+                  { value: 'PAYMENT', label: l10n('generalLedger.type.payment') },
                 ]}
                 value={typeFilter || ''}
                 onChange={(value: string | string[]) => onTypeFilterChange(Array.isArray(value) ? value[0] || null : value || null)}
-                placeholder="Filter by type"
+                placeholder={l10n('generalLedger.filter.byType')}
                 style={{ width: '200px' }}
               />
             </AxFormGroup>
@@ -378,7 +380,7 @@ export function GeneralLedgerListingPageRender(props: GeneralLedgerListingPageRe
         <TableWrapper {...debugProps(COMPONENT_NAME, 'TableWrapper')}>
           {filteredEntries.length === 0 ? (
             <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '200px' }}>
-              <AxParagraph>No general ledger entries found</AxParagraph>
+              <AxParagraph>{l10n('generalLedger.noEntries')}</AxParagraph>
             </div>
           ) : (
             <AxTable

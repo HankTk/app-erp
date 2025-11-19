@@ -176,7 +176,7 @@ export function VendorListingPageRender(props: VendorListingPageRenderProps) {
     }
     return (
       <div style={{ paddingLeft: 'var(--spacing-md)', fontSize: 'var(--font-size-sm)', color: 'var(--color-text-secondary)' }}>
-        <strong style={{ color: 'var(--color-text-primary)', marginRight: 'var(--spacing-sm)' }}>Addresses:</strong>
+        <strong style={{ color: 'var(--color-text-primary)', marginRight: 'var(--spacing-sm)' }}>{l10n('vendor.expandedRow.addresses')}</strong>
         {vendorAddresses.map((addr, index) => (
           <span key={addr.id}>
             {index > 0 && <span style={{ margin: '0 var(--spacing-xs)' }}>|</span>}
@@ -258,9 +258,9 @@ export function VendorListingPageRender(props: VendorListingPageRenderProps) {
         </HeaderCard>
         <TableCard padding="large" {...debugProps(COMPONENT_NAME, 'TableCard')}>
           <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '200px', flexDirection: 'column', gap: 'var(--spacing-md)' }}>
-            <AxParagraph color="error">Error: {error}</AxParagraph>
+            <AxParagraph color="error">{l10n('vendor.error')}: {error}</AxParagraph>
             <AxButton variant="secondary" onClick={onRetry}>
-              Retry
+              {l10n('common.retry')}
             </AxButton>
           </div>
         </TableCard>
@@ -446,7 +446,11 @@ export function VendorListingPageRender(props: VendorListingPageRenderProps) {
                           }}
                         >
                           <div style={{ fontWeight: 'var(--font-weight-medium)', marginBottom: 'var(--spacing-xs)' }}>
-                            {addr.addressType || 'Both (Shipping & Billing)'}
+                            {addr.addressType ? 
+                              (addr.addressType === 'SHIPPING' ? l10n('customer.addressType.shipping') :
+                               addr.addressType === 'BILLING' ? l10n('customer.addressType.billing') :
+                               l10n('customer.addressType.both')) :
+                              l10n('customer.addressType.both')}
                           </div>
                           <div>{formatAddress(addr)}</div>
                         </div>

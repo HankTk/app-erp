@@ -3,6 +3,7 @@ import { fetchOrders, deleteOrder, Order } from '../../api/orderApi';
 import { fetchCustomers, Customer } from '../../api/customerApi';
 import { fetchAddresses, Address } from '../../api/addressApi';
 import { OrderListingPageRender } from './OrderListingPage.render';
+import { useI18n } from '../../i18n/I18nProvider';
 
 
 interface OrderListingPageProps {
@@ -13,6 +14,7 @@ interface OrderListingPageProps {
 }
 
 export function OrderListingPage({ onNavigateToOrderEntry, onEditOrder, onViewOrder, onNavigateBack }: OrderListingPageProps = {} as OrderListingPageProps) {
+  const { l10n } = useI18n();
   const [orders, setOrders] = useState<Order[]>([]);
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [addresses, setAddresses] = useState<Address[]>([]);
@@ -30,7 +32,7 @@ export function OrderListingPage({ onNavigateToOrderEntry, onEditOrder, onViewOr
       const ordersData = await fetchOrders();
       setOrders(ordersData);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to load orders');
+      setError(err instanceof Error ? err.message : l10n('order.error.loadFailed'));
       console.error('Error fetching orders:', err);
     } finally {
       setLoading(false);
@@ -122,7 +124,7 @@ export function OrderListingPage({ onNavigateToOrderEntry, onEditOrder, onViewOr
       setSelectedOrder(null);
     } catch (err) {
       console.error('Error deleting order:', err);
-      alert(err instanceof Error ? err.message : 'Failed to delete order');
+      alert(err instanceof Error ? err.message : l10n('order.error.deleteFailed'));
     } finally {
       setSubmitting(false);
     }
@@ -188,23 +190,23 @@ export function OrderListingPage({ onNavigateToOrderEntry, onEditOrder, onViewOr
   const getStatusLabel = (status?: string) => {
     switch (status) {
       case 'DRAFT':
-        return 'Draft';
+        return l10n('order.status.draft');
       case 'PENDING_APPROVAL':
-        return 'Pending Approval';
+        return l10n('order.status.pendingApproval');
       case 'APPROVED':
-        return 'Approved';
+        return l10n('order.status.approved');
       case 'SHIPPING_INSTRUCTED':
-        return 'Shipping Instructed';
+        return l10n('order.status.shippingInstructed');
       case 'SHIPPED':
-        return 'Shipped';
+        return l10n('order.status.shipped');
       case 'INVOICED':
-        return 'Invoiced';
+        return l10n('order.status.invoiced');
       case 'PAID':
-        return 'Paid';
+        return l10n('order.status.paid');
       case 'CANCELLED':
-        return 'Cancelled';
+        return l10n('order.status.cancelled');
       case 'PENDING':
-        return 'Pending';
+        return l10n('order.status.pending');
       default:
         return status || 'N/A';
     }

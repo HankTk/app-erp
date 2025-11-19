@@ -13,6 +13,7 @@ import {
 } from '@ui/components';
 import { debugProps } from '../../utils/emotionCache';
 import { Address } from '../../api/addressApi';
+import { useI18n } from '../../i18n/I18nProvider';
 import {
   PageContainer,
   HeaderCard,
@@ -31,48 +32,48 @@ type ListingRenderContext = {
   onDeleteClick: (address: Address) => void;
 };
 
-const createColumns = (): ColumnDefinition<Address, ListingRenderContext>[] => [
+const createColumns = (t: (key: string, params?: Record<string, string | number | undefined>) => string): ColumnDefinition<Address, ListingRenderContext>[] => [
   { 
     key: 'address.type',
-    header: 'Type',
+    header: t('addressListing.table.type'),
     align: undefined,
     render: (address: Address) => address.addressType 
       ? address.addressType 
-      : <span style={{ color: 'var(--color-text-secondary)', fontStyle: 'italic' }}>Both</span>
+      : <span style={{ color: 'var(--color-text-secondary)', fontStyle: 'italic' }}>{t('customer.addressType.both')}</span>
   },
   { 
     key: 'address.streetAddress',
-    header: 'Street Address',
+    header: t('addressListing.table.streetAddress'),
     align: undefined,
     render: (address: Address) => address.streetAddress1 || ''
   },
   { 
     key: 'address.city',
-    header: 'City',
+    header: t('addressListing.table.city'),
     align: undefined,
     render: (address: Address) => address.city || ''
   },
   { 
     key: 'address.state',
-    header: 'State',
+    header: t('addressListing.table.state'),
     align: undefined,
     render: (address: Address) => address.state || ''
   },
   { 
     key: 'address.postalCode',
-    header: 'Postal Code',
+    header: t('addressListing.table.postalCode'),
     align: undefined,
     render: (address: Address) => address.postalCode || ''
   },
   { 
     key: 'address.country',
-    header: 'Country',
+    header: t('addressListing.table.country'),
     align: undefined,
     render: (address: Address) => address.country || ''
   },
   { 
     key: 'address.actions',
-    header: 'Actions',
+    header: t('generalLedger.table.actions'),
     align: 'center',
     render: (address: Address, context) => (
       <div style={{ display: 'flex', gap: 'var(--spacing-sm)', justifyContent: 'center' }}>
@@ -82,7 +83,7 @@ const createColumns = (): ColumnDefinition<Address, ListingRenderContext>[] => [
           onClick={() => context?.onEdit(address)}
           style={{ minWidth: '80px' }}
         >
-          Edit
+          {t('addressListing.table.edit')}
         </AxButton>
         <AxButton 
           variant="danger" 
@@ -90,7 +91,7 @@ const createColumns = (): ColumnDefinition<Address, ListingRenderContext>[] => [
           onClick={() => context?.onDeleteClick(address)}
           style={{ minWidth: '80px' }}
         >
-          Delete
+          {t('common.delete')}
         </AxButton>
       </div>
     )
@@ -148,7 +149,8 @@ export function AddressListingPageRender(props: AddressListingPageRenderProps) {
     onRetry,
   } = props;
 
-  const columns = createColumns();
+  const { l10n } = useI18n();
+  const columns = createColumns(l10n);
   const tableContext: ListingRenderContext = {
     onEdit,
     onDeleteClick,
@@ -166,26 +168,26 @@ export function AddressListingPageRender(props: AddressListingPageRenderProps) {
                   onClick={onNavigateBack}
                   style={{ minWidth: 'auto', padding: 'var(--spacing-sm) var(--spacing-md)' }}
                 >
-                  ← Back
+                  {l10n('master.back')}
                 </AxButton>
               )}
               <div>
                 <AxHeading3 style={{ marginBottom: 'var(--spacing-xs)' }}>
-                  Addresses
+                  {l10n('addressListing.title')}
                 </AxHeading3>
                 <AxParagraph color="secondary">
-                  Manage shipping and billing addresses
+                  {l10n('addressListing.subtitle')}
                 </AxParagraph>
               </div>
             </HeaderLeft>
             <HeaderRight {...debugProps(COMPONENT_NAME, 'HeaderRight')}>
-              <AxButton variant="primary" onClick={onAdd}>Add New</AxButton>
+              <AxButton variant="primary" onClick={onAdd}>{l10n('addressListing.addNew')}</AxButton>
             </HeaderRight>
           </HeaderSection>
         </HeaderCard>
         <TableCard padding="large" {...debugProps(COMPONENT_NAME, 'TableCard')}>
           <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '200px' }}>
-            <AxParagraph>Loading addresses...</AxParagraph>
+            <AxParagraph>{l10n('addressListing.loading')}</AxParagraph>
           </div>
         </TableCard>
       </PageContainer>
@@ -204,28 +206,28 @@ export function AddressListingPageRender(props: AddressListingPageRenderProps) {
                   onClick={onNavigateBack}
                   style={{ minWidth: 'auto', padding: 'var(--spacing-sm) var(--spacing-md)' }}
                 >
-                  ← Back
+                  {l10n('master.back')}
                 </AxButton>
               )}
               <div>
                 <AxHeading3 style={{ marginBottom: 'var(--spacing-xs)' }}>
-                  Addresses
+                  {l10n('addressListing.title')}
                 </AxHeading3>
                 <AxParagraph color="secondary">
-                  Manage shipping and billing addresses
+                  {l10n('addressListing.subtitle')}
                 </AxParagraph>
               </div>
             </HeaderLeft>
             <HeaderRight {...debugProps(COMPONENT_NAME, 'HeaderRight')}>
-              <AxButton variant="primary" onClick={onAdd}>Add New</AxButton>
+              <AxButton variant="primary" onClick={onAdd}>{l10n('addressListing.addNew')}</AxButton>
             </HeaderRight>
           </HeaderSection>
         </HeaderCard>
         <TableCard padding="large" {...debugProps(COMPONENT_NAME, 'TableCard')}>
           <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '200px', flexDirection: 'column', gap: 'var(--spacing-md)' }}>
-            <AxParagraph color="error">Error: {error}</AxParagraph>
+            <AxParagraph color="error">{l10n('addressListing.error')}: {error}</AxParagraph>
             <AxButton variant="secondary" onClick={onRetry}>
-              Retry
+              {l10n('common.retry')}
             </AxButton>
           </div>
         </TableCard>
@@ -257,9 +259,9 @@ export function AddressListingPageRender(props: AddressListingPageRenderProps) {
             </div>
           </HeaderLeft>
           <HeaderRight {...debugProps(COMPONENT_NAME, 'HeaderRight')}>
-            <AxButton variant="primary" onClick={onAdd}>Add New</AxButton>
+            <AxButton variant="primary" onClick={onAdd}>{l10n('addressListing.addNew')}</AxButton>
             {onClose && (
-              <AxButton variant="secondary" onClick={onClose}>Close</AxButton>
+              <AxButton variant="secondary" onClick={onClose}>{l10n('addressListing.close')}</AxButton>
             )}
           </HeaderRight>
         </HeaderSection>
@@ -269,7 +271,7 @@ export function AddressListingPageRender(props: AddressListingPageRenderProps) {
         <div style={{ flex: 1, overflow: 'auto', minHeight: 0 }}>
           {filteredAddresses.length === 0 ? (
             <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '200px' }}>
-              <AxParagraph>No addresses found</AxParagraph>
+              <AxParagraph>{l10n('addressListing.noAddresses')}</AxParagraph>
             </div>
           ) : (
             <AxTable
@@ -288,7 +290,7 @@ export function AddressListingPageRender(props: AddressListingPageRenderProps) {
       <AxDialog
         open={dialogMode !== null}
         onClose={onDialogClose}
-        title={dialogMode === 'add' ? 'Add Address' : 'Edit Address'}
+        title={dialogMode === 'add' ? l10n('addressListing.dialog.addTitle') : l10n('addressListing.dialog.editTitle')}
         size="large"
         footer={
           <div style={{ display: 'flex', gap: 'var(--spacing-sm)', justifyContent: 'flex-end' }}>
@@ -297,41 +299,41 @@ export function AddressListingPageRender(props: AddressListingPageRenderProps) {
               onClick={onDialogClose}
               disabled={submitting}
             >
-              Cancel
+              {l10n('common.cancel')}
             </AxButton>
             <AxButton 
               variant="primary" 
               onClick={onSave}
               disabled={submitting}
             >
-              {submitting ? 'Saving...' : 'Save'}
+              {submitting ? l10n('common.saving') : l10n('common.save')}
             </AxButton>
           </div>
         }
       >
         <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-lg)' }}>
           <AxFormGroup>
-            <AxLabel>Address Type (Optional)</AxLabel>
+            <AxLabel>{l10n('address.addressType')}</AxLabel>
             <AxListbox
               options={[
-                { value: null, label: 'Both (Shipping & Billing)' },
-                { value: 'SHIPPING', label: 'Shipping Only' },
-                { value: 'BILLING', label: 'Billing Only' },
+                { value: null, label: l10n('customer.addressType.both') },
+                { value: 'SHIPPING', label: l10n('customer.addressType.shipping') },
+                { value: 'BILLING', label: l10n('customer.addressType.billing') },
               ]}
               value={formData.addressType || null}
               onChange={(value) => {
                 onFormDataChange({ ...formData, addressType: value as 'SHIPPING' | 'BILLING' | null | undefined });
               }}
-              placeholder="Select address type (optional)"
+              placeholder={l10n('address.addressTypePlaceholder')}
               fullWidth
               disabled={submitting}
             />
             <AxParagraph marginTop="xs" color="secondary" size="sm">
-              Select "Both" to allow this address to be used for both shipping and billing. Leave as "Both" if not specified.
+              {l10n('address.addressTypeDescription')}
             </AxParagraph>
           </AxFormGroup>
           <AxFormGroup>
-            <AxLabel>Street Address 1</AxLabel>
+            <AxLabel>{l10n('address.streetAddress1')}</AxLabel>
             <AxInput
               type="text"
               value={formData.streetAddress1 || ''}
@@ -339,11 +341,11 @@ export function AddressListingPageRender(props: AddressListingPageRenderProps) {
               style={{ marginTop: 'var(--spacing-xs)' }}
               disabled={submitting}
               fullWidth
-              placeholder="Street address line 1"
+              placeholder={l10n('address.streetAddress1Placeholder')}
             />
           </AxFormGroup>
           <AxFormGroup>
-            <AxLabel>Street Address 2</AxLabel>
+            <AxLabel>{l10n('address.streetAddress2')}</AxLabel>
             <AxInput
               type="text"
               value={formData.streetAddress2 || ''}
@@ -351,12 +353,12 @@ export function AddressListingPageRender(props: AddressListingPageRenderProps) {
               style={{ marginTop: 'var(--spacing-xs)' }}
               disabled={submitting}
               fullWidth
-              placeholder="Street address line 2 (optional)"
+              placeholder={l10n('address.streetAddress2Placeholder')}
             />
           </AxFormGroup>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--spacing-md)' }}>
             <AxFormGroup>
-              <AxLabel>City</AxLabel>
+              <AxLabel>{l10n('address.city')}</AxLabel>
               <AxInput
                 type="text"
                 value={formData.city || ''}
@@ -367,7 +369,7 @@ export function AddressListingPageRender(props: AddressListingPageRenderProps) {
               />
             </AxFormGroup>
             <AxFormGroup>
-              <AxLabel>State/Province</AxLabel>
+              <AxLabel>{l10n('address.state')}</AxLabel>
               <AxInput
                 type="text"
                 value={formData.state || ''}
@@ -380,7 +382,7 @@ export function AddressListingPageRender(props: AddressListingPageRenderProps) {
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--spacing-md)' }}>
             <AxFormGroup>
-              <AxLabel>Postal Code</AxLabel>
+              <AxLabel>{l10n('address.postalCode')}</AxLabel>
               <AxInput
                 type="text"
                 value={formData.postalCode || ''}
@@ -391,7 +393,7 @@ export function AddressListingPageRender(props: AddressListingPageRenderProps) {
               />
             </AxFormGroup>
             <AxFormGroup>
-              <AxLabel>Country</AxLabel>
+              <AxLabel>{l10n('address.country')}</AxLabel>
               <AxInput
                 type="text"
                 value={formData.country || ''}
@@ -409,7 +411,7 @@ export function AddressListingPageRender(props: AddressListingPageRenderProps) {
       <AxDialog
         open={deleteDialogOpen}
         onClose={onDeleteCancel}
-        title="Delete Address"
+        title={l10n('addressListing.dialog.deleteTitle')}
         size="medium"
         footer={
           <div style={{ display: 'flex', gap: 'var(--spacing-sm)', justifyContent: 'flex-end' }}>
@@ -418,23 +420,23 @@ export function AddressListingPageRender(props: AddressListingPageRenderProps) {
               onClick={onDeleteCancel}
               disabled={submitting}
             >
-              Cancel
+              {l10n('common.cancel')}
             </AxButton>
             <AxButton 
               variant="danger" 
               onClick={onDeleteConfirm}
               disabled={submitting}
             >
-              {submitting ? 'Deleting...' : 'Delete'}
+              {submitting ? l10n('common.deleting') : l10n('common.delete')}
             </AxButton>
           </div>
         }
       >
         <AxParagraph marginBottom="md">
-          Are you sure you want to delete this address?
+          {l10n('addressListing.dialog.deleteConfirm')}
         </AxParagraph>
         <AxParagraph color="secondary" size="sm">
-          This action cannot be undone.
+          {l10n('addressListing.dialog.deleteWarning')}
         </AxParagraph>
       </AxDialog>
     </PageContainer>

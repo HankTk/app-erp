@@ -14,6 +14,7 @@ import {
 } from '@ui/components';
 import { debugProps } from '../../utils/emotionCache';
 import { RMA, RMAItem } from '../../api/rmaApi';
+import { useI18n } from '../../i18n/I18nProvider';
 import {
   PageContainer,
   HeaderCard,
@@ -62,11 +63,13 @@ export function ShopFloorControlPageRender(props: ShopFloorControlPageRenderProp
     getProductName,
   } = props;
 
+  const { l10n } = useI18n();
+
   if (loading) {
     return (
       <PageContainer {...debugProps(COMPONENT_NAME, 'PageContainer')}>
         <ContentCard padding="large">
-          <AxParagraph>Loading shop floor control data...</AxParagraph>
+          <AxParagraph>{l10n('sfc.loading')}</AxParagraph>
         </ContentCard>
       </PageContainer>
     );
@@ -77,11 +80,11 @@ export function ShopFloorControlPageRender(props: ShopFloorControlPageRenderProp
       <PageContainer {...debugProps(COMPONENT_NAME, 'PageContainer')}>
         <ContentCard padding="large">
           <AxParagraph style={{ color: 'var(--color-danger)' }}>
-            {error || 'RMA not found'}
+            {error || l10n('sfc.rmaNotFound')}
           </AxParagraph>
           {onNavigateBack && (
             <AxButton variant="secondary" onClick={onNavigateBack} style={{ marginTop: 'var(--spacing-md)' }}>
-              ← Back
+              {l10n('sfc.back')}
             </AxButton>
           )}
         </ContentCard>
@@ -100,15 +103,15 @@ export function ShopFloorControlPageRender(props: ShopFloorControlPageRenderProp
                 onClick={onNavigateBack}
                 style={{ minWidth: 'auto', padding: 'var(--spacing-sm) var(--spacing-md)' }}
               >
-                ← Back
+                {l10n('sfc.back')}
               </AxButton>
             )}
             <div>
               <AxHeading3 style={{ marginBottom: 'var(--spacing-xs)' }}>
-                Shop Floor Control - RMA {rma.rmaNumber || rma.id}
+                {l10n('sfc.title')} - RMA {rma.rmaNumber || rma.id}
               </AxHeading3>
               <AxParagraph style={{ color: 'var(--color-text-secondary)' }}>
-                Track receipt and processing of returned items
+                {l10n('sfc.trackReceipt')}
               </AxParagraph>
             </div>
           </HeaderLeft>
@@ -123,38 +126,38 @@ export function ShopFloorControlPageRender(props: ShopFloorControlPageRenderProp
       <ContentCard padding="large" {...debugProps(COMPONENT_NAME, 'ContentCard')}>
         <FormSection>
           <AxHeading3 style={{ marginBottom: 'var(--spacing-sm)', fontSize: 'var(--font-size-md)', fontWeight: 'var(--font-weight-semibold)' }}>
-            RMA Information
+            {l10n('sfc.rmaInformation')}
           </AxHeading3>
           <InfoBox>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 'var(--spacing-md)' }}>
               <div>
                 <AxParagraph style={{ fontSize: 'var(--font-size-sm)', color: 'var(--color-text-secondary)', marginBottom: 'var(--spacing-xs)' }}>
-                  Customer
+                  {l10n('sfc.customer')}
                 </AxParagraph>
                 <AxParagraph style={{ fontWeight: 'var(--font-weight-semibold)' }}>
-                  {rma.customerName || 'N/A'}
+                  {rma.customerName || l10n('generalLedger.notAvailable')}
                 </AxParagraph>
               </div>
               <div>
                 <AxParagraph style={{ fontSize: 'var(--font-size-sm)', color: 'var(--color-text-secondary)', marginBottom: 'var(--spacing-xs)' }}>
-                  Order Number
+                  {l10n('rma.orderNumber')}
                 </AxParagraph>
                 <AxParagraph style={{ fontWeight: 'var(--font-weight-semibold)' }}>
-                  {rma.orderNumber || 'N/A'}
+                  {rma.orderNumber || l10n('generalLedger.notAvailable')}
                 </AxParagraph>
               </div>
               <div>
                 <AxParagraph style={{ fontSize: 'var(--font-size-sm)', color: 'var(--color-text-secondary)', marginBottom: 'var(--spacing-xs)' }}>
-                  RMA Date
+                  {l10n('sfc.rmaDate')}
                 </AxParagraph>
                 <AxParagraph style={{ fontWeight: 'var(--font-weight-semibold)' }}>
-                  {rma.rmaDate ? new Date(rma.rmaDate).toLocaleDateString() : 'N/A'}
+                  {rma.rmaDate ? new Date(rma.rmaDate).toLocaleDateString() : l10n('generalLedger.notAvailable')}
                 </AxParagraph>
               </div>
               {rma.receivedDate && (
                 <div>
                   <AxParagraph style={{ fontSize: 'var(--font-size-sm)', color: 'var(--color-text-secondary)', marginBottom: 'var(--spacing-xs)' }}>
-                    Received Date
+                    {l10n('sfc.receivedDate')}
                   </AxParagraph>
                   <AxParagraph style={{ fontWeight: 'var(--font-weight-semibold)' }}>
                     {new Date(rma.receivedDate).toLocaleDateString()}
@@ -167,7 +170,7 @@ export function ShopFloorControlPageRender(props: ShopFloorControlPageRenderProp
 
         <FormSection>
           <AxHeading3 style={{ marginBottom: 'var(--spacing-sm)', fontSize: 'var(--font-size-md)', fontWeight: 'var(--font-weight-semibold)' }}>
-            Returned Items Processing
+            {l10n('sfc.returnedItemsProcessing')}
           </AxHeading3>
           
           {rma.items && rma.items.length > 0 ? (
@@ -175,13 +178,13 @@ export function ShopFloorControlPageRender(props: ShopFloorControlPageRenderProp
               <AxTable fullWidth>
                 <AxTableHead>
                   <AxTableRow>
-                    <AxTableHeader>Product</AxTableHeader>
-                    <AxTableHeader align="right">Requested Qty</AxTableHeader>
-                    <AxTableHeader align="right">Returned Qty</AxTableHeader>
-                    <AxTableHeader>Condition</AxTableHeader>
-                    <AxTableHeader>Reason</AxTableHeader>
-                    <AxTableHeader align="right">Unit Price</AxTableHeader>
-                    <AxTableHeader align="right">Line Total</AxTableHeader>
+                    <AxTableHeader>{l10n('sfc.table.product')}</AxTableHeader>
+                    <AxTableHeader align="right">{l10n('sfc.table.requestedQty')}</AxTableHeader>
+                    <AxTableHeader align="right">{l10n('sfc.table.returnedQty')}</AxTableHeader>
+                    <AxTableHeader>{l10n('sfc.table.condition')}</AxTableHeader>
+                    <AxTableHeader>{l10n('sfc.table.reason')}</AxTableHeader>
+                    <AxTableHeader align="right">{l10n('sfc.table.unitPrice')}</AxTableHeader>
+                    <AxTableHeader align="right">{l10n('sfc.table.lineTotal')}</AxTableHeader>
                   </AxTableRow>
                 </AxTableHead>
                 <AxTableBody>
@@ -208,12 +211,12 @@ export function ShopFloorControlPageRender(props: ShopFloorControlPageRenderProp
                       <AxTableCell style={{ position: 'relative', overflow: 'visible' }}>
                         <AxListbox
                           options={[
-                            { value: 'NEW', label: 'New' },
-                            { value: 'LIKE_NEW', label: 'Like New' },
-                            { value: 'GOOD', label: 'Good' },
-                            { value: 'FAIR', label: 'Fair' },
-                            { value: 'POOR', label: 'Poor' },
-                            { value: 'DAMAGED', label: 'Damaged' },
+                            { value: 'NEW', label: l10n('sfc.condition.new') },
+                            { value: 'LIKE_NEW', label: l10n('sfc.condition.likeNew') },
+                            { value: 'GOOD', label: l10n('sfc.condition.good') },
+                            { value: 'FAIR', label: l10n('sfc.condition.fair') },
+                            { value: 'POOR', label: l10n('sfc.condition.poor') },
+                            { value: 'DAMAGED', label: l10n('sfc.condition.damaged') },
                           ]}
                           value={item.condition || null}
                           onChange={(value) => {
@@ -225,7 +228,7 @@ export function ShopFloorControlPageRender(props: ShopFloorControlPageRenderProp
                               onUpdateItemCondition(item.id, value[0]);
                             }
                           }}
-                          placeholder="Select Condition"
+                          placeholder={l10n('sfc.selectCondition')}
                           disabled={submitting || rma.status === 'PROCESSED' || rma.status === 'CANCELLED'}
                           fullWidth
                         />
@@ -240,7 +243,7 @@ export function ShopFloorControlPageRender(props: ShopFloorControlPageRenderProp
             </TableWrapper>
           ) : (
             <AxParagraph style={{ color: 'var(--color-text-secondary)' }}>
-              No items to process
+              {l10n('sfc.noItems')}
             </AxParagraph>
           )}
         </FormSection>
@@ -248,7 +251,7 @@ export function ShopFloorControlPageRender(props: ShopFloorControlPageRenderProp
         {rma.notes && (
           <FormSection>
             <AxHeading3 style={{ marginBottom: 'var(--spacing-sm)', fontSize: 'var(--font-size-md)', fontWeight: 'var(--font-weight-semibold)' }}>
-              Notes
+              {l10n('sfc.notes')}
             </AxHeading3>
             <AxParagraph style={{ color: 'var(--color-text-secondary)' }}>
               {rma.notes}
@@ -263,7 +266,7 @@ export function ShopFloorControlPageRender(props: ShopFloorControlPageRenderProp
               onClick={onMarkAsReceived}
               disabled={submitting}
             >
-              Mark as Received
+              {l10n('sfc.markAsReceived')}
             </AxButton>
           )}
           {canMarkAsProcessed && (
@@ -272,12 +275,12 @@ export function ShopFloorControlPageRender(props: ShopFloorControlPageRenderProp
               onClick={onMarkAsProcessed}
               disabled={submitting}
             >
-              Mark as Processed
+              {l10n('sfc.markAsProcessed')}
             </AxButton>
           )}
           {onNavigateBack && (
             <AxButton variant="secondary" onClick={onNavigateBack}>
-              {backButtonLabel}
+              {l10n('sfc.back')}
             </AxButton>
           )}
         </ButtonGroup>
