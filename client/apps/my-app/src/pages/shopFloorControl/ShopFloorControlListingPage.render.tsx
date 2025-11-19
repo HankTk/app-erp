@@ -4,14 +4,10 @@ import {
   AxParagraph,
   AxButton,
   AxTable,
-  AxTableHead,
-  AxTableBody,
-  AxTableRow,
-  AxTableHeader,
-  AxTableCell,
   AxListbox,
   AxFormGroup,
   AxLabel,
+  ColumnDefinition,
 } from '@ui/components';
 import { debugProps } from '../../utils/emotionCache';
 import { SFC } from '../../api/sfcApi';
@@ -27,6 +23,139 @@ import {
 } from './ShopFloorControlListingPage.styles';
 
 const COMPONENT_NAME = 'ShopFloorControlListingPage';
+
+type SFCListingRenderContext = {
+  getCustomerName: (customerId?: string) => string;
+  onProcessRMA?: (rmaId: string) => void;
+  onProcess: (sfc: SFC) => void;
+};
+
+type RMAListingRenderContext = {
+  getCustomerName: (customerId?: string) => string;
+  processing: string | null;
+  onCreateSFC: (rma: RMA) => void;
+};
+
+const createSFCColumns = (): ColumnDefinition<SFC, SFCListingRenderContext>[] => [
+  { 
+    key: 'sfc.sfcNumber',
+    header: 'SFC Number',
+    align: undefined,
+    render: (sfc: SFC) => <strong>{sfc.sfcNumber || sfc.id}</strong>
+  },
+  { 
+    key: 'sfc.rmaNumber',
+    header: 'RMA Number',
+    align: undefined,
+    render: (sfc: SFC) => sfc.rmaNumber || 'N/A'
+  },
+  { 
+    key: 'sfc.customer',
+    header: 'Customer',
+    align: undefined,
+    render: (sfc: SFC, context) => sfc.customerName || context?.getCustomerName(sfc.customerId) || 'N/A'
+  },
+  { 
+    key: 'sfc.orderNumber',
+    header: 'Order Number',
+    align: undefined,
+    render: (sfc: SFC) => sfc.orderNumber || 'N/A'
+  },
+  { 
+    key: 'sfc.createdDate',
+    header: 'Created Date',
+    align: undefined,
+    render: (sfc: SFC) => sfc.createdDate ? new Date(sfc.createdDate).toLocaleDateString() : 'N/A'
+  },
+  { 
+    key: 'sfc.status',
+    header: 'Status',
+    align: undefined,
+    render: (sfc: SFC) => (
+      <StatusBadge status={sfc.status || 'PENDING'}>
+        {sfc.status || 'PENDING'}
+      </StatusBadge>
+    )
+  },
+  { 
+    key: 'sfc.actions',
+    header: 'Actions',
+    align: 'center',
+    render: (sfc: SFC, context) => {
+      if (sfc.id && context?.onProcessRMA && sfc.rmaId) {
+        return (
+          <AxButton 
+            variant="primary" 
+            size="small"
+            onClick={() => context.onProcess!(sfc)}
+            style={{ minWidth: 'auto' }}
+          >
+            Process
+          </AxButton>
+        );
+      }
+      return null;
+    }
+  },
+];
+
+const createRMAColumns = (): ColumnDefinition<RMA, RMAListingRenderContext>[] => [
+  { 
+    key: 'rma.rmaNumber',
+    header: 'RMA Number',
+    align: undefined,
+    render: (rma: RMA) => <strong>{rma.rmaNumber || rma.id}</strong>
+  },
+  { 
+    key: 'rma.customer',
+    header: 'Customer',
+    align: undefined,
+    render: (rma: RMA, context) => context?.getCustomerName(rma.customerId) || 'N/A'
+  },
+  { 
+    key: 'rma.orderNumber',
+    header: 'Order Number',
+    align: undefined,
+    render: (rma: RMA) => rma.orderNumber || 'N/A'
+  },
+  { 
+    key: 'rma.rmaDate',
+    header: 'RMA Date',
+    align: undefined,
+    render: (rma: RMA) => rma.rmaDate ? new Date(rma.rmaDate).toLocaleDateString() : 'N/A'
+  },
+  { 
+    key: 'rma.status',
+    header: 'Status',
+    align: undefined,
+    render: (rma: RMA) => (
+      <StatusBadge status={rma.status || 'DRAFT'}>
+        {rma.status || 'DRAFT'}
+      </StatusBadge>
+    )
+  },
+  { 
+    key: 'rma.actions',
+    header: 'Actions',
+    align: 'center',
+    render: (rma: RMA, context) => {
+      if (rma.id) {
+        return (
+          <AxButton 
+            variant="primary" 
+            size="small"
+            onClick={() => context?.onCreateSFC(rma)}
+            disabled={context?.processing === rma.id}
+            style={{ minWidth: 'auto' }}
+          >
+            {context?.processing === rma.id ? 'Creating...' : 'Create SFC'}
+          </AxButton>
+        );
+      }
+      return null;
+    }
+  },
+];
 
 interface ShopFloorControlListingPageRenderProps {
   sfcs: SFC[];
@@ -60,6 +189,19 @@ export function ShopFloorControlListingPageRender(props: ShopFloorControlListing
     onRetry,
     getCustomerName,
   } = props;
+
+  const sfcColumns = createSFCColumns();
+  const rmaColumns = createRMAColumns();
+  const sfcTableContext: SFCListingRenderContext = {
+    getCustomerName,
+    onProcessRMA,
+    onProcess,
+  };
+  const rmaTableContext: RMAListingRenderContext = {
+    getCustomerName,
+    processing,
+    onCreateSFC,
+  };
 
   return (
     <PageContainer {...debugProps(COMPONENT_NAME, 'PageContainer')}>
@@ -124,51 +266,14 @@ export function ShopFloorControlListingPageRender(props: ShopFloorControlListing
                 <AxHeading3 style={{ marginBottom: 'var(--spacing-sm)', fontSize: 'var(--font-size-md)' }}>
                   Active SFC Records
                 </AxHeading3>
-                <AxTable fullWidth>
-                  <AxTableHead>
-                    <AxTableRow>
-                      <AxTableHeader>SFC Number</AxTableHeader>
-                      <AxTableHeader>RMA Number</AxTableHeader>
-                      <AxTableHeader>Customer</AxTableHeader>
-                      <AxTableHeader>Order Number</AxTableHeader>
-                      <AxTableHeader>Created Date</AxTableHeader>
-                      <AxTableHeader>Status</AxTableHeader>
-                      <AxTableHeader align="center">Actions</AxTableHeader>
-                    </AxTableRow>
-                  </AxTableHead>
-                  <AxTableBody>
-                    {sfcs.map((sfc) => (
-                      <AxTableRow key={sfc.id}>
-                        <AxTableCell>
-                          <strong>{sfc.sfcNumber || sfc.id}</strong>
-                        </AxTableCell>
-                        <AxTableCell>{sfc.rmaNumber || 'N/A'}</AxTableCell>
-                        <AxTableCell>{sfc.customerName || getCustomerName(sfc.customerId)}</AxTableCell>
-                        <AxTableCell>{sfc.orderNumber || 'N/A'}</AxTableCell>
-                        <AxTableCell>
-                          {sfc.createdDate ? new Date(sfc.createdDate).toLocaleDateString() : 'N/A'}
-                        </AxTableCell>
-                        <AxTableCell>
-                          <StatusBadge status={sfc.status || 'PENDING'}>
-                            {sfc.status || 'PENDING'}
-                          </StatusBadge>
-                        </AxTableCell>
-                        <AxTableCell align="center">
-                          {sfc.id && onProcessRMA && sfc.rmaId && (
-                            <AxButton 
-                              variant="primary" 
-                              size="small"
-                              onClick={() => onProcess(sfc)}
-                              style={{ minWidth: 'auto' }}
-                            >
-                              Process
-                            </AxButton>
-                          )}
-                        </AxTableCell>
-                      </AxTableRow>
-                    ))}
-                  </AxTableBody>
-                </AxTable>
+                <AxTable
+                  fullWidth
+                  stickyHeader
+                  data={sfcs}
+                  columns={sfcColumns}
+                  context={sfcTableContext}
+                  getRowKey={(sfc) => sfc.id || ''}
+                />
               </div>
             )}
             
@@ -177,50 +282,14 @@ export function ShopFloorControlListingPageRender(props: ShopFloorControlListing
                 <AxHeading3 style={{ marginBottom: 'var(--spacing-sm)', fontSize: 'var(--font-size-md)' }}>
                   RMAs Ready for SFC Creation
                 </AxHeading3>
-                <AxTable fullWidth>
-                  <AxTableHead>
-                    <AxTableRow>
-                      <AxTableHeader>RMA Number</AxTableHeader>
-                      <AxTableHeader>Customer</AxTableHeader>
-                      <AxTableHeader>Order Number</AxTableHeader>
-                      <AxTableHeader>RMA Date</AxTableHeader>
-                      <AxTableHeader>Status</AxTableHeader>
-                      <AxTableHeader align="center">Actions</AxTableHeader>
-                    </AxTableRow>
-                  </AxTableHead>
-                  <AxTableBody>
-                    {rmasNeedingSFC.map((rma) => (
-                      <AxTableRow key={rma.id}>
-                        <AxTableCell>
-                          <strong>{rma.rmaNumber || rma.id}</strong>
-                        </AxTableCell>
-                        <AxTableCell>{getCustomerName(rma.customerId)}</AxTableCell>
-                        <AxTableCell>{rma.orderNumber || 'N/A'}</AxTableCell>
-                        <AxTableCell>
-                          {rma.rmaDate ? new Date(rma.rmaDate).toLocaleDateString() : 'N/A'}
-                        </AxTableCell>
-                        <AxTableCell>
-                          <StatusBadge status={rma.status || 'DRAFT'}>
-                            {rma.status || 'DRAFT'}
-                          </StatusBadge>
-                        </AxTableCell>
-                        <AxTableCell align="center">
-                          {rma.id && (
-                            <AxButton 
-                              variant="primary" 
-                              size="small"
-                              onClick={() => onCreateSFC(rma)}
-                              disabled={processing === rma.id}
-                              style={{ minWidth: 'auto' }}
-                            >
-                              {processing === rma.id ? 'Creating...' : 'Create SFC'}
-                            </AxButton>
-                          )}
-                        </AxTableCell>
-                      </AxTableRow>
-                    ))}
-                  </AxTableBody>
-                </AxTable>
+                <AxTable
+                  fullWidth
+                  stickyHeader
+                  data={rmasNeedingSFC}
+                  columns={rmaColumns}
+                  context={rmaTableContext}
+                  getRowKey={(rma) => rma.id || ''}
+                />
               </div>
             )}
             

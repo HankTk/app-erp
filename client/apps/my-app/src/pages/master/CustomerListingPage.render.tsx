@@ -1,12 +1,5 @@
-import { Fragment } from 'react';
 import {
   AxTable,
-  AxTableHead,
-  AxTableBody,
-  AxTableRow,
-  AxTableHeader,
-  AxTableCell,
-  AxCard,
   AxHeading3,
   AxParagraph,
   AxButton,
@@ -14,6 +7,7 @@ import {
   AxInput,
   AxLabel,
   AxFormGroup,
+  ColumnDefinition,
 } from '@ui/components';
 import { debugProps } from '../../utils/emotionCache';
 import { Customer } from '../../api/customerApi';
@@ -35,55 +29,57 @@ type DialogMode = 'add' | 'edit' | null;
 type ListingRenderContext = {
   onEdit: (customer: Customer) => void;
   onDeleteClick: (customer: Customer) => void;
+  getCustomerAddresses: (customerId: string | undefined) => Address[];
+  formatAddress: (address: Address) => string;
 };
 
-const LISTING_TABLE_COLUMNS = [
+const createColumns = (): ColumnDefinition<Customer, ListingRenderContext>[] => [
   { 
     key: 'customer.customerNumber',
-    label: 'Customer Number',
-    align: undefined as 'left' | 'right' | 'center' | undefined,
+    header: 'Customer Number',
+    align: undefined,
     render: (customer: Customer) => customer.customerNumber || ''
   },
   { 
     key: 'customer.companyName',
-    label: 'Company Name',
-    align: undefined as 'left' | 'right' | 'center' | undefined,
+    header: 'Company Name',
+    align: undefined,
     render: (customer: Customer) => customer.companyName || ''
   },
   { 
     key: 'customer.firstName',
-    label: 'First Name',
-    align: undefined as 'left' | 'right' | 'center' | undefined,
+    header: 'First Name',
+    align: undefined,
     render: (customer: Customer) => customer.firstName || ''
   },
   { 
     key: 'customer.lastName',
-    label: 'Last Name',
-    align: undefined as 'left' | 'right' | 'center' | undefined,
+    header: 'Last Name',
+    align: undefined,
     render: (customer: Customer) => customer.lastName || ''
   },
   { 
     key: 'customer.email',
-    label: 'Email',
-    align: undefined as 'left' | 'right' | 'center' | undefined,
+    header: 'Email',
+    align: undefined,
     render: (customer: Customer) => customer.email || ''
   },
   { 
     key: 'customer.phone',
-    label: 'Phone',
-    align: undefined as 'left' | 'right' | 'center' | undefined,
+    header: 'Phone',
+    align: undefined,
     render: (customer: Customer) => customer.phone || ''
   },
   { 
     key: 'customer.actions',
-    label: 'Actions',
-    align: 'center' as const,
-    render: (customer: Customer, context: ListingRenderContext) => (
+    header: 'Actions',
+    align: 'center',
+    render: (customer: Customer, context) => (
       <div style={{ display: 'flex', gap: 'var(--spacing-sm)', justifyContent: 'center' }}>
         <AxButton 
           variant="secondary" 
           size="small"
-          onClick={() => context.onEdit(customer)}
+          onClick={() => context?.onEdit(customer)}
           style={{ minWidth: '80px' }}
         >
           Edit
@@ -91,7 +87,7 @@ const LISTING_TABLE_COLUMNS = [
         <AxButton 
           variant="danger" 
           size="small"
-          onClick={() => context.onDeleteClick(customer)}
+          onClick={() => context?.onDeleteClick(customer)}
           style={{ minWidth: '80px' }}
         >
           Delete
@@ -133,7 +129,6 @@ interface CustomerListingPageRenderProps {
 export function CustomerListingPageRender(props: CustomerListingPageRenderProps) {
   const {
     customers,
-    addresses,
     loading,
     error,
     dialogMode,
@@ -159,6 +154,34 @@ export function CustomerListingPageRender(props: CustomerListingPageRenderProps)
     formatAddress,
     getCustomerAddresses,
   } = props;
+
+  const columns = createColumns();
+  const tableContext: ListingRenderContext = {
+    onEdit,
+    onDeleteClick,
+    getCustomerAddresses,
+    formatAddress,
+  };
+
+  const renderExpandedRow = (customer: Customer, context?: ListingRenderContext) => {
+    const customerAddresses = context?.getCustomerAddresses(customer.id) || [];
+    if (customerAddresses.length === 0) {
+      return null;
+    }
+    return (
+      <div style={{ paddingLeft: 'var(--spacing-md)', fontSize: 'var(--font-size-sm)', color: 'var(--color-text-secondary)' }}>
+        <strong style={{ color: 'var(--color-text-primary)', marginRight: 'var(--spacing-sm)' }}>Addresses:</strong>
+        {customerAddresses.map((addr, index) => (
+          <span key={addr.id}>
+            {index > 0 && <span style={{ margin: '0 var(--spacing-xs)' }}>|</span>}
+            <span style={{ marginRight: 'var(--spacing-xs)' }}>
+              {addr.addressType ? `[${addr.addressType}]` : '[Both]'} {context?.formatAddress(addr)}
+            </span>
+          </span>
+        ))}
+      </div>
+    );
+  };
 
   if (loading) {
     return (
@@ -269,62 +292,21 @@ export function CustomerListingPageRender(props: CustomerListingPageRenderProps)
       </HeaderCard>
 
       <TableCard padding="large" {...debugProps(COMPONENT_NAME, 'TableCard')}>
-        <div style={{ flex: 1, overflow: 'auto', minHeight: 0 }}>
-          {customers.length === 0 ? (
-            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '200px' }}>
-              <AxParagraph>No customers found</AxParagraph>
-            </div>
-          ) : (
-            <AxTable fullWidth stickyHeader>
-              <AxTableHead>
-                <AxTableRow>
-                  {LISTING_TABLE_COLUMNS.map((column) => (
-                    <AxTableHeader key={column.key} align={column.align}>
-                      {column.label}
-                    </AxTableHeader>
-                  ))}
-                </AxTableRow>
-              </AxTableHead>
-              <AxTableBody>
-                {customers.map((customer) => {
-                  const customerAddresses = getCustomerAddresses(customer.id);
-                  const context: ListingRenderContext = {
-                    onEdit,
-                    onDeleteClick,
-                  };
-                  return (
-                    <Fragment key={customer.id}>
-                      <AxTableRow>
-                        {LISTING_TABLE_COLUMNS.map((column) => (
-                          <AxTableCell key={column.key} align={column.align}>
-                            {column.render(customer, context)}
-                          </AxTableCell>
-                        ))}
-                      </AxTableRow>
-                      {customerAddresses.length > 0 && (
-                        <AxTableRow key={`${customer.id}-addresses`}>
-                          <AxTableCell colSpan={LISTING_TABLE_COLUMNS.length} style={{ paddingTop: 0, paddingBottom: 'var(--spacing-md)' }}>
-                            <div style={{ paddingLeft: 'var(--spacing-md)', fontSize: 'var(--font-size-sm)', color: 'var(--color-text-secondary)' }}>
-                              <strong style={{ color: 'var(--color-text-primary)', marginRight: 'var(--spacing-sm)' }}>Addresses:</strong>
-                              {customerAddresses.map((addr, index) => (
-                                <span key={addr.id}>
-                                  {index > 0 && <span style={{ margin: '0 var(--spacing-xs)' }}>|</span>}
-                                  <span style={{ marginRight: 'var(--spacing-xs)' }}>
-                                    {addr.addressType ? `[${addr.addressType}]` : '[Both]'} {formatAddress(addr)}
-                                  </span>
-                                </span>
-                              ))}
-                            </div>
-                          </AxTableCell>
-                        </AxTableRow>
-                      )}
-                    </Fragment>
-                  );
-                })}
-              </AxTableBody>
-            </AxTable>
-          )}
-        </div>
+        {customers.length === 0 ? (
+          <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '200px' }}>
+            <AxParagraph>No customers found</AxParagraph>
+          </div>
+        ) : (
+          <AxTable
+            fullWidth
+            stickyHeader
+            data={customers}
+            columns={columns}
+            context={tableContext}
+            getRowKey={(customer) => customer.id || ''}
+            renderExpandedRow={renderExpandedRow}
+          />
+        )}
       </TableCard>
 
       {/* Add/Edit Customer Dialog */}

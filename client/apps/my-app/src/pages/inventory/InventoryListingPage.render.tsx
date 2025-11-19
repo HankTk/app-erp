@@ -1,17 +1,12 @@
 import {
   AxTable,
-  AxTableHead,
-  AxTableBody,
-  AxTableRow,
-  AxTableHeader,
-  AxTableCell,
-  AxCard,
   AxHeading3,
   AxParagraph,
   AxButton,
   AxInput,
   AxFormGroup,
   AxListbox,
+  ColumnDefinition,
 } from '@ui/components';
 import { useI18n } from '../../i18n/I18nProvider';
 import { debugProps } from '../../utils/emotionCache';
@@ -42,35 +37,35 @@ type ListingRenderContext = {
   l10n: (key: string) => string;
 };
 
-const LISTING_TABLE_COLUMNS = [
+const createColumns = (l10n: (key: string) => string): ColumnDefinition<InventoryWithDetails, ListingRenderContext>[] => [
   { 
     key: 'inventory.productCode',
-    label: (l10n: (key: string) => string) => l10n('inventory.productCode'),
-    align: undefined as 'left' | 'right' | 'center' | undefined,
+    header: l10n('inventory.productCode'),
+    align: undefined,
     render: (item: InventoryWithDetails) => item.productCode || '-'
   },
   { 
     key: 'inventory.productName',
-    label: (l10n: (key: string) => string) => l10n('inventory.productName'),
-    align: undefined as 'left' | 'right' | 'center' | undefined,
+    header: l10n('inventory.productName'),
+    align: undefined,
     render: (item: InventoryWithDetails) => item.productName || '-'
   },
   { 
     key: 'inventory.warehouseCode',
-    label: (l10n: (key: string) => string) => l10n('inventory.warehouseCode'),
-    align: undefined as 'left' | 'right' | 'center' | undefined,
+    header: l10n('inventory.warehouseCode'),
+    align: undefined,
     render: (item: InventoryWithDetails) => item.warehouseCode || '-'
   },
   { 
     key: 'inventory.warehouseName',
-    label: (l10n: (key: string) => string) => l10n('inventory.warehouseName'),
-    align: undefined as 'left' | 'right' | 'center' | undefined,
+    header: l10n('inventory.warehouseName'),
+    align: undefined,
     render: (item: InventoryWithDetails) => item.warehouseName || '-'
   },
   { 
     key: 'inventory.quantity',
-    label: (l10n: (key: string) => string) => l10n('inventory.quantity'),
-    align: 'right' as const,
+    header: l10n('inventory.quantity'),
+    align: 'right',
     render: (item: InventoryWithDetails) => (
       <strong style={{ fontSize: 'var(--font-size-lg)' }}>
         {item.quantity ?? 0}
@@ -79,26 +74,26 @@ const LISTING_TABLE_COLUMNS = [
   },
   { 
     key: 'inventory.actions',
-    label: (l10n: (key: string) => string) => l10n('common.actions'),
-    align: 'center' as const,
-    render: (item: InventoryWithDetails, context: ListingRenderContext) => {
+    header: l10n('common.actions'),
+    align: 'center',
+    render: (item: InventoryWithDetails, context) => {
       const itemKey = item.id || `${item.productId}-${item.warehouseId}`;
       return (
         <div style={{ display: 'flex', gap: 'var(--spacing-xl)', alignItems: 'center' }}>
           <AxInput
             type="number"
-            value={context.adjustQuantities[itemKey] || ''}
-            onChange={(e) => context.onAdjustQuantityChange(itemKey, parseInt(e.target.value) || 0)}
+            value={context?.adjustQuantities[itemKey] || ''}
+            onChange={(e) => context?.onAdjustQuantityChange(itemKey, parseInt(e.target.value) || 0)}
             style={{ width: '80px' }}
             placeholder="±Qty"
           />
           <AxButton
             variant="primary"
             size="small"
-            onClick={() => context.onAdjustInventory(item)}
-            disabled={context.adjusting === itemKey || (context.adjustQuantities[itemKey] || 0) === 0}
+            onClick={() => context?.onAdjustInventory(item)}
+            disabled={context?.adjusting === itemKey || (context?.adjustQuantities[itemKey] || 0) === 0}
           >
-            {context.l10n('inventory.adjust')}
+            {context?.l10n('inventory.adjust')}
           </AxButton>
         </div>
       );
@@ -138,6 +133,14 @@ export function InventoryListingPageRender(props: InventoryListingPageRenderProp
   } = props;
   
   const { l10n } = useI18n();
+  const columns = createColumns(l10n);
+  const tableContext: ListingRenderContext = {
+    adjusting,
+    adjustQuantities,
+    onAdjustQuantityChange,
+    onAdjustInventory,
+    l10n,
+  };
 
   if (loading) {
     return (
@@ -266,46 +269,20 @@ export function InventoryListingPageRender(props: InventoryListingPageRenderProp
       </HeaderCard>
 
       <TableCard padding="large" {...debugProps(COMPONENT_NAME, 'TableCard')}>
-        <AxTable fullWidth>
-          <AxTableHead>
-            <AxTableRow>
-              {LISTING_TABLE_COLUMNS.map((column) => (
-                <AxTableHeader key={column.key} align={column.align}>
-                  {column.label(l10n)}
-                </AxTableHeader>
-              ))}
-            </AxTableRow>
-          </AxTableHead>
-          <AxTableBody>
-            {inventory.length === 0 ? (
-              <AxTableRow>
-                <AxTableCell colSpan={LISTING_TABLE_COLUMNS.length} align="center">
-                  {l10n('inventory.noInventory')}
-                </AxTableCell>
-              </AxTableRow>
-            ) : (
-              inventory.map((item) => {
-                const itemKey = item.id || `${item.productId}-${item.warehouseId}`;
-                const context: ListingRenderContext = {
-                  adjusting,
-                  adjustQuantities,
-                  onAdjustQuantityChange,
-                  onAdjustInventory,
-                  l10n,
-                };
-                return (
-                  <AxTableRow key={itemKey}>
-                    {LISTING_TABLE_COLUMNS.map((column) => (
-                      <AxTableCell key={column.key} align={column.align}>
-                        {column.render(item, context)}
-                      </AxTableCell>
-                    ))}
-                  </AxTableRow>
-                );
-              })
-            )}
-          </AxTableBody>
-        </AxTable>
+        {inventory.length === 0 ? (
+          <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '200px' }}>
+            <AxParagraph>{l10n('inventory.noInventory')}</AxParagraph>
+          </div>
+        ) : (
+          <AxTable
+            fullWidth
+            stickyHeader
+            data={inventory}
+            columns={columns}
+            context={tableContext}
+            getRowKey={(item) => item.id || `${item.productId}-${item.warehouseId}`}
+          />
+        )}
       </TableCard>
     </PageContainer>
   );

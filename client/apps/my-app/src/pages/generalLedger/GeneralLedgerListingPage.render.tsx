@@ -1,16 +1,12 @@
 import {
   AxTable,
-  AxTableHead,
-  AxTableBody,
-  AxTableRow,
-  AxTableHeader,
-  AxTableCell,
   AxHeading3,
   AxParagraph,
   AxButton,
   AxFormGroup,
   AxListbox,
   AxInput,
+  ColumnDefinition,
 } from '@ui/components';
 import { debugProps } from '../../utils/emotionCache';
 import {
@@ -45,6 +41,122 @@ interface GLEntry {
   cost?: number;
   status: string;
 }
+
+type ListingRenderContext = {
+  formatDate: (dateString: string) => string;
+  getTypeColor: (type: string) => string;
+  getTypeBackgroundColor: (type: string) => string;
+  getTypeLabel: (type: string) => string;
+  onViewEntry?: (orderId: string) => void;
+};
+
+const createColumns = (): ColumnDefinition<GLEntry, ListingRenderContext>[] => [
+  { 
+    key: 'gl.date',
+    header: 'Date',
+    align: undefined,
+    render: (entry: GLEntry, context) => context?.formatDate(entry.date) || 'N/A'
+  },
+  { 
+    key: 'gl.type',
+    header: 'Type',
+    align: undefined,
+    render: (entry: GLEntry, context) => (
+      <span 
+        style={{ 
+          color: context?.getTypeColor(entry.type) || 'var(--color-text-primary)', 
+          fontWeight: 600,
+          padding: '4px 12px',
+          borderRadius: '12px',
+          backgroundColor: context?.getTypeBackgroundColor(entry.type) || 'transparent',
+          display: 'inline-block',
+          fontSize: 'var(--font-size-sm)',
+        }}
+      >
+        {context?.getTypeLabel(entry.type) || entry.type}
+      </span>
+    )
+  },
+  { 
+    key: 'gl.orderPoInvoice',
+    header: 'Order/PO/Invoice',
+    align: undefined,
+    render: (entry: GLEntry) => {
+      const orderOrPO = entry.poNumber ? `PO: ${entry.poNumber}` : entry.orderNumber ? `Order: ${entry.orderNumber}` : 'N/A';
+      return entry.invoiceNumber ? `${orderOrPO} / ${entry.invoiceNumber}` : orderOrPO;
+    }
+  },
+  { 
+    key: 'gl.customerSupplier',
+    header: 'Customer/Supplier',
+    align: undefined,
+    render: (entry: GLEntry) => entry.customerName || entry.supplierName || 'N/A'
+  },
+  { 
+    key: 'gl.description',
+    header: 'Description',
+    align: undefined,
+    render: (entry: GLEntry) => entry.description
+  },
+  { 
+    key: 'gl.quantity',
+    header: 'Quantity',
+    align: 'right',
+    render: (entry: GLEntry) => entry.quantity
+  },
+  { 
+    key: 'gl.debit',
+    header: 'Debit',
+    align: 'right',
+    render: (entry: GLEntry) => {
+      const debitAmount = entry.type === 'COST' || entry.type === 'EXPENSE' || entry.type === 'ACCOUNTS_PAYABLE' ? entry.amount : 0;
+      return (
+        <span style={{ 
+          color: debitAmount > 0 ? 'var(--color-error)' : 'var(--color-text-secondary)',
+          fontWeight: debitAmount > 0 ? 'var(--font-weight-bold)' : 'normal'
+        }}>
+          {debitAmount > 0 ? `$${debitAmount.toFixed(2)}` : '-'}
+        </span>
+      );
+    }
+  },
+  { 
+    key: 'gl.credit',
+    header: 'Credit',
+    align: 'right',
+    render: (entry: GLEntry) => {
+      const creditAmount = entry.type === 'REVENUE' || entry.type === 'PAYMENT' ? entry.amount : 0;
+      return (
+        <span style={{ 
+          color: creditAmount > 0 ? 'var(--color-success)' : 'var(--color-text-secondary)',
+          fontWeight: creditAmount > 0 ? 'var(--font-weight-bold)' : 'normal'
+        }}>
+          {creditAmount > 0 ? `$${creditAmount.toFixed(2)}` : '-'}
+        </span>
+      );
+    }
+  },
+  { 
+    key: 'gl.actions',
+    header: 'Actions',
+    align: 'center',
+    render: (entry: GLEntry, context) => {
+      if (context?.onViewEntry && (entry.orderId || entry.poId)) {
+        return (
+          <AxButton 
+            variant="secondary" 
+            size="small"
+            onClick={() => context.onViewEntry!(entry.orderId || entry.poId || '')}
+            style={{ minWidth: '80px' }}
+          >
+            View
+          </AxButton>
+        );
+      }
+      return null;
+    }
+  },
+];
 
 interface GeneralLedgerListingPageRenderProps {
   glEntries: GLEntry[];
@@ -99,6 +211,15 @@ export function GeneralLedgerListingPageRender(props: GeneralLedgerListingPageRe
     totalPayment,
     netIncome,
   } = props;
+
+  const columns = createColumns();
+  const tableContext: ListingRenderContext = {
+    formatDate,
+    getTypeColor,
+    getTypeBackgroundColor,
+    getTypeLabel,
+    onViewEntry,
+  };
 
   if (loading) {
     return (
@@ -240,83 +361,14 @@ export function GeneralLedgerListingPageRender(props: GeneralLedgerListingPageRe
               <AxParagraph>No general ledger entries found</AxParagraph>
             </div>
           ) : (
-            <AxTable fullWidth stickyHeader>
-              <AxTableHead>
-                <AxTableRow>
-                  <AxTableHeader>Date</AxTableHeader>
-                  <AxTableHeader>Type</AxTableHeader>
-                  <AxTableHeader>Order/PO/Invoice</AxTableHeader>
-                  <AxTableHeader>Customer/Supplier</AxTableHeader>
-                  <AxTableHeader>Description</AxTableHeader>
-                  <AxTableHeader align="right">Quantity</AxTableHeader>
-                  <AxTableHeader align="right">Debit</AxTableHeader>
-                  <AxTableHeader align="right">Credit</AxTableHeader>
-                  <AxTableHeader align="center">Actions</AxTableHeader>
-                </AxTableRow>
-              </AxTableHead>
-              <AxTableBody>
-                {filteredEntries.map((entry) => {
-                  // Debit for COST, EXPENSE, ACCOUNTS_PAYABLE; Credit for REVENUE and PAYMENT
-                  const debitAmount = entry.type === 'COST' || entry.type === 'EXPENSE' || entry.type === 'ACCOUNTS_PAYABLE' ? entry.amount : 0;
-                  const creditAmount = entry.type === 'REVENUE' || entry.type === 'PAYMENT' ? entry.amount : 0;
-                  
-                  // Determine customer/supplier name
-                  const customerOrSupplierName = entry.customerName || entry.supplierName || 'N/A';
-                  
-                  return (
-                    <AxTableRow key={entry.id}>
-                      <AxTableCell>{formatDate(entry.date)}</AxTableCell>
-                      <AxTableCell>
-                        <span 
-                          style={{ 
-                            color: getTypeColor(entry.type), 
-                            fontWeight: 600,
-                            padding: '4px 12px',
-                            borderRadius: '12px',
-                            backgroundColor: getTypeBackgroundColor(entry.type),
-                            display: 'inline-block',
-                            fontSize: 'var(--font-size-sm)',
-                          }}
-                        >
-                          {getTypeLabel(entry.type)}
-                        </span>
-                      </AxTableCell>
-                      <AxTableCell>
-                        {entry.poNumber ? `PO: ${entry.poNumber}` : entry.orderNumber ? `Order: ${entry.orderNumber}` : 'N/A'}
-                        {entry.invoiceNumber && ` / ${entry.invoiceNumber}`}
-                      </AxTableCell>
-                      <AxTableCell>{customerOrSupplierName}</AxTableCell>
-                      <AxTableCell>{entry.description}</AxTableCell>
-                      <AxTableCell align="right">{entry.quantity}</AxTableCell>
-                      <AxTableCell align="right" style={{ 
-                        color: debitAmount > 0 ? 'var(--color-error)' : 'var(--color-text-secondary)',
-                        fontWeight: debitAmount > 0 ? 'var(--font-weight-bold)' : 'normal'
-                      }}>
-                        {debitAmount > 0 ? `$${debitAmount.toFixed(2)}` : '-'}
-                      </AxTableCell>
-                      <AxTableCell align="right" style={{ 
-                        color: creditAmount > 0 ? 'var(--color-success)' : 'var(--color-text-secondary)',
-                        fontWeight: creditAmount > 0 ? 'var(--font-weight-bold)' : 'normal'
-                      }}>
-                        {creditAmount > 0 ? `$${creditAmount.toFixed(2)}` : '-'}
-                      </AxTableCell>
-                      <AxTableCell align="center">
-                        {onViewEntry && (entry.orderId || entry.poId) && (
-                          <AxButton 
-                            variant="secondary" 
-                            size="small"
-                            onClick={() => onViewEntry(entry.orderId || entry.poId || '')}
-                            style={{ minWidth: '80px' }}
-                          >
-                            View
-                          </AxButton>
-                        )}
-                      </AxTableCell>
-                    </AxTableRow>
-                  );
-                })}
-              </AxTableBody>
-            </AxTable>
+            <AxTable
+              fullWidth
+              stickyHeader
+              data={filteredEntries}
+              columns={columns}
+              context={tableContext}
+              getRowKey={(entry) => entry.id}
+            />
           )}
         </TableWrapper>
         

@@ -1,10 +1,5 @@
 import {
   AxTable,
-  AxTableHead,
-  AxTableBody,
-  AxTableRow,
-  AxTableHeader,
-  AxTableCell,
   AxCard,
   AxHeading3,
   AxParagraph,
@@ -14,6 +9,7 @@ import {
   AxLabel,
   AxFormGroup,
   AxCheckbox,
+  ColumnDefinition,
 } from '@ui/components';
 import { useI18n } from '../../i18n/I18nProvider';
 import { debugProps } from '../../utils/emotionCache';
@@ -37,55 +33,55 @@ type ListingRenderContext = {
   l10n: (key: string) => string;
 };
 
-const LISTING_TABLE_COLUMNS = [
+const createColumns = (l10n: (key: string) => string): ColumnDefinition<Warehouse, ListingRenderContext>[] => [
   { 
     key: 'warehouse.warehouseCode',
-    label: (l10n: (key: string) => string) => l10n('inventory.warehouseCode'),
-    align: undefined as 'left' | 'right' | 'center' | undefined,
+    header: l10n('inventory.warehouseCode'),
+    align: undefined,
     render: (warehouse: Warehouse) => warehouse.warehouseCode || '-'
   },
   { 
     key: 'warehouse.warehouseName',
-    label: (l10n: (key: string) => string) => l10n('inventory.warehouseName'),
-    align: undefined as 'left' | 'right' | 'center' | undefined,
+    header: l10n('inventory.warehouseName'),
+    align: undefined,
     render: (warehouse: Warehouse) => warehouse.warehouseName || '-'
   },
   { 
     key: 'warehouse.address',
-    label: (l10n: (key: string) => string) => l10n('inventory.address'),
-    align: undefined as 'left' | 'right' | 'center' | undefined,
+    header: l10n('inventory.address'),
+    align: undefined,
     render: (warehouse: Warehouse) => warehouse.address || '-'
   },
   { 
     key: 'warehouse.status',
-    label: (l10n: (key: string) => string) => l10n('common.status'),
-    align: undefined as 'left' | 'right' | 'center' | undefined,
-    render: (warehouse: Warehouse, context: ListingRenderContext) => warehouse.active ? (
-      <span style={{ color: 'var(--color-success)' }}>{context.l10n('common.active')}</span>
+    header: l10n('common.status'),
+    align: undefined,
+    render: (warehouse: Warehouse, context) => warehouse.active ? (
+      <span style={{ color: 'var(--color-success)' }}>{context?.l10n('common.active')}</span>
     ) : (
-      <span style={{ color: 'var(--color-text-secondary)' }}>{context.l10n('common.inactive')}</span>
+      <span style={{ color: 'var(--color-text-secondary)' }}>{context?.l10n('common.inactive')}</span>
     )
   },
   { 
     key: 'warehouse.actions',
-    label: (l10n: (key: string) => string) => l10n('common.actions'),
-    align: 'center' as const,
-    render: (warehouse: Warehouse, context: ListingRenderContext) => (
+    header: l10n('common.actions'),
+    align: 'center',
+    render: (warehouse: Warehouse, context) => (
       <>
         <AxButton
           variant="secondary"
           size="small"
-          onClick={() => context.onEdit(warehouse)}
+          onClick={() => context?.onEdit(warehouse)}
           style={{ marginRight: 'var(--spacing-xs)' }}
         >
-          {context.l10n('common.edit')}
+          {context?.l10n('common.edit')}
         </AxButton>
         <AxButton
           variant="danger"
           size="small"
-          onClick={() => context.onDelete(warehouse)}
+          onClick={() => context?.onDelete(warehouse)}
         >
-          {context.l10n('common.delete')}
+          {context?.l10n('common.delete')}
         </AxButton>
       </>
     )
@@ -136,6 +132,12 @@ export function WarehouseListingPageRender(props: WarehouseListingPageRenderProp
   } = props;
   
   const { l10n } = useI18n();
+  const columns = createColumns(l10n);
+  const tableContext: ListingRenderContext = {
+    onEdit,
+    onDelete,
+    l10n,
+  };
 
   if (loading) {
     return (
@@ -252,35 +254,20 @@ export function WarehouseListingPageRender(props: WarehouseListingPageRenderProp
       </HeaderCard>
 
       <TableCard padding="large" {...debugProps(COMPONENT_NAME, 'TableCard')}>
-        <AxTable fullWidth>
-          <AxTableHead>
-            <AxTableRow>
-              {LISTING_TABLE_COLUMNS.map((column) => (
-                <AxTableHeader key={column.key} align={column.align}>
-                  {column.label(l10n)}
-                </AxTableHeader>
-              ))}
-            </AxTableRow>
-          </AxTableHead>
-          <AxTableBody>
-            {warehouses.map((warehouse) => {
-              const context: ListingRenderContext = {
-                onEdit,
-                onDelete,
-                l10n,
-              };
-              return (
-                <AxTableRow key={warehouse.id}>
-                  {LISTING_TABLE_COLUMNS.map((column) => (
-                    <AxTableCell key={column.key} align={column.align}>
-                      {column.render(warehouse, context)}
-                    </AxTableCell>
-                  ))}
-                </AxTableRow>
-              );
-            })}
-          </AxTableBody>
-        </AxTable>
+        {warehouses.length === 0 ? (
+          <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '200px' }}>
+            <AxParagraph>{l10n('inventory.noWarehouses')}</AxParagraph>
+          </div>
+        ) : (
+          <AxTable
+            fullWidth
+            stickyHeader
+            data={warehouses}
+            columns={columns}
+            context={tableContext}
+            getRowKey={(warehouse) => warehouse.id || ''}
+          />
+        )}
       </TableCard>
 
       <AxDialog

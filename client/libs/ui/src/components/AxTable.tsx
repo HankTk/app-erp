@@ -23,6 +23,7 @@ export interface AxTableProps<T = any, C = any> extends Omit<React.TableHTMLAttr
   columns?: ColumnDefinition<T, C>[];
   context?: C;
   getRowKey?: (item: T, index: number) => string | number;
+  renderExpandedRow?: (item: T, context?: C) => React.ReactNode;
   // Legacy API (children-based)
   children?: React.ReactNode;
 }
@@ -168,6 +169,7 @@ export function AxTable<T = any, C = any>({
   columns,
   context,
   getRowKey,
+  renderExpandedRow,
   ...props
 }: AxTableProps<T, C>) {
   // If data and columns are provided, use generic data-driven API
@@ -194,23 +196,33 @@ export function AxTable<T = any, C = any>({
           <AxTableBody>
             {data!.map((item, index) => {
               const rowKey = getRowKey ? getRowKey(item, index) : (item as any)?.id ?? index;
+              const expandedContent = renderExpandedRow ? renderExpandedRow(item, context) : null;
               return (
-                <AxTableRow key={rowKey} variant={variant}>
-                  {columns!.map((column) => {
-                    const cellContent = column.render
-                      ? column.render(item, context)
-                      : (item as any)?.[column.key] ?? '';
-                    return (
-                      <AxTableCell
-                        key={column.key}
-                        align={column.align}
-                        variant={column.variant ?? variant}
-                      >
-                        {cellContent}
+                <React.Fragment key={rowKey}>
+                  <AxTableRow variant={variant}>
+                    {columns!.map((column) => {
+                      const cellContent = column.render
+                        ? column.render(item, context)
+                        : (item as any)?.[column.key] ?? '';
+                      return (
+                        <AxTableCell
+                          key={column.key}
+                          align={column.align}
+                          variant={column.variant ?? variant}
+                        >
+                          {cellContent}
+                        </AxTableCell>
+                      );
+                    })}
+                  </AxTableRow>
+                  {expandedContent && (
+                    <AxTableRow variant={variant}>
+                      <AxTableCell colSpan={columns!.length} variant={variant} style={{ paddingTop: 0, paddingBottom: 'var(--spacing-md)' }}>
+                        {expandedContent}
                       </AxTableCell>
-                    );
-                  })}
-                </AxTableRow>
+                    </AxTableRow>
+                  )}
+                </React.Fragment>
               );
             })}
           </AxTableBody>

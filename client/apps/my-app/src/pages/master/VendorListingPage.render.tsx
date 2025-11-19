@@ -1,11 +1,5 @@
-import { Fragment } from 'react';
 import {
   AxTable,
-  AxTableHead,
-  AxTableBody,
-  AxTableRow,
-  AxTableHeader,
-  AxTableCell,
   AxCard,
   AxHeading3,
   AxParagraph,
@@ -14,6 +8,7 @@ import {
   AxInput,
   AxLabel,
   AxFormGroup,
+  ColumnDefinition,
 } from '@ui/components';
 import { useI18n } from '../../i18n/I18nProvider';
 import { debugProps } from '../../utils/emotionCache';
@@ -37,66 +32,68 @@ type ListingRenderContext = {
   onEdit: (vendor: Vendor) => void;
   onDeleteClick: (vendor: Vendor) => void;
   l10n: (key: string) => string;
+  getVendorAddresses: (vendorId: string | undefined) => Address[];
+  formatAddress: (address: Address) => string;
 };
 
-const LISTING_TABLE_COLUMNS = [
+const createColumns = (l10n: (key: string) => string): ColumnDefinition<Vendor, ListingRenderContext>[] => [
   { 
     key: 'vendor.vendorNumber',
-    label: (l10n: (key: string) => string) => l10n('vendor.vendorNumber'),
-    align: undefined as 'left' | 'right' | 'center' | undefined,
+    header: l10n('vendor.vendorNumber'),
+    align: undefined,
     render: (vendor: Vendor) => vendor.vendorNumber || ''
   },
   { 
     key: 'vendor.companyName',
-    label: (l10n: (key: string) => string) => l10n('vendor.companyName'),
-    align: undefined as 'left' | 'right' | 'center' | undefined,
+    header: l10n('vendor.companyName'),
+    align: undefined,
     render: (vendor: Vendor) => vendor.companyName || ''
   },
   { 
     key: 'vendor.firstName',
-    label: (l10n: (key: string) => string) => l10n('vendor.firstName'),
-    align: undefined as 'left' | 'right' | 'center' | undefined,
+    header: l10n('vendor.firstName'),
+    align: undefined,
     render: (vendor: Vendor) => vendor.firstName || ''
   },
   { 
     key: 'vendor.lastName',
-    label: (l10n: (key: string) => string) => l10n('vendor.lastName'),
-    align: undefined as 'left' | 'right' | 'center' | undefined,
+    header: l10n('vendor.lastName'),
+    align: undefined,
     render: (vendor: Vendor) => vendor.lastName || ''
   },
   { 
     key: 'vendor.email',
-    label: (l10n: (key: string) => string) => l10n('vendor.email'),
-    align: undefined as 'left' | 'right' | 'center' | undefined,
+    header: l10n('vendor.email'),
+    align: undefined,
     render: (vendor: Vendor) => vendor.email || ''
   },
   { 
     key: 'vendor.phone',
-    label: (l10n: (key: string) => string) => l10n('vendor.phone'),
-    align: undefined as 'left' | 'right' | 'center' | undefined,
+    header: l10n('vendor.phone'),
+    align: undefined,
     render: (vendor: Vendor) => vendor.phone || ''
   },
   { 
     key: 'vendor.actions',
-    label: (l10n: (key: string) => string) => l10n('vendor.actions'),
-    align: 'center' as const,
-    render: (vendor: Vendor, context: ListingRenderContext) => (
+    header: l10n('vendor.actions'),
+    align: 'center',
+    render: (vendor: Vendor, context) => (
       <div style={{ display: 'flex', gap: 'var(--spacing-sm)', justifyContent: 'center' }}>
         <AxButton 
           variant="secondary" 
           size="small"
-          onClick={() => context.onEdit(vendor)}
+          onClick={() => context?.onEdit(vendor)}
           style={{ minWidth: '80px' }}
         >
-          {context.l10n('vendor.edit')}
+          {context?.l10n('vendor.edit')}
         </AxButton>
         <AxButton 
           variant="danger" 
           size="small"
-          onClick={() => context.onDeleteClick(vendor)}
+          onClick={() => context?.onDeleteClick(vendor)}
           style={{ minWidth: '80px' }}
         >
-          {context.l10n('vendor.delete')}
+          {context?.l10n('vendor.delete')}
         </AxButton>
       </div>
     )
@@ -163,6 +160,34 @@ export function VendorListingPageRender(props: VendorListingPageRenderProps) {
   } = props;
   
   const { l10n } = useI18n();
+  const columns = createColumns(l10n);
+  const tableContext: ListingRenderContext = {
+    onEdit,
+    onDeleteClick,
+    l10n,
+    getVendorAddresses,
+    formatAddress,
+  };
+
+  const renderExpandedRow = (vendor: Vendor, context?: ListingRenderContext) => {
+    const vendorAddresses = context?.getVendorAddresses(vendor.id) || [];
+    if (vendorAddresses.length === 0) {
+      return null;
+    }
+    return (
+      <div style={{ paddingLeft: 'var(--spacing-md)', fontSize: 'var(--font-size-sm)', color: 'var(--color-text-secondary)' }}>
+        <strong style={{ color: 'var(--color-text-primary)', marginRight: 'var(--spacing-sm)' }}>Addresses:</strong>
+        {vendorAddresses.map((addr, index) => (
+          <span key={addr.id}>
+            {index > 0 && <span style={{ margin: '0 var(--spacing-xs)' }}>|</span>}
+            <span style={{ marginRight: 'var(--spacing-xs)' }}>
+              {addr.addressType ? `[${addr.addressType}]` : '[Both]'} {context?.formatAddress(addr)}
+            </span>
+          </span>
+        ))}
+      </div>
+    );
+  };
 
   if (loading) {
     return (
@@ -273,63 +298,21 @@ export function VendorListingPageRender(props: VendorListingPageRenderProps) {
       </HeaderCard>
 
       <TableCard padding="large" {...debugProps(COMPONENT_NAME, 'TableCard')}>
-        <div style={{ flex: 1, overflow: 'auto', minHeight: 0 }}>
-          {vendors.length === 0 ? (
-            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '200px' }}>
-              <AxParagraph>{l10n('vendor.noData')}</AxParagraph>
-            </div>
-          ) : (
-            <AxTable fullWidth stickyHeader>
-              <AxTableHead>
-                <AxTableRow>
-                  {LISTING_TABLE_COLUMNS.map((column) => (
-                    <AxTableHeader key={column.key} align={column.align}>
-                      {column.label(l10n)}
-                    </AxTableHeader>
-                  ))}
-                </AxTableRow>
-              </AxTableHead>
-              <AxTableBody>
-                {vendors.map((vendor) => {
-                  const vendorAddresses = getVendorAddresses(vendor.id);
-                  const context: ListingRenderContext = {
-                    onEdit,
-                    onDeleteClick,
-                    l10n,
-                  };
-                  return (
-                    <Fragment key={vendor.id}>
-                      <AxTableRow>
-                        {LISTING_TABLE_COLUMNS.map((column) => (
-                          <AxTableCell key={column.key} align={column.align}>
-                            {column.render(vendor, context)}
-                          </AxTableCell>
-                        ))}
-                      </AxTableRow>
-                      {vendorAddresses.length > 0 && (
-                        <AxTableRow key={`${vendor.id}-addresses`}>
-                          <AxTableCell colSpan={LISTING_TABLE_COLUMNS.length} style={{ paddingTop: 0, paddingBottom: 'var(--spacing-md)' }}>
-                            <div style={{ paddingLeft: 'var(--spacing-md)', fontSize: 'var(--font-size-sm)', color: 'var(--color-text-secondary)' }}>
-                              <strong style={{ color: 'var(--color-text-primary)', marginRight: 'var(--spacing-sm)' }}>Addresses:</strong>
-                              {vendorAddresses.map((addr, index) => (
-                                <span key={addr.id}>
-                                  {index > 0 && <span style={{ margin: '0 var(--spacing-xs)' }}>|</span>}
-                                  <span style={{ marginRight: 'var(--spacing-xs)' }}>
-                                    {addr.addressType ? `[${addr.addressType}]` : '[Both]'} {formatAddress(addr)}
-                                  </span>
-                                </span>
-                              ))}
-                            </div>
-                          </AxTableCell>
-                        </AxTableRow>
-                      )}
-                    </Fragment>
-                  );
-                })}
-              </AxTableBody>
-            </AxTable>
-          )}
-        </div>
+        {vendors.length === 0 ? (
+          <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '200px' }}>
+            <AxParagraph>{l10n('vendor.noData')}</AxParagraph>
+          </div>
+        ) : (
+          <AxTable
+            fullWidth
+            stickyHeader
+            data={vendors}
+            columns={columns}
+            context={tableContext}
+            getRowKey={(vendor) => vendor.id || ''}
+            renderExpandedRow={renderExpandedRow}
+          />
+        )}
       </TableCard>
 
       {/* Add/Edit Vendor Dialog */}

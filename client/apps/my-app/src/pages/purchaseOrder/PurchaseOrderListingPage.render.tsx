@@ -1,10 +1,5 @@
 import {
   AxTable,
-  AxTableHead,
-  AxTableBody,
-  AxTableRow,
-  AxTableHeader,
-  AxTableCell,
   AxCard,
   AxHeading3,
   AxParagraph,
@@ -12,6 +7,7 @@ import {
   AxDialog,
   AxFormGroup,
   AxListbox,
+  ColumnDefinition,
 } from '@ui/components';
 import { useI18n } from '../../i18n/I18nProvider';
 import { debugProps } from '../../utils/emotionCache';
@@ -38,74 +34,74 @@ type ListingRenderContext = {
   l10n: (key: string) => string;
 };
 
-const LISTING_TABLE_COLUMNS = [
+const createColumns = (l10n: (key: string) => string): ColumnDefinition<PurchaseOrder, ListingRenderContext>[] => [
   { 
     key: 'purchaseOrder.orderNumber',
-    label: (l10n: (key: string) => string) => l10n('purchaseOrder.orderNumber'),
-    align: undefined as 'left' | 'right' | 'center' | undefined,
-    render: (po: PurchaseOrder, context: ListingRenderContext) => po.orderNumber || po.id?.substring(0, 8) || 'N/A'
+    header: l10n('purchaseOrder.orderNumber'),
+    align: undefined,
+    render: (po: PurchaseOrder) => po.orderNumber || po.id?.substring(0, 8) || 'N/A'
   },
   { 
     key: 'purchaseOrder.supplier',
-    label: (l10n: (key: string) => string) => l10n('purchaseOrder.supplier'),
-    align: undefined as 'left' | 'right' | 'center' | undefined,
-    render: (po: PurchaseOrder, context: ListingRenderContext) => context.getSupplierName(po.supplierId)
+    header: l10n('purchaseOrder.supplier'),
+    align: undefined,
+    render: (po: PurchaseOrder, context) => context?.getSupplierName(po.supplierId) || 'N/A'
   },
   { 
     key: 'purchaseOrder.status',
-    label: (l10n: (key: string) => string) => l10n('purchaseOrder.status'),
-    align: undefined as 'left' | 'right' | 'center' | undefined,
-    render: (po: PurchaseOrder, context: ListingRenderContext) => (
+    header: l10n('purchaseOrder.status'),
+    align: undefined,
+    render: (po: PurchaseOrder, context) => (
       <span 
         style={{ 
-          color: context.getStatusColor(po.status), 
+          color: context?.getStatusColor(po.status) || 'var(--color-text-primary)', 
           fontWeight: 600,
           padding: 'var(--spacing-xs) var(--spacing-sm)',
           borderRadius: 'var(--radius-sm)',
-          backgroundColor: context.getStatusColor(po.status) + '20',
+          backgroundColor: (context?.getStatusColor(po.status) || 'var(--color-text-primary)') + '20',
           fontSize: 'var(--font-size-sm)',
         }}
       >
-        {context.getStatusLabel(po.status)}
+        {context?.getStatusLabel(po.status) || po.status || 'N/A'}
       </span>
     )
   },
   { 
     key: 'purchaseOrder.orderDate',
-    label: (l10n: (key: string) => string) => l10n('purchaseOrder.orderDate'),
-    align: undefined as 'left' | 'right' | 'center' | undefined,
-    render: (po: PurchaseOrder, context: ListingRenderContext) => context.formatDate(po.orderDate)
+    header: l10n('purchaseOrder.orderDate'),
+    align: undefined,
+    render: (po: PurchaseOrder, context) => context?.formatDate(po.orderDate) || 'N/A'
   },
   { 
     key: 'purchaseOrder.expectedDeliveryDate',
-    label: (l10n: (key: string) => string) => l10n('purchaseOrder.expectedDeliveryDate'),
-    align: undefined as 'left' | 'right' | 'center' | undefined,
-    render: (po: PurchaseOrder, context: ListingRenderContext) => context.formatDate(po.expectedDeliveryDate)
+    header: l10n('purchaseOrder.expectedDeliveryDate'),
+    align: undefined,
+    render: (po: PurchaseOrder, context) => context?.formatDate(po.expectedDeliveryDate) || 'N/A'
   },
   { 
     key: 'purchaseOrder.total',
-    label: (l10n: (key: string) => string) => l10n('purchaseOrder.total'),
-    align: 'right' as const,
+    header: l10n('purchaseOrder.total'),
+    align: 'right',
     render: (po: PurchaseOrder) => `$${(po.total?.toFixed(2) || '0.00')}`
   },
   { 
     key: 'purchaseOrder.actions',
-    label: (l10n: (key: string) => string) => l10n('purchaseOrder.actions'),
-    align: 'center' as const,
-    render: (po: PurchaseOrder, context: ListingRenderContext) => (
+    header: l10n('purchaseOrder.actions'),
+    align: 'center',
+    render: (po: PurchaseOrder, context) => (
       <div style={{ display: 'flex', gap: 'var(--spacing-xs)', justifyContent: 'center' }}>
-        {context.onViewPO && (
+        {context?.onViewPO && (
           <AxButton variant="secondary" size="small" onClick={() => context.onViewPO!(po.id!)}>
             {context.l10n('purchaseOrder.view')}
           </AxButton>
         )}
-        {context.onEditPO && (
+        {context?.onEditPO && (
           <AxButton variant="secondary" size="small" onClick={() => context.onEditPO!(po.id!)}>
             {context.l10n('purchaseOrder.edit')}
           </AxButton>
         )}
-        <AxButton variant="danger" size="small" onClick={() => context.onDeleteClick(po)}>
-          {context.l10n('purchaseOrder.delete')}
+        <AxButton variant="danger" size="small" onClick={() => context?.onDeleteClick(po)}>
+          {context?.l10n('purchaseOrder.delete')}
         </AxButton>
       </div>
     )
@@ -162,6 +158,17 @@ export function PurchaseOrderListingPageRender(props: PurchaseOrderListingPageRe
   } = props;
   
   const { l10n } = useI18n();
+  const columns = createColumns(l10n);
+  const tableContext: ListingRenderContext = {
+    getSupplierName,
+    formatDate,
+    getStatusColor,
+    getStatusLabel,
+    onViewPO,
+    onEditPO,
+    onDeleteClick,
+    l10n,
+  };
 
   if (loading) {
     return (
@@ -287,48 +294,20 @@ export function PurchaseOrderListingPageRender(props: PurchaseOrderListingPageRe
       </HeaderCard>
 
       <TableCard padding="large" {...debugProps(COMPONENT_NAME, 'TableCard')}>
-        <div style={{ flex: 1, overflow: 'auto', minHeight: 0, height: 0, maxHeight: '100%' }}>
-          {filteredPOs.length === 0 ? (
-            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '200px' }}>
-              <AxParagraph>{l10n('purchaseOrder.noData')}</AxParagraph>
-            </div>
-          ) : (
-            <AxTable fullWidth stickyHeader>
-              <AxTableHead>
-                <AxTableRow>
-                  {LISTING_TABLE_COLUMNS.map((column) => (
-                    <AxTableHeader key={column.key} align={column.align}>
-                      {column.label(l10n)}
-                    </AxTableHeader>
-                  ))}
-                </AxTableRow>
-              </AxTableHead>
-              <AxTableBody>
-                {filteredPOs.map((po) => {
-                  const context: ListingRenderContext = {
-                    getSupplierName,
-                    formatDate,
-                    getStatusColor,
-                    getStatusLabel,
-                    onViewPO,
-                    onEditPO,
-                    onDeleteClick,
-                    l10n,
-                  };
-                  return (
-                    <AxTableRow key={po.id}>
-                      {LISTING_TABLE_COLUMNS.map((column) => (
-                        <AxTableCell key={column.key} align={column.align}>
-                          {column.render(po, context)}
-                        </AxTableCell>
-                      ))}
-                    </AxTableRow>
-                  );
-                })}
-              </AxTableBody>
-            </AxTable>
-          )}
-        </div>
+        {filteredPOs.length === 0 ? (
+          <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '200px' }}>
+            <AxParagraph>{l10n('purchaseOrder.noData')}</AxParagraph>
+          </div>
+        ) : (
+          <AxTable
+            fullWidth
+            stickyHeader
+            data={filteredPOs}
+            columns={columns}
+            context={tableContext}
+            getRowKey={(po) => po.id || ''}
+          />
+        )}
       </TableCard>
 
       <AxDialog
