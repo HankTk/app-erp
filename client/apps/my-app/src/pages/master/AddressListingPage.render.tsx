@@ -30,6 +30,77 @@ const COMPONENT_NAME = 'AddressListingPage';
 
 type DialogMode = 'add' | 'edit' | null;
 
+type ListingRenderContext = {
+  onEdit: (address: Address) => void;
+  onDeleteClick: (address: Address) => void;
+};
+
+const LISTING_TABLE_COLUMNS = [
+  { 
+    key: 'address.type',
+    label: 'Type',
+    align: undefined as 'left' | 'right' | 'center' | undefined,
+    render: (address: Address) => address.addressType 
+      ? address.addressType 
+      : <span style={{ color: 'var(--color-text-secondary)', fontStyle: 'italic' }}>Both</span>
+  },
+  { 
+    key: 'address.streetAddress',
+    label: 'Street Address',
+    align: undefined as 'left' | 'right' | 'center' | undefined,
+    render: (address: Address) => address.streetAddress1 || ''
+  },
+  { 
+    key: 'address.city',
+    label: 'City',
+    align: undefined as 'left' | 'right' | 'center' | undefined,
+    render: (address: Address) => address.city || ''
+  },
+  { 
+    key: 'address.state',
+    label: 'State',
+    align: undefined as 'left' | 'right' | 'center' | undefined,
+    render: (address: Address) => address.state || ''
+  },
+  { 
+    key: 'address.postalCode',
+    label: 'Postal Code',
+    align: undefined as 'left' | 'right' | 'center' | undefined,
+    render: (address: Address) => address.postalCode || ''
+  },
+  { 
+    key: 'address.country',
+    label: 'Country',
+    align: undefined as 'left' | 'right' | 'center' | undefined,
+    render: (address: Address) => address.country || ''
+  },
+  { 
+    key: 'address.actions',
+    label: 'Actions',
+    align: 'center' as const,
+    render: (address: Address, context: ListingRenderContext) => (
+      <div style={{ display: 'flex', gap: 'var(--spacing-sm)', justifyContent: 'center' }}>
+        <AxButton 
+          variant="secondary" 
+          size="small"
+          onClick={() => context.onEdit(address)}
+          style={{ minWidth: '80px' }}
+        >
+          Edit
+        </AxButton>
+        <AxButton 
+          variant="danger" 
+          size="small"
+          onClick={() => context.onDeleteClick(address)}
+          style={{ minWidth: '80px' }}
+        >
+          Delete
+        </AxButton>
+      </div>
+    )
+  },
+];
+
 interface AddressListingPageRenderProps {
   addresses: Address[];
   loading: boolean;
@@ -202,50 +273,29 @@ export function AddressListingPageRender(props: AddressListingPageRenderProps) {
             <AxTable fullWidth stickyHeader>
               <AxTableHead>
                 <AxTableRow>
-                  <AxTableHeader>Type</AxTableHeader>
-                  <AxTableHeader>Street Address</AxTableHeader>
-                  <AxTableHeader>City</AxTableHeader>
-                  <AxTableHeader>State</AxTableHeader>
-                  <AxTableHeader>Postal Code</AxTableHeader>
-                  <AxTableHeader>Country</AxTableHeader>
-                  <AxTableHeader align="center">Actions</AxTableHeader>
+                  {LISTING_TABLE_COLUMNS.map((column) => (
+                    <AxTableHeader key={column.key} align={column.align}>
+                      {column.label}
+                    </AxTableHeader>
+                  ))}
                 </AxTableRow>
               </AxTableHead>
               <AxTableBody>
-                {filteredAddresses.map((address) => (
-                  <AxTableRow key={address.id}>
-                    <AxTableCell>
-                      {address.addressType 
-                        ? address.addressType 
-                        : <span style={{ color: 'var(--color-text-secondary)', fontStyle: 'italic' }}>Both</span>}
-                    </AxTableCell>
-                    <AxTableCell>{address.streetAddress1 || ''}</AxTableCell>
-                    <AxTableCell>{address.city || ''}</AxTableCell>
-                    <AxTableCell>{address.state || ''}</AxTableCell>
-                    <AxTableCell>{address.postalCode || ''}</AxTableCell>
-                    <AxTableCell>{address.country || ''}</AxTableCell>
-                    <AxTableCell align="center">
-                      <div style={{ display: 'flex', gap: 'var(--spacing-sm)', justifyContent: 'center' }}>
-                        <AxButton 
-                          variant="secondary" 
-                          size="small"
-                          onClick={() => onEdit(address)}
-                          style={{ minWidth: '80px' }}
-                        >
-                          Edit
-                        </AxButton>
-                        <AxButton 
-                          variant="danger" 
-                          size="small"
-                          onClick={() => onDeleteClick(address)}
-                          style={{ minWidth: '80px' }}
-                        >
-                          Delete
-                        </AxButton>
-                      </div>
-                    </AxTableCell>
-                  </AxTableRow>
-                ))}
+                {filteredAddresses.map((address) => {
+                  const context: ListingRenderContext = {
+                    onEdit,
+                    onDeleteClick,
+                  };
+                  return (
+                    <AxTableRow key={address.id}>
+                      {LISTING_TABLE_COLUMNS.map((column) => (
+                        <AxTableCell key={column.key} align={column.align}>
+                          {column.render(address, context)}
+                        </AxTableCell>
+                      ))}
+                    </AxTableRow>
+                  );
+                })}
               </AxTableBody>
             </AxTable>
           )}

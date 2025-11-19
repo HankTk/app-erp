@@ -68,6 +68,82 @@ interface HistoryRecord {
   data?: Record<string, any>;
 }
 
+interface OrderItem {
+  id?: string;
+  productName?: string;
+  productCode?: string;
+  quantity?: number;
+  unitPrice?: number;
+  lineTotal?: number;
+}
+
+const INVOICE_ITEMS_TABLE_COLUMNS = [
+  { 
+    key: 'accountsReceivable.invoice.product',
+    align: undefined as 'left' | 'right' | 'center' | undefined,
+    render: (item: OrderItem) => item.productName || item.productCode || 'N/A'
+  },
+  { 
+    key: 'accountsReceivable.invoice.quantity',
+    align: 'right' as const,
+    render: (item: OrderItem) => item.quantity || 0
+  },
+  { 
+    key: 'accountsReceivable.invoice.unitPrice',
+    align: 'right' as const,
+    render: (item: OrderItem) => `$${(item.unitPrice?.toFixed(2) || '0.00')}`
+  },
+  { 
+    key: 'accountsReceivable.invoice.lineTotal',
+    align: 'right' as const,
+    render: (item: OrderItem) => `$${(item.lineTotal?.toFixed(2) || '0.00')}`
+  },
+];
+
+type HistoryRenderContext = {
+  formatDateTime: (dateString: string) => string;
+  getStepLabel: (step: string) => string;
+  getStatusLabel: (status?: string) => string;
+  getDataKeyLabel: (key: string) => string;
+  formatDataValue: (key: string, value: any) => string;
+};
+
+const HISTORY_TABLE_COLUMNS = [
+  { 
+    key: 'accountsReceivable.history.timestamp',
+    render: (record: HistoryRecord, context: HistoryRenderContext) => context.formatDateTime(record.timestamp)
+  },
+  { 
+    key: 'accountsReceivable.history.step',
+    render: (record: HistoryRecord, context: HistoryRenderContext) => context.getStepLabel(record.step)
+  },
+  { 
+    key: 'accountsReceivable.history.status',
+    render: (record: HistoryRecord, context: HistoryRenderContext) => context.getStatusLabel(record.status)
+  },
+  { 
+    key: 'accountsReceivable.history.note',
+    render: (record: HistoryRecord, _context: HistoryRenderContext) => record.note || 'N/A'
+  },
+  { 
+    key: 'accountsReceivable.history.data',
+    render: (record: HistoryRecord, context: HistoryRenderContext) => {
+      if (record.data && Object.keys(record.data).length > 0) {
+        return (
+          <DataContainer>
+            {Object.entries(record.data).map(([key, value]) => (
+              <DataItem key={key}>
+                <strong>{context.getDataKeyLabel(key)}:</strong> {context.formatDataValue(key, value)}
+              </DataItem>
+            ))}
+          </DataContainer>
+        );
+      }
+      return 'N/A';
+    }
+  },
+];
+
 interface AccountReceivableDetailPageRenderProps {
   // State
   currentStep: AccountReceivableStep;
@@ -295,19 +371,21 @@ export function AccountReceivableDetailPageRender(props: AccountReceivableDetail
                 <ItemsTable fullWidth>
                   <AxTableHead>
                     <AxTableRow>
-                      <AxTableHeader>Product</AxTableHeader>
-                      <AxTableHeader align="right">Quantity</AxTableHeader>
-                      <AxTableHeader align="right">Unit Price</AxTableHeader>
-                      <AxTableHeader align="right">Total</AxTableHeader>
+                      {INVOICE_ITEMS_TABLE_COLUMNS.map((column) => (
+                        <AxTableHeader key={column.key} align={column.align}>
+                          {l10n(column.key)}
+                        </AxTableHeader>
+                      ))}
                     </AxTableRow>
                   </AxTableHead>
                   <AxTableBody>
                     {order.items.map((item, index) => (
                       <AxTableRow key={index}>
-                        <AxTableCell>{item.productName || item.productCode || 'N/A'}</AxTableCell>
-                        <AxTableCell align="right">{item.quantity || 0}</AxTableCell>
-                        <AxTableCell align="right">${item.unitPrice?.toFixed(2) || '0.00'}</AxTableCell>
-                        <AxTableCell align="right">${item.lineTotal?.toFixed(2) || '0.00'}</AxTableCell>
+                        {INVOICE_ITEMS_TABLE_COLUMNS.map((column) => (
+                          <AxTableCell key={column.key} align={column.align}>
+                            {column.render(item)}
+                          </AxTableCell>
+                        ))}
                       </AxTableRow>
                     ))}
                   </AxTableBody>
@@ -456,33 +534,32 @@ export function AccountReceivableDetailPageRender(props: AccountReceivableDetail
                   <AxTable fullWidth>
                     <AxTableHead>
                       <AxTableRow>
-                        <AxTableHeader>Date / Time</AxTableHeader>
-                        <AxTableHeader>Step</AxTableHeader>
-                        <AxTableHeader>Status</AxTableHeader>
-                        <AxTableHeader>Notes</AxTableHeader>
-                        <AxTableHeader>Data</AxTableHeader>
+                        {HISTORY_TABLE_COLUMNS.map((column) => (
+                          <AxTableHeader key={column.key}>
+                            {l10n(column.key)}
+                          </AxTableHeader>
+                        ))}
                       </AxTableRow>
                     </AxTableHead>
                     <AxTableBody>
-                      {historyRecords.map((record, index) => (
-                        <AxTableRow key={index}>
-                          <AxTableCell>{formatDateTime(record.timestamp)}</AxTableCell>
-                          <AxTableCell>{getStepLabel(record.step)}</AxTableCell>
-                          <AxTableCell>{getStatusLabel(record.status)}</AxTableCell>
-                          <AxTableCell>{record.note || 'N/A'}</AxTableCell>
-                          <AxTableCell>
-                            {record.data && Object.keys(record.data).length > 0 ? (
-                              <DataContainer>
-                                {Object.entries(record.data).map(([key, value]) => (
-                                  <DataItem key={key}>
-                                    <strong>{getDataKeyLabel(key)}:</strong> {formatDataValue(key, value)}
-                                  </DataItem>
-                                ))}
-                              </DataContainer>
-                            ) : 'N/A'}
-                          </AxTableCell>
-                        </AxTableRow>
-                      ))}
+                      {historyRecords.map((record, index) => {
+                        const context: HistoryRenderContext = {
+                          formatDateTime,
+                          getStepLabel,
+                          getStatusLabel,
+                          getDataKeyLabel,
+                          formatDataValue,
+                        };
+                        return (
+                          <AxTableRow key={index}>
+                            {HISTORY_TABLE_COLUMNS.map((column) => (
+                              <AxTableCell key={column.key}>
+                                {column.render(record, context)}
+                              </AxTableCell>
+                            ))}
+                          </AxTableRow>
+                        );
+                      })}
                     </AxTableBody>
                   </AxTable>
                 </ScrollableContainer>

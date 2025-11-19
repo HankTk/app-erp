@@ -26,6 +26,114 @@ import {
 
 const COMPONENT_NAME = 'OrderListingPage';
 
+type ListingRenderContext = {
+  getCustomerName: (customerId?: string) => string;
+  formatDate: (dateString?: string) => string;
+  getStatusColor: (status?: string) => string;
+  getStatusBackgroundColor: (status?: string) => string;
+  getStatusLabel: (status?: string) => string;
+  onViewOrder?: (orderId: string) => void;
+  onEditOrder?: (orderId: string) => void;
+  onDeleteClick: (order: Order) => void;
+};
+
+const LISTING_TABLE_COLUMNS = [
+  { 
+    key: 'order.orderNumber',
+    label: 'Order Number',
+    align: undefined as 'left' | 'right' | 'center' | undefined,
+    render: (order: Order, context: ListingRenderContext) => order.orderNumber || order.id?.substring(0, 8) || 'N/A'
+  },
+  { 
+    key: 'order.customer',
+    label: 'Customer',
+    align: undefined as 'left' | 'right' | 'center' | undefined,
+    render: (order: Order, context: ListingRenderContext) => context.getCustomerName(order.customerId)
+  },
+  { 
+    key: 'order.status',
+    label: 'Status',
+    align: undefined as 'left' | 'right' | 'center' | undefined,
+    render: (order: Order, context: ListingRenderContext) => (
+      <span 
+        style={{ 
+          color: context.getStatusColor(order.status), 
+          fontWeight: 600,
+          padding: '4px 12px',
+          borderRadius: '12px',
+          backgroundColor: context.getStatusBackgroundColor(order.status),
+          display: 'inline-block',
+          fontSize: 'var(--font-size-sm)',
+        }}
+      >
+        {context.getStatusLabel(order.status)}
+      </span>
+    )
+  },
+  { 
+    key: 'order.orderDate',
+    label: 'Order Date',
+    align: undefined as 'left' | 'right' | 'center' | undefined,
+    render: (order: Order, context: ListingRenderContext) => context.formatDate(order.orderDate)
+  },
+  { 
+    key: 'order.shipDate',
+    label: 'Ship Date',
+    align: undefined as 'left' | 'right' | 'center' | undefined,
+    render: (order: Order, context: ListingRenderContext) => context.formatDate(order.shipDate)
+  },
+  { 
+    key: 'order.total',
+    label: 'Total',
+    align: 'right' as const,
+    render: (order: Order) => `$${(order.total?.toFixed(2) || '0.00')}`
+  },
+  { 
+    key: 'order.items',
+    label: 'Items',
+    align: 'center' as const,
+    render: (order: Order) => order.items?.length || 0
+  },
+  { 
+    key: 'order.actions',
+    label: 'Actions',
+    align: 'center' as const,
+    render: (order: Order, context: ListingRenderContext) => (
+      <div style={{ display: 'flex', gap: 'var(--spacing-sm)', justifyContent: 'center' }}>
+        {context.onViewOrder && (
+          <AxButton 
+            variant="secondary" 
+            size="small"
+            onClick={() => context.onViewOrder!(order.id!)}
+            style={{ minWidth: '80px' }}
+          >
+            View
+          </AxButton>
+        )}
+        {context.onEditOrder && (
+          <AxButton 
+            variant="secondary" 
+            size="small"
+            onClick={() => context.onEditOrder!(order.id!)}
+            disabled={order.status === 'PAID' || order.status === 'CANCELLED'}
+            style={{ minWidth: '80px' }}
+          >
+            Edit
+          </AxButton>
+        )}
+        <AxButton 
+          variant="danger" 
+          size="small"
+          onClick={() => context.onDeleteClick(order)}
+          style={{ minWidth: '80px' }}
+        >
+          Delete
+        </AxButton>
+      </div>
+    )
+  },
+];
+
 interface OrderListingPageRenderProps {
   orders: Order[];
   loading: boolean;
@@ -213,79 +321,35 @@ export function OrderListingPageRender(props: OrderListingPageRenderProps) {
             <AxTable fullWidth stickyHeader>
               <AxTableHead>
                 <AxTableRow>
-                  <AxTableHeader>Order Number</AxTableHeader>
-                  <AxTableHeader>Customer</AxTableHeader>
-                  <AxTableHeader>Status</AxTableHeader>
-                  <AxTableHeader>Order Date</AxTableHeader>
-                  <AxTableHeader>Ship Date</AxTableHeader>
-                  <AxTableHeader align="right">Total</AxTableHeader>
-                  <AxTableHeader align="center">Items</AxTableHeader>
-                  <AxTableHeader align="center">Actions</AxTableHeader>
+                  {LISTING_TABLE_COLUMNS.map((column) => (
+                    <AxTableHeader key={column.key} align={column.align}>
+                      {column.label}
+                    </AxTableHeader>
+                  ))}
                 </AxTableRow>
               </AxTableHead>
               <AxTableBody>
-                {filteredOrders.map((order) => (
-                  <AxTableRow key={order.id}>
-                    <AxTableCell>{order.orderNumber || order.id?.substring(0, 8) || 'N/A'}</AxTableCell>
-                    <AxTableCell>{getCustomerName(order.customerId)}</AxTableCell>
-                    <AxTableCell>
-                      <span 
-                        style={{ 
-                          color: getStatusColor(order.status), 
-                          fontWeight: 600,
-                          padding: '4px 12px',
-                          borderRadius: '12px',
-                          backgroundColor: getStatusBackgroundColor(order.status),
-                          display: 'inline-block',
-                          fontSize: 'var(--font-size-sm)',
-                        }}
-                      >
-                        {getStatusLabel(order.status)}
-                      </span>
-                    </AxTableCell>
-                    <AxTableCell>{formatDate(order.orderDate)}</AxTableCell>
-                    <AxTableCell>{formatDate(order.shipDate)}</AxTableCell>
-                    <AxTableCell align="right">
-                      ${order.total?.toFixed(2) || '0.00'}
-                    </AxTableCell>
-                    <AxTableCell align="center">
-                      {order.items?.length || 0}
-                    </AxTableCell>
-                    <AxTableCell align="center">
-                      <div style={{ display: 'flex', gap: 'var(--spacing-sm)', justifyContent: 'center' }}>
-                        {onViewOrder && (
-                          <AxButton 
-                            variant="secondary" 
-                            size="small"
-                            onClick={() => onViewOrder(order.id!)}
-                            style={{ minWidth: '80px' }}
-                          >
-                            View
-                          </AxButton>
-                        )}
-                        {onEditOrder && (
-                          <AxButton 
-                            variant="secondary" 
-                            size="small"
-                            onClick={() => onEditOrder(order.id!)}
-                            disabled={order.status === 'PAID' || order.status === 'CANCELLED'}
-                            style={{ minWidth: '80px' }}
-                          >
-                            Edit
-                          </AxButton>
-                        )}
-                        <AxButton 
-                          variant="danger" 
-                          size="small"
-                          onClick={() => onDeleteClick(order)}
-                          style={{ minWidth: '80px' }}
-                        >
-                          Delete
-                        </AxButton>
-                      </div>
-                    </AxTableCell>
-                  </AxTableRow>
-                ))}
+                {filteredOrders.map((order) => {
+                  const context: ListingRenderContext = {
+                    getCustomerName,
+                    formatDate,
+                    getStatusColor,
+                    getStatusBackgroundColor,
+                    getStatusLabel,
+                    onViewOrder,
+                    onEditOrder,
+                    onDeleteClick,
+                  };
+                  return (
+                    <AxTableRow key={order.id}>
+                      {LISTING_TABLE_COLUMNS.map((column) => (
+                        <AxTableCell key={column.key} align={column.align}>
+                          {column.render(order, context)}
+                        </AxTableCell>
+                      ))}
+                    </AxTableRow>
+                  );
+                })}
               </AxTableBody>
             </AxTable>
           )}

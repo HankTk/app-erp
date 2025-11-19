@@ -31,6 +31,67 @@ const COMPONENT_NAME = 'WarehouseListingPage';
 
 type DialogMode = 'add' | 'edit' | null;
 
+type ListingRenderContext = {
+  onEdit: (warehouse: Warehouse) => void;
+  onDelete: (warehouse: Warehouse) => void;
+  l10n: (key: string) => string;
+};
+
+const LISTING_TABLE_COLUMNS = [
+  { 
+    key: 'warehouse.warehouseCode',
+    label: (l10n: (key: string) => string) => l10n('inventory.warehouseCode'),
+    align: undefined as 'left' | 'right' | 'center' | undefined,
+    render: (warehouse: Warehouse) => warehouse.warehouseCode || '-'
+  },
+  { 
+    key: 'warehouse.warehouseName',
+    label: (l10n: (key: string) => string) => l10n('inventory.warehouseName'),
+    align: undefined as 'left' | 'right' | 'center' | undefined,
+    render: (warehouse: Warehouse) => warehouse.warehouseName || '-'
+  },
+  { 
+    key: 'warehouse.address',
+    label: (l10n: (key: string) => string) => l10n('inventory.address'),
+    align: undefined as 'left' | 'right' | 'center' | undefined,
+    render: (warehouse: Warehouse) => warehouse.address || '-'
+  },
+  { 
+    key: 'warehouse.status',
+    label: (l10n: (key: string) => string) => l10n('common.status'),
+    align: undefined as 'left' | 'right' | 'center' | undefined,
+    render: (warehouse: Warehouse, context: ListingRenderContext) => warehouse.active ? (
+      <span style={{ color: 'var(--color-success)' }}>{context.l10n('common.active')}</span>
+    ) : (
+      <span style={{ color: 'var(--color-text-secondary)' }}>{context.l10n('common.inactive')}</span>
+    )
+  },
+  { 
+    key: 'warehouse.actions',
+    label: (l10n: (key: string) => string) => l10n('common.actions'),
+    align: 'center' as const,
+    render: (warehouse: Warehouse, context: ListingRenderContext) => (
+      <>
+        <AxButton
+          variant="secondary"
+          size="small"
+          onClick={() => context.onEdit(warehouse)}
+          style={{ marginRight: 'var(--spacing-xs)' }}
+        >
+          {context.l10n('common.edit')}
+        </AxButton>
+        <AxButton
+          variant="danger"
+          size="small"
+          onClick={() => context.onDelete(warehouse)}
+        >
+          {context.l10n('common.delete')}
+        </AxButton>
+      </>
+    )
+  },
+];
+
 interface WarehouseListingPageRenderProps {
   warehouses: Warehouse[];
   loading: boolean;
@@ -194,45 +255,30 @@ export function WarehouseListingPageRender(props: WarehouseListingPageRenderProp
         <AxTable fullWidth variant="bordered">
           <AxTableHead>
             <AxTableRow>
-              <AxTableHeader>{l10n('inventory.warehouseCode')}</AxTableHeader>
-              <AxTableHeader>{l10n('inventory.warehouseName')}</AxTableHeader>
-              <AxTableHeader>{l10n('inventory.address')}</AxTableHeader>
-              <AxTableHeader>{l10n('common.status')}</AxTableHeader>
-              <AxTableHeader align="center">{l10n('common.actions')}</AxTableHeader>
+              {LISTING_TABLE_COLUMNS.map((column) => (
+                <AxTableHeader key={column.key} align={column.align}>
+                  {column.label(l10n)}
+                </AxTableHeader>
+              ))}
             </AxTableRow>
           </AxTableHead>
           <AxTableBody>
-            {warehouses.map((warehouse) => (
-              <AxTableRow key={warehouse.id}>
-                <AxTableCell>{warehouse.warehouseCode || '-'}</AxTableCell>
-                <AxTableCell>{warehouse.warehouseName || '-'}</AxTableCell>
-                <AxTableCell>{warehouse.address || '-'}</AxTableCell>
-                <AxTableCell>
-                  {warehouse.active ? (
-                    <span style={{ color: 'var(--color-success)' }}>{l10n('common.active')}</span>
-                  ) : (
-                    <span style={{ color: 'var(--color-text-secondary)' }}>{l10n('common.inactive')}</span>
-                  )}
-                </AxTableCell>
-                <AxTableCell align="center">
-                  <AxButton
-                    variant="secondary"
-                    size="small"
-                    onClick={() => onEdit(warehouse)}
-                    style={{ marginRight: 'var(--spacing-xs)' }}
-                  >
-                    {l10n('common.edit')}
-                  </AxButton>
-                  <AxButton
-                    variant="danger"
-                    size="small"
-                    onClick={() => onDelete(warehouse)}
-                  >
-                    {l10n('common.delete')}
-                  </AxButton>
-                </AxTableCell>
-              </AxTableRow>
-            ))}
+            {warehouses.map((warehouse) => {
+              const context: ListingRenderContext = {
+                onEdit,
+                onDelete,
+                l10n,
+              };
+              return (
+                <AxTableRow key={warehouse.id}>
+                  {LISTING_TABLE_COLUMNS.map((column) => (
+                    <AxTableCell key={column.key} align={column.align}>
+                      {column.render(warehouse, context)}
+                    </AxTableCell>
+                  ))}
+                </AxTableRow>
+              );
+            })}
           </AxTableBody>
         </AxTable>
       </TableCard>

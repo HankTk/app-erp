@@ -30,11 +30,94 @@ import {
   FormGroupNoMargin,
   TableContainer,
   LoadingContainer,
-  OutstandingCell,
   StatusBadge,
 } from './AccountPayableListingPage.styles';
 
 const COMPONENT_NAME = 'AccountPayableListingPage';
+
+type ListingRenderContext = {
+  getSupplierName: (supplierId?: string) => string;
+  formatDate: (dateString?: string) => string;
+  calculateOutstandingAmount: (invoice: PurchaseOrder) => number;
+  l10n: (key: string) => string;
+  onViewInvoice?: (prId: string) => void;
+};
+
+const LISTING_TABLE_COLUMNS = [
+  { 
+    key: 'accountsPayable.invoiceNumber',
+    align: undefined as 'left' | 'right' | 'center' | undefined,
+    render: (invoice: PurchaseOrder, context: ListingRenderContext) => invoice.invoiceNumber || 'N/A'
+  },
+  { 
+    key: 'accountsPayable.orderNumber',
+    align: undefined as 'left' | 'right' | 'center' | undefined,
+    render: (invoice: PurchaseOrder, context: ListingRenderContext) => invoice.orderNumber || invoice.id?.substring(0, 8) || 'N/A'
+  },
+  { 
+    key: 'accountsPayable.supplier',
+    align: undefined as 'left' | 'right' | 'center' | undefined,
+    render: (invoice: PurchaseOrder, context: ListingRenderContext) => context.getSupplierName(invoice.supplierId)
+  },
+  { 
+    key: 'accountsPayable.invoiceDate',
+    align: undefined as 'left' | 'right' | 'center' | undefined,
+    render: (invoice: PurchaseOrder, context: ListingRenderContext) => context.formatDate(invoice.invoiceDate)
+  },
+  { 
+    key: 'accountsPayable.dueDate',
+    align: undefined as 'left' | 'right' | 'center' | undefined,
+    render: (invoice: PurchaseOrder, context: ListingRenderContext) => context.formatDate(invoice.invoiceDate)
+  },
+  { 
+    key: 'accountsPayable.total',
+    align: 'right' as const,
+    render: (invoice: PurchaseOrder) => `$${(invoice.total?.toFixed(2) || '0.00')}`
+  },
+  { 
+    key: 'accountsPayable.paid',
+    align: 'right' as const,
+    render: (invoice: PurchaseOrder) => `$${((invoice.jsonData?.paymentAmount || 0).toFixed(2))}`
+  },
+  { 
+    key: 'accountsPayable.outstanding',
+    align: 'right' as const,
+    render: (invoice: PurchaseOrder, context: ListingRenderContext) => {
+      const outstanding = context.calculateOutstandingAmount(invoice);
+      return (
+        <span style={{
+          color: outstanding > 0 ? 'var(--color-warning)' : 'var(--color-success)',
+          fontWeight: outstanding > 0 ? 'var(--font-weight-bold)' : 'normal'
+        }}>
+          ${outstanding.toFixed(2)}
+        </span>
+      );
+    }
+  },
+  { 
+    key: 'accountsPayable.status',
+    align: undefined as 'left' | 'right' | 'center' | undefined,
+    render: (invoice: PurchaseOrder, context: ListingRenderContext) => (
+      <StatusBadge $status={invoice.status as 'PAID' | 'INVOICED'}>
+        {invoice.status === 'PAID' ? context.l10n('accountsPayable.status.paid') : context.l10n('accountsPayable.status.invoiced')}
+      </StatusBadge>
+    )
+  },
+  { 
+    key: 'accountsPayable.actions',
+    align: undefined as 'left' | 'right' | 'center' | undefined,
+    render: (invoice: PurchaseOrder, context: ListingRenderContext) => {
+      if (context.onViewInvoice && invoice.id) {
+        return (
+          <AxButton variant="secondary" size="small" onClick={() => context.onViewInvoice!(invoice.id!)}>
+            {context.l10n('accountsPayable.view')}
+          </AxButton>
+        );
+      }
+      return null;
+    }
+  },
+];
 
 interface AccountPayableListingPageRenderProps {
   invoices: PurchaseOrder[];
@@ -126,50 +209,29 @@ export function AccountPayableListingPageRender(props: AccountPayableListingPage
             <AxTable fullWidth stickyHeader>
             <AxTableHead>
               <AxTableRow>
-                <AxTableHeader>{l10n('accountsPayable.invoiceNumber')}</AxTableHeader>
-                <AxTableHeader>{l10n('accountsPayable.orderNumber')}</AxTableHeader>
-                <AxTableHeader>{l10n('accountsPayable.supplier')}</AxTableHeader>
-                <AxTableHeader>{l10n('accountsPayable.invoiceDate')}</AxTableHeader>
-                <AxTableHeader>{l10n('accountsPayable.dueDate')}</AxTableHeader>
-                <AxTableHeader align="right">{l10n('accountsPayable.total')}</AxTableHeader>
-                <AxTableHeader align="right">{l10n('accountsPayable.paid')}</AxTableHeader>
-                <AxTableHeader align="right">{l10n('accountsPayable.outstanding')}</AxTableHeader>
-                <AxTableHeader>{l10n('accountsPayable.status')}</AxTableHeader>
-                <AxTableHeader>{l10n('accountsPayable.actions')}</AxTableHeader>
+                {LISTING_TABLE_COLUMNS.map((column) => (
+                  <AxTableHeader key={column.key} align={column.align}>
+                    {l10n(column.key)}
+                  </AxTableHeader>
+                ))}
               </AxTableRow>
             </AxTableHead>
             <AxTableBody>
               {filteredInvoices.map((invoice) => {
-                const outstanding = calculateOutstandingAmount(invoice);
-                const paidAmount = invoice.jsonData?.paymentAmount || 0;
+                const context: ListingRenderContext = {
+                  getSupplierName,
+                  formatDate,
+                  calculateOutstandingAmount,
+                  l10n,
+                  onViewInvoice,
+                };
                 return (
                   <AxTableRow key={invoice.id}>
-                    <AxTableCell>{invoice.invoiceNumber || 'N/A'}</AxTableCell>
-                    <AxTableCell>{invoice.orderNumber || invoice.id?.substring(0, 8) || 'N/A'}</AxTableCell>
-                    <AxTableCell>{getSupplierName(invoice.supplierId)}</AxTableCell>
-                    <AxTableCell>{formatDate(invoice.invoiceDate)}</AxTableCell>
-                    <AxTableCell>{formatDate(invoice.invoiceDate)}</AxTableCell>
-                    <AxTableCell align="right">
-                      ${invoice.total?.toFixed(2) || '0.00'}
-                    </AxTableCell>
-                    <AxTableCell align="right">
-                      ${paidAmount.toFixed(2)}
-                    </AxTableCell>
-                    <OutstandingCell align="right" $outstanding={outstanding}>
-                      ${outstanding.toFixed(2)}
-                    </OutstandingCell>
-                    <AxTableCell>
-                      <StatusBadge $status={invoice.status as 'PAID' | 'INVOICED'}>
-                        {invoice.status === 'PAID' ? l10n('accountsPayable.status.paid') : l10n('accountsPayable.status.invoiced')}
-                      </StatusBadge>
-                    </AxTableCell>
-                    <AxTableCell>
-                      {onViewInvoice && invoice.id && (
-                        <AxButton variant="secondary" size="small" onClick={() => onViewInvoice(invoice.id!)}>
-                          {l10n('accountsPayable.view')}
-                        </AxButton>
-                      )}
-                    </AxTableCell>
+                    {LISTING_TABLE_COLUMNS.map((column) => (
+                      <AxTableCell key={column.key} align={column.align}>
+                        {column.render(invoice, context)}
+                      </AxTableCell>
+                    ))}
                   </AxTableRow>
                 );
               })}

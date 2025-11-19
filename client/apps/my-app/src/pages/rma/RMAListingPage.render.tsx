@@ -26,6 +26,131 @@ import {
 
 const COMPONENT_NAME = 'RMAListingPage';
 
+type ListingRenderContext = {
+  getCustomerName: (rma: RMA) => string;
+  formatDate: (dateString?: string) => string;
+  getStatusColor: (status?: string) => string;
+  getStatusBackgroundColor: (status?: string) => string;
+  getStatusLabel: (status?: string) => string;
+  onViewRMA?: (rmaId: string) => void;
+  onEditRMA?: (rmaId: string) => void;
+  onDeleteClick: (rma: RMA) => void;
+  onNavigateToShopFloorControl?: (rmaId: string) => void;
+};
+
+const LISTING_TABLE_COLUMNS = [
+  { 
+    key: 'rma.rmaNumber',
+    label: 'RMA Number',
+    align: undefined as 'left' | 'right' | 'center' | undefined,
+    render: (rma: RMA) => rma.rmaNumber || rma.id?.substring(0, 8) || 'N/A'
+  },
+  { 
+    key: 'rma.orderNumber',
+    label: 'Order Number',
+    align: undefined as 'left' | 'right' | 'center' | undefined,
+    render: (rma: RMA) => rma.orderNumber || 'N/A'
+  },
+  { 
+    key: 'rma.customer',
+    label: 'Customer',
+    align: undefined as 'left' | 'right' | 'center' | undefined,
+    render: (rma: RMA, context: ListingRenderContext) => context.getCustomerName(rma)
+  },
+  { 
+    key: 'rma.status',
+    label: 'Status',
+    align: undefined as 'left' | 'right' | 'center' | undefined,
+    render: (rma: RMA, context: ListingRenderContext) => (
+      <span 
+        style={{ 
+          color: context.getStatusColor(rma.status), 
+          fontWeight: 600,
+          padding: '4px 12px',
+          borderRadius: '12px',
+          backgroundColor: context.getStatusBackgroundColor(rma.status),
+          display: 'inline-block',
+          fontSize: 'var(--font-size-sm)',
+        }}
+      >
+        {context.getStatusLabel(rma.status)}
+      </span>
+    )
+  },
+  { 
+    key: 'rma.rmaDate',
+    label: 'RMA Date',
+    align: undefined as 'left' | 'right' | 'center' | undefined,
+    render: (rma: RMA, context: ListingRenderContext) => context.formatDate(rma.rmaDate)
+  },
+  { 
+    key: 'rma.receivedDate',
+    label: 'Received Date',
+    align: undefined as 'left' | 'right' | 'center' | undefined,
+    render: (rma: RMA, context: ListingRenderContext) => context.formatDate(rma.receivedDate)
+  },
+  { 
+    key: 'rma.total',
+    label: 'Total',
+    align: 'right' as const,
+    render: (rma: RMA) => `$${(rma.total?.toFixed(2) || '0.00')}`
+  },
+  { 
+    key: 'rma.items',
+    label: 'Items',
+    align: 'center' as const,
+    render: (rma: RMA) => rma.items?.length || 0
+  },
+  { 
+    key: 'rma.actions',
+    label: 'Actions',
+    align: 'center' as const,
+    render: (rma: RMA, context: ListingRenderContext) => (
+      <div style={{ display: 'flex', gap: 'var(--spacing-sm)', justifyContent: 'center', flexWrap: 'wrap' }}>
+        {context.onViewRMA && (
+          <AxButton 
+            variant="secondary" 
+            size="small"
+            onClick={() => context.onViewRMA!(rma.id!)}
+            style={{ minWidth: '80px' }}
+          >
+            View
+          </AxButton>
+        )}
+        {context.onEditRMA && (
+          <AxButton 
+            variant="secondary" 
+            size="small"
+            onClick={() => context.onEditRMA!(rma.id!)}
+            disabled={rma.status === 'PROCESSED' || rma.status === 'CANCELLED'}
+            style={{ minWidth: '80px' }}
+          >
+            Edit
+          </AxButton>
+        )}
+        {rma.id && context.onNavigateToShopFloorControl && (
+          <AxButton 
+            variant="primary" 
+            size="small"
+            onClick={() => context.onNavigateToShopFloorControl!(rma.id!)}
+            style={{ minWidth: 'auto', whiteSpace: 'nowrap' }}
+          >
+            Shop Floor
+          </AxButton>
+        )}
+        <AxButton 
+          variant="danger" 
+          size="small"
+          onClick={() => context.onDeleteClick(rma)}
+          style={{ minWidth: '80px' }}
+        >
+          Delete
+        </AxButton>
+      </div>
+    )
+  },
+];
+
 interface RMAListingPageRenderProps {
   rmas: RMA[];
   loading: boolean;
@@ -209,91 +334,36 @@ export function RMAListingPageRender(props: RMAListingPageRenderProps) {
             <AxTable fullWidth stickyHeader>
               <AxTableHead>
                 <AxTableRow>
-                  <AxTableHeader>RMA Number</AxTableHeader>
-                  <AxTableHeader>Order Number</AxTableHeader>
-                  <AxTableHeader>Customer</AxTableHeader>
-                  <AxTableHeader>Status</AxTableHeader>
-                  <AxTableHeader>RMA Date</AxTableHeader>
-                  <AxTableHeader>Received Date</AxTableHeader>
-                  <AxTableHeader align="right">Total</AxTableHeader>
-                  <AxTableHeader align="center">Items</AxTableHeader>
-                  <AxTableHeader align="center">Actions</AxTableHeader>
+                  {LISTING_TABLE_COLUMNS.map((column) => (
+                    <AxTableHeader key={column.key} align={column.align}>
+                      {column.label}
+                    </AxTableHeader>
+                  ))}
                 </AxTableRow>
               </AxTableHead>
               <AxTableBody>
-                {filteredRMAs.map((rma) => (
-                  <AxTableRow key={rma.id}>
-                    <AxTableCell>{rma.rmaNumber || rma.id?.substring(0, 8) || 'N/A'}</AxTableCell>
-                    <AxTableCell>{rma.orderNumber || 'N/A'}</AxTableCell>
-                    <AxTableCell>{getCustomerName(rma)}</AxTableCell>
-                    <AxTableCell>
-                      <span 
-                        style={{ 
-                          color: getStatusColor(rma.status), 
-                          fontWeight: 600,
-                          padding: '4px 12px',
-                          borderRadius: '12px',
-                          backgroundColor: getStatusBackgroundColor(rma.status),
-                          display: 'inline-block',
-                          fontSize: 'var(--font-size-sm)',
-                        }}
-                      >
-                        {getStatusLabel(rma.status)}
-                      </span>
-                    </AxTableCell>
-                    <AxTableCell>{formatDate(rma.rmaDate)}</AxTableCell>
-                    <AxTableCell>{formatDate(rma.receivedDate)}</AxTableCell>
-                    <AxTableCell align="right">
-                      ${rma.total?.toFixed(2) || '0.00'}
-                    </AxTableCell>
-                    <AxTableCell align="center">
-                      {rma.items?.length || 0}
-                    </AxTableCell>
-                    <AxTableCell align="center">
-                      <div style={{ display: 'flex', gap: 'var(--spacing-sm)', justifyContent: 'center', flexWrap: 'wrap' }}>
-                        {onViewRMA && (
-                          <AxButton 
-                            variant="secondary" 
-                            size="small"
-                            onClick={() => onViewRMA(rma.id!)}
-                            style={{ minWidth: '80px' }}
-                          >
-                            View
-                          </AxButton>
-                        )}
-                        {onEditRMA && (
-                          <AxButton 
-                            variant="secondary" 
-                            size="small"
-                            onClick={() => onEditRMA(rma.id!)}
-                            disabled={rma.status === 'PROCESSED' || rma.status === 'CANCELLED'}
-                            style={{ minWidth: '80px' }}
-                          >
-                            Edit
-                          </AxButton>
-                        )}
-                        {rma.id && onNavigateToShopFloorControl && (
-                          <AxButton 
-                            variant="primary" 
-                            size="small"
-                            onClick={() => onNavigateToShopFloorControl(rma.id!)}
-                            style={{ minWidth: 'auto', whiteSpace: 'nowrap' }}
-                          >
-                            Shop Floor
-                          </AxButton>
-                        )}
-                        <AxButton 
-                          variant="danger" 
-                          size="small"
-                          onClick={() => onDeleteClick(rma)}
-                          style={{ minWidth: '80px' }}
-                        >
-                          Delete
-                        </AxButton>
-                      </div>
-                    </AxTableCell>
-                  </AxTableRow>
-                ))}
+                {filteredRMAs.map((rma) => {
+                  const context: ListingRenderContext = {
+                    getCustomerName,
+                    formatDate,
+                    getStatusColor,
+                    getStatusBackgroundColor,
+                    getStatusLabel,
+                    onViewRMA,
+                    onEditRMA,
+                    onDeleteClick,
+                    onNavigateToShopFloorControl,
+                  };
+                  return (
+                    <AxTableRow key={rma.id}>
+                      {LISTING_TABLE_COLUMNS.map((column) => (
+                        <AxTableCell key={column.key} align={column.align}>
+                          {column.render(rma, context)}
+                        </AxTableCell>
+                      ))}
+                    </AxTableRow>
+                  );
+                })}
               </AxTableBody>
             </AxTable>
           )}

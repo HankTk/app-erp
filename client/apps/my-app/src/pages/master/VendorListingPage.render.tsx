@@ -33,6 +33,76 @@ const COMPONENT_NAME = 'VendorListingPage';
 
 type DialogMode = 'add' | 'edit' | null;
 
+type ListingRenderContext = {
+  onEdit: (vendor: Vendor) => void;
+  onDeleteClick: (vendor: Vendor) => void;
+  l10n: (key: string) => string;
+};
+
+const LISTING_TABLE_COLUMNS = [
+  { 
+    key: 'vendor.vendorNumber',
+    label: (l10n: (key: string) => string) => l10n('vendor.vendorNumber'),
+    align: undefined as 'left' | 'right' | 'center' | undefined,
+    render: (vendor: Vendor) => vendor.vendorNumber || ''
+  },
+  { 
+    key: 'vendor.companyName',
+    label: (l10n: (key: string) => string) => l10n('vendor.companyName'),
+    align: undefined as 'left' | 'right' | 'center' | undefined,
+    render: (vendor: Vendor) => vendor.companyName || ''
+  },
+  { 
+    key: 'vendor.firstName',
+    label: (l10n: (key: string) => string) => l10n('vendor.firstName'),
+    align: undefined as 'left' | 'right' | 'center' | undefined,
+    render: (vendor: Vendor) => vendor.firstName || ''
+  },
+  { 
+    key: 'vendor.lastName',
+    label: (l10n: (key: string) => string) => l10n('vendor.lastName'),
+    align: undefined as 'left' | 'right' | 'center' | undefined,
+    render: (vendor: Vendor) => vendor.lastName || ''
+  },
+  { 
+    key: 'vendor.email',
+    label: (l10n: (key: string) => string) => l10n('vendor.email'),
+    align: undefined as 'left' | 'right' | 'center' | undefined,
+    render: (vendor: Vendor) => vendor.email || ''
+  },
+  { 
+    key: 'vendor.phone',
+    label: (l10n: (key: string) => string) => l10n('vendor.phone'),
+    align: undefined as 'left' | 'right' | 'center' | undefined,
+    render: (vendor: Vendor) => vendor.phone || ''
+  },
+  { 
+    key: 'vendor.actions',
+    label: (l10n: (key: string) => string) => l10n('vendor.actions'),
+    align: 'center' as const,
+    render: (vendor: Vendor, context: ListingRenderContext) => (
+      <div style={{ display: 'flex', gap: 'var(--spacing-sm)', justifyContent: 'center' }}>
+        <AxButton 
+          variant="secondary" 
+          size="small"
+          onClick={() => context.onEdit(vendor)}
+          style={{ minWidth: '80px' }}
+        >
+          {context.l10n('vendor.edit')}
+        </AxButton>
+        <AxButton 
+          variant="danger" 
+          size="small"
+          onClick={() => context.onDeleteClick(vendor)}
+          style={{ minWidth: '80px' }}
+        >
+          {context.l10n('vendor.delete')}
+        </AxButton>
+      </div>
+    )
+  },
+];
+
 interface VendorListingPageRenderProps {
   vendors: Vendor[];
   addresses: Address[];
@@ -212,51 +282,33 @@ export function VendorListingPageRender(props: VendorListingPageRenderProps) {
             <AxTable fullWidth stickyHeader>
               <AxTableHead>
                 <AxTableRow>
-                  <AxTableHeader>{l10n('vendor.vendorNumber')}</AxTableHeader>
-                  <AxTableHeader>{l10n('vendor.companyName')}</AxTableHeader>
-                  <AxTableHeader>{l10n('vendor.firstName')}</AxTableHeader>
-                  <AxTableHeader>{l10n('vendor.lastName')}</AxTableHeader>
-                  <AxTableHeader>{l10n('vendor.email')}</AxTableHeader>
-                  <AxTableHeader>{l10n('vendor.phone')}</AxTableHeader>
-                  <AxTableHeader align="center">{l10n('vendor.actions')}</AxTableHeader>
+                  {LISTING_TABLE_COLUMNS.map((column) => (
+                    <AxTableHeader key={column.key} align={column.align}>
+                      {column.label(l10n)}
+                    </AxTableHeader>
+                  ))}
                 </AxTableRow>
               </AxTableHead>
               <AxTableBody>
                 {vendors.map((vendor) => {
                   const vendorAddresses = getVendorAddresses(vendor.id);
+                  const context: ListingRenderContext = {
+                    onEdit,
+                    onDeleteClick,
+                    l10n,
+                  };
                   return (
                     <Fragment key={vendor.id}>
                       <AxTableRow>
-                        <AxTableCell>{vendor.vendorNumber || ''}</AxTableCell>
-                        <AxTableCell>{vendor.companyName || ''}</AxTableCell>
-                        <AxTableCell>{vendor.firstName || ''}</AxTableCell>
-                        <AxTableCell>{vendor.lastName || ''}</AxTableCell>
-                        <AxTableCell>{vendor.email || ''}</AxTableCell>
-                        <AxTableCell>{vendor.phone || ''}</AxTableCell>
-                        <AxTableCell align="center">
-                          <div style={{ display: 'flex', gap: 'var(--spacing-sm)', justifyContent: 'center' }}>
-                            <AxButton 
-                              variant="secondary" 
-                              size="small"
-                              onClick={() => onEdit(vendor)}
-                              style={{ minWidth: '80px' }}
-                            >
-                              {l10n('vendor.edit')}
-                            </AxButton>
-                            <AxButton 
-                              variant="danger" 
-                              size="small"
-                              onClick={() => onDeleteClick(vendor)}
-                              style={{ minWidth: '80px' }}
-                            >
-                              {l10n('vendor.delete')}
-                            </AxButton>
-                          </div>
-                        </AxTableCell>
+                        {LISTING_TABLE_COLUMNS.map((column) => (
+                          <AxTableCell key={column.key} align={column.align}>
+                            {column.render(vendor, context)}
+                          </AxTableCell>
+                        ))}
                       </AxTableRow>
                       {vendorAddresses.length > 0 && (
                         <AxTableRow key={`${vendor.id}-addresses`}>
-                          <AxTableCell colSpan={7} style={{ paddingTop: 0, paddingBottom: 'var(--spacing-md)' }}>
+                          <AxTableCell colSpan={LISTING_TABLE_COLUMNS.length} style={{ paddingTop: 0, paddingBottom: 'var(--spacing-md)' }}>
                             <div style={{ paddingLeft: 'var(--spacing-md)', fontSize: 'var(--font-size-sm)', color: 'var(--color-text-secondary)' }}>
                               <strong style={{ color: 'var(--color-text-primary)', marginRight: 'var(--spacing-sm)' }}>Addresses:</strong>
                               {vendorAddresses.map((addr, index) => (

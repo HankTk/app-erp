@@ -30,6 +30,92 @@ const COMPONENT_NAME = 'ProductListingPage';
 
 type DialogMode = 'add' | 'edit' | null;
 
+type ListingRenderContext = {
+  onEdit: (product: Product) => void;
+  onDeleteClick: (product: Product) => void;
+};
+
+const LISTING_TABLE_COLUMNS = [
+  { 
+    key: 'product.productCode',
+    label: 'Product Code',
+    align: undefined as 'left' | 'right' | 'center' | undefined,
+    render: (product: Product) => product.productCode || ''
+  },
+  { 
+    key: 'product.productName',
+    label: 'Product Name',
+    align: undefined as 'left' | 'right' | 'center' | undefined,
+    render: (product: Product) => product.productName || ''
+  },
+  { 
+    key: 'product.description',
+    label: 'Description',
+    align: undefined as 'left' | 'right' | 'center' | undefined,
+    render: (product: Product) => product.description || ''
+  },
+  { 
+    key: 'product.unitPrice',
+    label: 'Unit Price',
+    align: 'right' as const,
+    render: (product: Product) => product.unitPrice !== undefined && product.unitPrice !== null 
+      ? `$${product.unitPrice.toFixed(2)}` 
+      : ''
+  },
+  { 
+    key: 'product.cost',
+    label: 'Cost',
+    align: 'right' as const,
+    render: (product: Product) => product.cost !== undefined && product.cost !== null 
+      ? `$${product.cost.toFixed(2)}` 
+      : '-'
+  },
+  { 
+    key: 'product.unitOfMeasure',
+    label: 'Unit of Measure',
+    align: undefined as 'left' | 'right' | 'center' | undefined,
+    render: (product: Product) => product.unitOfMeasure || ''
+  },
+  { 
+    key: 'product.active',
+    label: 'Active',
+    align: 'center' as const,
+    render: (product: Product) => (
+      <span style={{ 
+        color: product.active ? 'var(--color-success)' : 'var(--color-text-secondary)',
+        fontWeight: 500
+      }}>
+        {product.active ? 'Yes' : 'No'}
+      </span>
+    )
+  },
+  { 
+    key: 'product.actions',
+    label: 'Actions',
+    align: 'center' as const,
+    render: (product: Product, context: ListingRenderContext) => (
+      <div style={{ display: 'flex', gap: 'var(--spacing-sm)', justifyContent: 'center' }}>
+        <AxButton 
+          variant="secondary" 
+          size="small"
+          onClick={() => context.onEdit(product)}
+          style={{ minWidth: '80px' }}
+        >
+          Edit
+        </AxButton>
+        <AxButton 
+          variant="danger" 
+          size="small"
+          onClick={() => context.onDeleteClick(product)}
+          style={{ minWidth: '80px' }}
+        >
+          Delete
+        </AxButton>
+      </div>
+    )
+  },
+];
+
 interface ProductListingPageRenderProps {
   products: Product[];
   loading: boolean;
@@ -191,63 +277,29 @@ export function ProductListingPageRender(props: ProductListingPageRenderProps) {
             <AxTable fullWidth stickyHeader>
               <AxTableHead>
                 <AxTableRow>
-                  <AxTableHeader>Product Code</AxTableHeader>
-                  <AxTableHeader>Product Name</AxTableHeader>
-                  <AxTableHeader>Description</AxTableHeader>
-                  <AxTableHeader align="right">Unit Price</AxTableHeader>
-                  <AxTableHeader align="right">Cost</AxTableHeader>
-                  <AxTableHeader>Unit of Measure</AxTableHeader>
-                  <AxTableHeader align="center">Active</AxTableHeader>
-                  <AxTableHeader align="center">Actions</AxTableHeader>
+                  {LISTING_TABLE_COLUMNS.map((column) => (
+                    <AxTableHeader key={column.key} align={column.align}>
+                      {column.label}
+                    </AxTableHeader>
+                  ))}
                 </AxTableRow>
               </AxTableHead>
               <AxTableBody>
-                {products.map((product) => (
-                  <AxTableRow key={product.id}>
-                    <AxTableCell>{product.productCode || ''}</AxTableCell>
-                    <AxTableCell>{product.productName || ''}</AxTableCell>
-                    <AxTableCell>{product.description || ''}</AxTableCell>
-                    <AxTableCell align="right">
-                      {product.unitPrice !== undefined && product.unitPrice !== null 
-                        ? `$${product.unitPrice.toFixed(2)}` 
-                        : ''}
-                    </AxTableCell>
-                    <AxTableCell align="right">
-                      {product.cost !== undefined && product.cost !== null 
-                        ? `$${product.cost.toFixed(2)}` 
-                        : '-'}
-                    </AxTableCell>
-                    <AxTableCell>{product.unitOfMeasure || ''}</AxTableCell>
-                    <AxTableCell align="center">
-                      <span style={{ 
-                        color: product.active ? 'var(--color-success)' : 'var(--color-text-secondary)',
-                        fontWeight: 500
-                      }}>
-                        {product.active ? 'Yes' : 'No'}
-                      </span>
-                    </AxTableCell>
-                    <AxTableCell align="center">
-                      <div style={{ display: 'flex', gap: 'var(--spacing-sm)', justifyContent: 'center' }}>
-                        <AxButton 
-                          variant="secondary" 
-                          size="small"
-                          onClick={() => onEdit(product)}
-                          style={{ minWidth: '80px' }}
-                        >
-                          Edit
-                        </AxButton>
-                        <AxButton 
-                          variant="danger" 
-                          size="small"
-                          onClick={() => onDeleteClick(product)}
-                          style={{ minWidth: '80px' }}
-                        >
-                          Delete
-                        </AxButton>
-                      </div>
-                    </AxTableCell>
-                  </AxTableRow>
-                ))}
+                {products.map((product) => {
+                  const context: ListingRenderContext = {
+                    onEdit,
+                    onDeleteClick,
+                  };
+                  return (
+                    <AxTableRow key={product.id}>
+                      {LISTING_TABLE_COLUMNS.map((column) => (
+                        <AxTableCell key={column.key} align={column.align}>
+                          {column.render(product, context)}
+                        </AxTableCell>
+                      ))}
+                    </AxTableRow>
+                  );
+                })}
               </AxTableBody>
             </AxTable>
           )}

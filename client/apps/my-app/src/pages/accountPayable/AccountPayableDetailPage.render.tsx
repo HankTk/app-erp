@@ -37,6 +37,67 @@ const COMPONENT_NAME = 'AccountPayableDetailPage';
 
 type AccountPayableStep = 'invoice' | 'payment' | 'history';
 
+interface PurchaseOrderItem {
+  id?: string;
+  productName?: string;
+  productCode?: string;
+  productId?: string;
+  quantity?: number;
+  unitPrice?: number;
+  lineTotal?: number;
+}
+
+const INVOICE_ITEMS_TABLE_COLUMNS = [
+  { 
+    key: 'accountsPayable.invoice.product',
+    align: undefined as 'left' | 'right' | 'center' | undefined,
+    render: (item: PurchaseOrderItem) => item.productName || item.productCode || item.productId || 'N/A'
+  },
+  { 
+    key: 'accountsPayable.invoice.quantity',
+    align: undefined as 'left' | 'right' | 'center' | undefined,
+    render: (item: PurchaseOrderItem) => item.quantity || 0
+  },
+  { 
+    key: 'accountsPayable.invoice.unitPrice',
+    align: 'right' as const,
+    render: (item: PurchaseOrderItem) => `$${(item.unitPrice?.toFixed(2) || '0.00')}`
+  },
+  { 
+    key: 'accountsPayable.invoice.lineTotal',
+    align: 'right' as const,
+    render: (item: PurchaseOrderItem) => `$${(item.lineTotal?.toFixed(2) || '0.00')}`
+  },
+];
+
+const HISTORY_TABLE_COLUMNS = [
+  { 
+    key: 'accountsPayable.history.timestamp',
+    render: (record: HistoryRecord, formatDateTime: (dateString: string) => string, _l10n: (key: string) => string) => formatDateTime(record.timestamp)
+  },
+  { 
+    key: 'accountsPayable.history.step',
+    render: (record: HistoryRecord, _formatDateTime: (dateString: string) => string, l10n: (key: string) => string) => {
+      return record.step === 'invoicing' ? l10n('accountsPayable.history.step.invoicing') :
+             record.step === 'payment' ? l10n('accountsPayable.history.step.payment') :
+             record.step === 'status_change' ? l10n('accountsPayable.history.step.statusChange') :
+             record.step;
+    }
+  },
+  { 
+    key: 'accountsPayable.history.status',
+    render: (record: HistoryRecord, _formatDateTime: (dateString: string) => string, l10n: (key: string) => string) => {
+      return record.status === 'INVOICED' ? l10n('accountsPayable.history.status.invoiced') :
+             record.status === 'PAID' ? l10n('accountsPayable.history.status.paid') :
+             record.status;
+    }
+  },
+  { 
+    key: 'accountsPayable.history.note',
+    render: (record: HistoryRecord, _formatDateTime: (dateString: string) => string, _l10n: (key: string) => string) => record.note || '-'
+  },
+];
+
 interface HistoryRecord {
   step: string;
   status: string;
@@ -260,19 +321,21 @@ export function AccountPayableDetailPageRender(props: AccountPayableDetailPageRe
                     <AxTable fullWidth>
                       <AxTableHead>
                         <AxTableRow>
-                          <AxTableHeader>{l10n('accountsPayable.invoice.product')}</AxTableHeader>
-                          <AxTableHeader>{l10n('accountsPayable.invoice.quantity')}</AxTableHeader>
-                          <AxTableHeader align="right">{l10n('accountsPayable.invoice.unitPrice')}</AxTableHeader>
-                          <AxTableHeader align="right">{l10n('accountsPayable.invoice.lineTotal')}</AxTableHeader>
+                          {INVOICE_ITEMS_TABLE_COLUMNS.map((column) => (
+                            <AxTableHeader key={column.key} align={column.align}>
+                              {l10n(column.key)}
+                            </AxTableHeader>
+                          ))}
                         </AxTableRow>
                       </AxTableHead>
                       <AxTableBody>
                         {po.items.map((item) => (
                           <AxTableRow key={item.id}>
-                            <AxTableCell>{item.productName || item.productCode || item.productId || 'N/A'}</AxTableCell>
-                            <AxTableCell>{item.quantity || 0}</AxTableCell>
-                            <AxTableCell align="right">${item.unitPrice?.toFixed(2) || '0.00'}</AxTableCell>
-                            <AxTableCell align="right">${item.lineTotal?.toFixed(2) || '0.00'}</AxTableCell>
+                            {INVOICE_ITEMS_TABLE_COLUMNS.map((column) => (
+                              <AxTableCell key={column.key} align={column.align}>
+                                {column.render(item)}
+                              </AxTableCell>
+                            ))}
                           </AxTableRow>
                         ))}
                       </AxTableBody>
@@ -416,28 +479,21 @@ export function AccountPayableDetailPageRender(props: AccountPayableDetailPageRe
                   <AxTable fullWidth>
                     <AxTableHead>
                       <AxTableRow>
-                        <AxTableHeader>{l10n('accountsPayable.history.timestamp')}</AxTableHeader>
-                        <AxTableHeader>{l10n('accountsPayable.history.step')}</AxTableHeader>
-                        <AxTableHeader>{l10n('accountsPayable.history.status')}</AxTableHeader>
-                        <AxTableHeader>{l10n('accountsPayable.history.note')}</AxTableHeader>
+                        {HISTORY_TABLE_COLUMNS.map((column) => (
+                          <AxTableHeader key={column.key}>
+                            {l10n(column.key)}
+                          </AxTableHeader>
+                        ))}
                       </AxTableRow>
                     </AxTableHead>
                     <AxTableBody>
                       {historyRecords.map((record, index) => (
                         <AxTableRow key={index}>
-                          <AxTableCell>{formatDateTime(record.timestamp)}</AxTableCell>
-                          <AxTableCell>
-                            {record.step === 'invoicing' ? l10n('accountsPayable.history.step.invoicing') :
-                             record.step === 'payment' ? l10n('accountsPayable.history.step.payment') :
-                             record.step === 'status_change' ? l10n('accountsPayable.history.step.statusChange') :
-                             record.step}
-                          </AxTableCell>
-                          <AxTableCell>
-                            {record.status === 'INVOICED' ? l10n('accountsPayable.history.status.invoiced') :
-                             record.status === 'PAID' ? l10n('accountsPayable.history.status.paid') :
-                             record.status}
-                          </AxTableCell>
-                          <AxTableCell>{record.note || '-'}</AxTableCell>
+                          {HISTORY_TABLE_COLUMNS.map((column) => (
+                            <AxTableCell key={column.key}>
+                              {column.render(record, formatDateTime, l10n)}
+                            </AxTableCell>
+                          ))}
                         </AxTableRow>
                       ))}
                     </AxTableBody>

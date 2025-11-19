@@ -27,6 +27,91 @@ import {
 
 const COMPONENT_NAME = 'PurchaseOrderListingPage';
 
+type ListingRenderContext = {
+  getSupplierName: (supplierId?: string) => string;
+  formatDate: (dateString?: string) => string;
+  getStatusColor: (status?: string) => string;
+  getStatusLabel: (status?: string) => string;
+  onViewPO?: (poId: string) => void;
+  onEditPO?: (poId: string) => void;
+  onDeleteClick: (po: PurchaseOrder) => void;
+  l10n: (key: string) => string;
+};
+
+const LISTING_TABLE_COLUMNS = [
+  { 
+    key: 'purchaseOrder.orderNumber',
+    label: (l10n: (key: string) => string) => l10n('purchaseOrder.orderNumber'),
+    align: undefined as 'left' | 'right' | 'center' | undefined,
+    render: (po: PurchaseOrder, context: ListingRenderContext) => po.orderNumber || po.id?.substring(0, 8) || 'N/A'
+  },
+  { 
+    key: 'purchaseOrder.supplier',
+    label: (l10n: (key: string) => string) => l10n('purchaseOrder.supplier'),
+    align: undefined as 'left' | 'right' | 'center' | undefined,
+    render: (po: PurchaseOrder, context: ListingRenderContext) => context.getSupplierName(po.supplierId)
+  },
+  { 
+    key: 'purchaseOrder.status',
+    label: (l10n: (key: string) => string) => l10n('purchaseOrder.status'),
+    align: undefined as 'left' | 'right' | 'center' | undefined,
+    render: (po: PurchaseOrder, context: ListingRenderContext) => (
+      <span 
+        style={{ 
+          color: context.getStatusColor(po.status), 
+          fontWeight: 600,
+          padding: 'var(--spacing-xs) var(--spacing-sm)',
+          borderRadius: 'var(--radius-sm)',
+          backgroundColor: context.getStatusColor(po.status) + '20',
+          fontSize: 'var(--font-size-sm)',
+        }}
+      >
+        {context.getStatusLabel(po.status)}
+      </span>
+    )
+  },
+  { 
+    key: 'purchaseOrder.orderDate',
+    label: (l10n: (key: string) => string) => l10n('purchaseOrder.orderDate'),
+    align: undefined as 'left' | 'right' | 'center' | undefined,
+    render: (po: PurchaseOrder, context: ListingRenderContext) => context.formatDate(po.orderDate)
+  },
+  { 
+    key: 'purchaseOrder.expectedDeliveryDate',
+    label: (l10n: (key: string) => string) => l10n('purchaseOrder.expectedDeliveryDate'),
+    align: undefined as 'left' | 'right' | 'center' | undefined,
+    render: (po: PurchaseOrder, context: ListingRenderContext) => context.formatDate(po.expectedDeliveryDate)
+  },
+  { 
+    key: 'purchaseOrder.total',
+    label: (l10n: (key: string) => string) => l10n('purchaseOrder.total'),
+    align: 'right' as const,
+    render: (po: PurchaseOrder) => `$${(po.total?.toFixed(2) || '0.00')}`
+  },
+  { 
+    key: 'purchaseOrder.actions',
+    label: (l10n: (key: string) => string) => l10n('purchaseOrder.actions'),
+    align: 'center' as const,
+    render: (po: PurchaseOrder, context: ListingRenderContext) => (
+      <div style={{ display: 'flex', gap: 'var(--spacing-xs)', justifyContent: 'center' }}>
+        {context.onViewPO && (
+          <AxButton variant="secondary" size="small" onClick={() => context.onViewPO!(po.id!)}>
+            {context.l10n('purchaseOrder.view')}
+          </AxButton>
+        )}
+        {context.onEditPO && (
+          <AxButton variant="secondary" size="small" onClick={() => context.onEditPO!(po.id!)}>
+            {context.l10n('purchaseOrder.edit')}
+          </AxButton>
+        )}
+        <AxButton variant="danger" size="small" onClick={() => context.onDeleteClick(po)}>
+          {context.l10n('purchaseOrder.delete')}
+        </AxButton>
+      </div>
+    )
+  },
+];
+
 interface PurchaseOrderListingPageRenderProps {
   pos: PurchaseOrder[];
   loading: boolean;
@@ -211,58 +296,35 @@ export function PurchaseOrderListingPageRender(props: PurchaseOrderListingPageRe
             <AxTable fullWidth stickyHeader>
               <AxTableHead>
                 <AxTableRow>
-                  <AxTableHeader>{l10n('purchaseOrder.orderNumber')}</AxTableHeader>
-                  <AxTableHeader>{l10n('purchaseOrder.supplier')}</AxTableHeader>
-                  <AxTableHeader>{l10n('purchaseOrder.status')}</AxTableHeader>
-                  <AxTableHeader>{l10n('purchaseOrder.orderDate')}</AxTableHeader>
-                  <AxTableHeader>{l10n('purchaseOrder.expectedDeliveryDate')}</AxTableHeader>
-                  <AxTableHeader align="right">{l10n('purchaseOrder.total')}</AxTableHeader>
-                  <AxTableHeader align="center">{l10n('purchaseOrder.actions')}</AxTableHeader>
+                  {LISTING_TABLE_COLUMNS.map((column) => (
+                    <AxTableHeader key={column.key} align={column.align}>
+                      {column.label(l10n)}
+                    </AxTableHeader>
+                  ))}
                 </AxTableRow>
               </AxTableHead>
               <AxTableBody>
-                {filteredPOs.map((po) => (
-                  <AxTableRow key={po.id}>
-                    <AxTableCell>{po.orderNumber || po.id?.substring(0, 8) || 'N/A'}</AxTableCell>
-                    <AxTableCell>{getSupplierName(po.supplierId)}</AxTableCell>
-                    <AxTableCell>
-                      <span 
-                        style={{ 
-                          color: getStatusColor(po.status), 
-                          fontWeight: 600,
-                          padding: 'var(--spacing-xs) var(--spacing-sm)',
-                          borderRadius: 'var(--radius-sm)',
-                          backgroundColor: getStatusColor(po.status) + '20',
-                          fontSize: 'var(--font-size-sm)',
-                        }}
-                      >
-                        {getStatusLabel(po.status)}
-                      </span>
-                    </AxTableCell>
-                    <AxTableCell>{formatDate(po.orderDate)}</AxTableCell>
-                    <AxTableCell>{formatDate(po.expectedDeliveryDate)}</AxTableCell>
-                    <AxTableCell align="right">
-                      ${po.total?.toFixed(2) || '0.00'}
-                    </AxTableCell>
-                    <AxTableCell align="center">
-                      <div style={{ display: 'flex', gap: 'var(--spacing-xs)', justifyContent: 'center' }}>
-                        {onViewPO && (
-                          <AxButton variant="secondary" size="small" onClick={() => onViewPO(po.id!)}>
-                            {l10n('purchaseOrder.view')}
-                          </AxButton>
-                        )}
-                        {onEditPO && (
-                          <AxButton variant="secondary" size="small" onClick={() => onEditPO(po.id!)}>
-                            {l10n('purchaseOrder.edit')}
-                          </AxButton>
-                        )}
-                        <AxButton variant="danger" size="small" onClick={() => onDeleteClick(po)}>
-                          {l10n('purchaseOrder.delete')}
-                        </AxButton>
-                      </div>
-                    </AxTableCell>
-                  </AxTableRow>
-                ))}
+                {filteredPOs.map((po) => {
+                  const context: ListingRenderContext = {
+                    getSupplierName,
+                    formatDate,
+                    getStatusColor,
+                    getStatusLabel,
+                    onViewPO,
+                    onEditPO,
+                    onDeleteClick,
+                    l10n,
+                  };
+                  return (
+                    <AxTableRow key={po.id}>
+                      {LISTING_TABLE_COLUMNS.map((column) => (
+                        <AxTableCell key={column.key} align={column.align}>
+                          {column.render(po, context)}
+                        </AxTableCell>
+                      ))}
+                    </AxTableRow>
+                  );
+                })}
               </AxTableBody>
             </AxTable>
           )}

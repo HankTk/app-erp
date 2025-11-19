@@ -25,6 +25,117 @@ import {
 
 const COMPONENT_NAME = 'AccountReceivableListingPage';
 
+type ListingRenderContext = {
+  getCustomerName: (customerId?: string) => string;
+  formatDate: (dateString?: string) => string;
+  calculateOutstandingAmount: (invoice: Order) => number;
+  getStatusColor: (status?: string) => string;
+  getStatusBackgroundColor: (status?: string) => string;
+  getStatusLabel: (status?: string) => string;
+  onViewInvoice?: (orderId: string) => void;
+};
+
+const LISTING_TABLE_COLUMNS = [
+  { 
+    key: 'accountsReceivable.invoiceNumber',
+    label: 'Invoice Number',
+    align: undefined as 'left' | 'right' | 'center' | undefined,
+    render: (invoice: Order, context: ListingRenderContext) => invoice.invoiceNumber || 'N/A'
+  },
+  { 
+    key: 'accountsReceivable.orderNumber',
+    label: 'Order Number',
+    align: undefined as 'left' | 'right' | 'center' | undefined,
+    render: (invoice: Order, context: ListingRenderContext) => invoice.orderNumber || invoice.id?.substring(0, 8) || 'N/A'
+  },
+  { 
+    key: 'accountsReceivable.customer',
+    label: 'Customer',
+    align: undefined as 'left' | 'right' | 'center' | undefined,
+    render: (invoice: Order, context: ListingRenderContext) => context.getCustomerName(invoice.customerId)
+  },
+  { 
+    key: 'accountsReceivable.invoiceDate',
+    label: 'Invoice Date',
+    align: undefined as 'left' | 'right' | 'center' | undefined,
+    render: (invoice: Order, context: ListingRenderContext) => context.formatDate(invoice.invoiceDate)
+  },
+  { 
+    key: 'accountsReceivable.dueDate',
+    label: 'Due Date',
+    align: undefined as 'left' | 'right' | 'center' | undefined,
+    render: (invoice: Order, context: ListingRenderContext) => context.formatDate(invoice.invoiceDate)
+  },
+  { 
+    key: 'accountsReceivable.invoiceAmount',
+    label: 'Invoice Amount',
+    align: 'right' as const,
+    render: (invoice: Order) => `$${(invoice.total?.toFixed(2) || '0.00')}`
+  },
+  { 
+    key: 'accountsReceivable.paidAmount',
+    label: 'Paid Amount',
+    align: 'right' as const,
+    render: (invoice: Order) => `$${((invoice.jsonData?.paymentAmount || 0).toFixed(2))}`
+  },
+  { 
+    key: 'accountsReceivable.outstanding',
+    label: 'Outstanding',
+    align: 'right' as const,
+    render: (invoice: Order, context: ListingRenderContext) => {
+      const outstanding = context.calculateOutstandingAmount(invoice);
+      return (
+        <span style={{ 
+          color: outstanding > 0 ? 'var(--color-warning)' : 'var(--color-success)',
+          fontWeight: outstanding > 0 ? 'var(--font-weight-bold)' : 'normal'
+        }}>
+          ${outstanding.toFixed(2)}
+        </span>
+      );
+    }
+  },
+  { 
+    key: 'accountsReceivable.status',
+    label: 'Status',
+    align: undefined as 'left' | 'right' | 'center' | undefined,
+    render: (invoice: Order, context: ListingRenderContext) => (
+      <span 
+        style={{ 
+          color: context.getStatusColor(invoice.status), 
+          fontWeight: 600,
+          padding: '4px 12px',
+          borderRadius: '12px',
+          backgroundColor: context.getStatusBackgroundColor(invoice.status),
+          display: 'inline-block',
+          fontSize: 'var(--font-size-sm)',
+        }}
+      >
+        {context.getStatusLabel(invoice.status)}
+      </span>
+    )
+  },
+  { 
+    key: 'accountsReceivable.actions',
+    label: 'Actions',
+    align: 'center' as const,
+    render: (invoice: Order, context: ListingRenderContext) => {
+      if (context.onViewInvoice && invoice.id) {
+        return (
+          <AxButton 
+            variant="secondary" 
+            size="small"
+            onClick={() => context.onViewInvoice!(invoice.id!)}
+            style={{ minWidth: '80px' }}
+          >
+            View
+          </AxButton>
+        );
+      }
+      return null;
+    }
+  },
+];
+
 interface AccountReceivableListingPageRenderProps {
   invoices: Order[];
   loading: boolean;
@@ -187,68 +298,31 @@ export function AccountReceivableListingPageRender(props: AccountReceivableListi
             <AxTable fullWidth stickyHeader>
               <AxTableHead>
                 <AxTableRow>
-                  <AxTableHeader>Invoice Number</AxTableHeader>
-                  <AxTableHeader>Order Number</AxTableHeader>
-                  <AxTableHeader>Customer</AxTableHeader>
-                  <AxTableHeader>Invoice Date</AxTableHeader>
-                  <AxTableHeader>Due Date</AxTableHeader>
-                  <AxTableHeader align="right">Invoice Amount</AxTableHeader>
-                  <AxTableHeader align="right">Paid Amount</AxTableHeader>
-                  <AxTableHeader align="right">Outstanding</AxTableHeader>
-                  <AxTableHeader>Status</AxTableHeader>
-                  <AxTableHeader align="center">Actions</AxTableHeader>
+                  {LISTING_TABLE_COLUMNS.map((column) => (
+                    <AxTableHeader key={column.key} align={column.align}>
+                      {column.label}
+                    </AxTableHeader>
+                  ))}
                 </AxTableRow>
               </AxTableHead>
               <AxTableBody>
                 {filteredInvoices.map((invoice) => {
-                  const outstanding = calculateOutstandingAmount(invoice);
-                  const paidAmount = invoice.jsonData?.paymentAmount || 0;
+                  const context: ListingRenderContext = {
+                    getCustomerName,
+                    formatDate,
+                    calculateOutstandingAmount,
+                    getStatusColor,
+                    getStatusBackgroundColor,
+                    getStatusLabel,
+                    onViewInvoice,
+                  };
                   return (
                     <AxTableRow key={invoice.id}>
-                      <AxTableCell>{invoice.invoiceNumber || 'N/A'}</AxTableCell>
-                      <AxTableCell>{invoice.orderNumber || invoice.id?.substring(0, 8) || 'N/A'}</AxTableCell>
-                      <AxTableCell>{getCustomerName(invoice.customerId)}</AxTableCell>
-                      <AxTableCell>{formatDate(invoice.invoiceDate)}</AxTableCell>
-                      <AxTableCell>{formatDate(invoice.invoiceDate)}</AxTableCell>
-                      <AxTableCell align="right">
-                        ${invoice.total?.toFixed(2) || '0.00'}
-                      </AxTableCell>
-                      <AxTableCell align="right">
-                        ${paidAmount.toFixed(2)}
-                      </AxTableCell>
-                      <AxTableCell align="right" style={{ 
-                        color: outstanding > 0 ? 'var(--color-warning)' : 'var(--color-success)',
-                        fontWeight: outstanding > 0 ? 'var(--font-weight-bold)' : 'normal'
-                      }}>
-                        ${outstanding.toFixed(2)}
-                      </AxTableCell>
-                      <AxTableCell>
-                        <span 
-                          style={{ 
-                            color: getStatusColor(invoice.status), 
-                            fontWeight: 600,
-                            padding: '4px 12px',
-                            borderRadius: '12px',
-                            backgroundColor: getStatusBackgroundColor(invoice.status),
-                            display: 'inline-block',
-                            fontSize: 'var(--font-size-sm)',
-                          }}
-                        >
-                          {getStatusLabel(invoice.status)}
-                        </span>
-                      </AxTableCell>
-                      <AxTableCell align="center">
-                        {onViewInvoice && invoice.id && (
-                          <AxButton 
-                            variant="secondary" 
-                            size="small"
-                            onClick={() => onViewInvoice(invoice.id!)}
-                            style={{ minWidth: '80px' }}
-                          >
-                            View
-                          </AxButton>
-                        )}
-                      </AxTableCell>
+                      {LISTING_TABLE_COLUMNS.map((column) => (
+                        <AxTableCell key={column.key} align={column.align}>
+                          {column.render(invoice, context)}
+                        </AxTableCell>
+                      ))}
                     </AxTableRow>
                   );
                 })}

@@ -32,6 +32,75 @@ const COMPONENT_NAME = 'CustomerListingPage';
 
 type DialogMode = 'add' | 'edit' | null;
 
+type ListingRenderContext = {
+  onEdit: (customer: Customer) => void;
+  onDeleteClick: (customer: Customer) => void;
+};
+
+const LISTING_TABLE_COLUMNS = [
+  { 
+    key: 'customer.customerNumber',
+    label: 'Customer Number',
+    align: undefined as 'left' | 'right' | 'center' | undefined,
+    render: (customer: Customer) => customer.customerNumber || ''
+  },
+  { 
+    key: 'customer.companyName',
+    label: 'Company Name',
+    align: undefined as 'left' | 'right' | 'center' | undefined,
+    render: (customer: Customer) => customer.companyName || ''
+  },
+  { 
+    key: 'customer.firstName',
+    label: 'First Name',
+    align: undefined as 'left' | 'right' | 'center' | undefined,
+    render: (customer: Customer) => customer.firstName || ''
+  },
+  { 
+    key: 'customer.lastName',
+    label: 'Last Name',
+    align: undefined as 'left' | 'right' | 'center' | undefined,
+    render: (customer: Customer) => customer.lastName || ''
+  },
+  { 
+    key: 'customer.email',
+    label: 'Email',
+    align: undefined as 'left' | 'right' | 'center' | undefined,
+    render: (customer: Customer) => customer.email || ''
+  },
+  { 
+    key: 'customer.phone',
+    label: 'Phone',
+    align: undefined as 'left' | 'right' | 'center' | undefined,
+    render: (customer: Customer) => customer.phone || ''
+  },
+  { 
+    key: 'customer.actions',
+    label: 'Actions',
+    align: 'center' as const,
+    render: (customer: Customer, context: ListingRenderContext) => (
+      <div style={{ display: 'flex', gap: 'var(--spacing-sm)', justifyContent: 'center' }}>
+        <AxButton 
+          variant="secondary" 
+          size="small"
+          onClick={() => context.onEdit(customer)}
+          style={{ minWidth: '80px' }}
+        >
+          Edit
+        </AxButton>
+        <AxButton 
+          variant="danger" 
+          size="small"
+          onClick={() => context.onDeleteClick(customer)}
+          style={{ minWidth: '80px' }}
+        >
+          Delete
+        </AxButton>
+      </div>
+    )
+  },
+];
+
 interface CustomerListingPageRenderProps {
   customers: Customer[];
   addresses: Address[];
@@ -209,51 +278,32 @@ export function CustomerListingPageRender(props: CustomerListingPageRenderProps)
             <AxTable fullWidth stickyHeader>
               <AxTableHead>
                 <AxTableRow>
-                  <AxTableHeader>Customer Number</AxTableHeader>
-                  <AxTableHeader>Company Name</AxTableHeader>
-                  <AxTableHeader>First Name</AxTableHeader>
-                  <AxTableHeader>Last Name</AxTableHeader>
-                  <AxTableHeader>Email</AxTableHeader>
-                  <AxTableHeader>Phone</AxTableHeader>
-                  <AxTableHeader align="center">Actions</AxTableHeader>
+                  {LISTING_TABLE_COLUMNS.map((column) => (
+                    <AxTableHeader key={column.key} align={column.align}>
+                      {column.label}
+                    </AxTableHeader>
+                  ))}
                 </AxTableRow>
               </AxTableHead>
               <AxTableBody>
                 {customers.map((customer) => {
                   const customerAddresses = getCustomerAddresses(customer.id);
+                  const context: ListingRenderContext = {
+                    onEdit,
+                    onDeleteClick,
+                  };
                   return (
                     <Fragment key={customer.id}>
                       <AxTableRow>
-                        <AxTableCell>{customer.customerNumber || ''}</AxTableCell>
-                        <AxTableCell>{customer.companyName || ''}</AxTableCell>
-                        <AxTableCell>{customer.firstName || ''}</AxTableCell>
-                        <AxTableCell>{customer.lastName || ''}</AxTableCell>
-                        <AxTableCell>{customer.email || ''}</AxTableCell>
-                        <AxTableCell>{customer.phone || ''}</AxTableCell>
-                        <AxTableCell align="center">
-                          <div style={{ display: 'flex', gap: 'var(--spacing-sm)', justifyContent: 'center' }}>
-                            <AxButton 
-                              variant="secondary" 
-                              size="small"
-                              onClick={() => onEdit(customer)}
-                              style={{ minWidth: '80px' }}
-                            >
-                              Edit
-                            </AxButton>
-                            <AxButton 
-                              variant="danger" 
-                              size="small"
-                              onClick={() => onDeleteClick(customer)}
-                              style={{ minWidth: '80px' }}
-                            >
-                              Delete
-                            </AxButton>
-                          </div>
-                        </AxTableCell>
+                        {LISTING_TABLE_COLUMNS.map((column) => (
+                          <AxTableCell key={column.key} align={column.align}>
+                            {column.render(customer, context)}
+                          </AxTableCell>
+                        ))}
                       </AxTableRow>
                       {customerAddresses.length > 0 && (
                         <AxTableRow key={`${customer.id}-addresses`}>
-                          <AxTableCell colSpan={7} style={{ paddingTop: 0, paddingBottom: 'var(--spacing-md)' }}>
+                          <AxTableCell colSpan={LISTING_TABLE_COLUMNS.length} style={{ paddingTop: 0, paddingBottom: 'var(--spacing-md)' }}>
                             <div style={{ paddingLeft: 'var(--spacing-md)', fontSize: 'var(--font-size-sm)', color: 'var(--color-text-secondary)' }}>
                               <strong style={{ color: 'var(--color-text-primary)', marginRight: 'var(--spacing-sm)' }}>Addresses:</strong>
                               {customerAddresses.map((addr, index) => (
