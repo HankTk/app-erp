@@ -78,14 +78,14 @@ export function PurchaseOrderHistoryStepPageRender(props: PurchaseOrderHistorySt
         )}
       </div>
 
-      <AxParagraph style={{ marginBottom: 'var(--spacing-lg)', color: 'var(--color-text-secondary)' }}>
+      <AxParagraph marginBottom="lg" color="secondary">
         {l10n('purchaseOrderEntry.history.description')}
       </AxParagraph>
 
       {historyRecords.length === 0 ? (
         <EmptyState {...debugProps(COMPONENT_NAME, 'EmptyState')}>
           <AxParagraph>{l10n('purchaseOrderEntry.history.empty')}</AxParagraph>
-          <AxParagraph style={{ fontSize: 'var(--font-size-sm)', marginTop: 'var(--spacing-sm)' }}>
+          <AxParagraph size="sm" marginTop="sm">
             {l10n('purchaseOrderEntry.history.emptyDescription')}
           </AxParagraph>
         </EmptyState>

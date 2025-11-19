@@ -221,7 +221,7 @@ export function ShopFloorControlListingPageRender(props: ShopFloorControlListing
               <AxHeading3 style={{ marginBottom: 'var(--spacing-xs)' }}>
                 Shop Floor Control
               </AxHeading3>
-              <AxParagraph style={{ color: 'var(--color-text-secondary)' }}>
+              <AxParagraph color="secondary">
                 Manage shop floor control work orders
               </AxParagraph>
             </div>
@@ -254,7 +254,7 @@ export function ShopFloorControlListingPageRender(props: ShopFloorControlListing
           </div>
         ) : error ? (
           <div style={{ padding: 'var(--spacing-lg)', textAlign: 'center' }}>
-            <AxParagraph style={{ color: 'var(--color-danger)' }}>{error}</AxParagraph>
+            <AxParagraph color="danger">{error}</AxParagraph>
             <AxButton variant="secondary" onClick={onRetry} style={{ marginTop: 'var(--spacing-md)' }}>
               Retry
             </AxButton>
@@ -295,7 +295,7 @@ export function ShopFloorControlListingPageRender(props: ShopFloorControlListing
             
             {sfcs.length === 0 && rmasNeedingSFC.length === 0 && (
               <div style={{ padding: 'var(--spacing-lg)', textAlign: 'center' }}>
-                <AxParagraph style={{ color: 'var(--color-text-secondary)' }}>
+                <AxParagraph color="secondary">
                   No SFC records found. RMAs must be in APPROVED or RECEIVED status to create SFC records.
                 </AxParagraph>
               </div>

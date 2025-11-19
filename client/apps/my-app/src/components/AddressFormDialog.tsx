@@ -152,7 +152,7 @@ export function AddressFormDialog({
             fullWidth
             disabled={submitting}
           />
-          <AxParagraph style={{ marginTop: 'var(--spacing-xs)', color: 'var(--color-text-secondary)', fontSize: 'var(--font-size-sm)' }}>
+          <AxParagraph marginTop="xs" color="secondary" size="sm">
             Select "Both" to allow this address to be used for both shipping and billing. Leave as "Both" if not specified.
           </AxParagraph>
         </AxFormGroup>

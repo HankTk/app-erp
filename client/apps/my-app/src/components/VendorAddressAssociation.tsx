@@ -300,7 +300,7 @@ export function VendorAddressAssociation({ vendorId, onAddressesUpdated }: Vendo
               </AxButton>
             </div>
             {addressOptions.length === 0 && (
-              <AxParagraph style={{ marginTop: 'var(--spacing-xs)', color: 'var(--color-text-secondary)', fontSize: 'var(--font-size-sm)' }}>
+              <AxParagraph marginTop="xs" color="secondary" size="sm">
                 No addresses available to associate. Click ... to create a new address.
               </AxParagraph>
             )}
@@ -312,7 +312,7 @@ export function VendorAddressAssociation({ vendorId, onAddressesUpdated }: Vendo
         <AxHeading3 style={{ marginBottom: 'var(--spacing-sm)' }}>Associated Addresses</AxHeading3>
         {associatedAddresses.length === 0 ? (
           <AddressCard padding="medium">
-            <AxParagraph style={{ color: 'var(--color-text-secondary)', textAlign: 'center' }}>
+            <AxParagraph color="secondary" textAlign="center">
               No addresses associated with this vendor
             </AxParagraph>
           </AddressCard>
@@ -415,15 +415,15 @@ export function VendorAddressAssociation({ vendorId, onAddressesUpdated }: Vendo
           </div>
         }
       >
-        <AxParagraph style={{ marginBottom: 'var(--spacing-md)' }}>
+        <AxParagraph marginBottom="md">
           Are you sure you want to delete this address?
         </AxParagraph>
         {addressToDelete && (
-          <AxParagraph style={{ color: 'var(--color-text-secondary)', fontSize: 'var(--font-size-sm)', marginBottom: 'var(--spacing-md)' }}>
+          <AxParagraph color="secondary" size="sm" marginBottom="md">
             {formatAddress(addressToDelete)}
           </AxParagraph>
         )}
-        <AxParagraph style={{ color: 'var(--color-text-secondary)', fontSize: 'var(--font-size-sm)' }}>
+        <AxParagraph color="secondary" size="sm">
           This action cannot be undone. The address will be permanently deleted.
         </AxParagraph>
       </AxDialog>

@@ -8,6 +8,7 @@ import {
   AxInput,
   ColumnDefinition,
 } from '@ui/components';
+import { useI18n } from '../../i18n/I18nProvider';
 import { debugProps } from '../../utils/emotionCache';
 import {
   PageContainer,
@@ -18,9 +19,27 @@ import {
   TableCard,
   TableWrapper,
   SummarySection,
+  SummaryItemContainer,
+  SummaryItemLabel,
+  SummaryItemValue,
 } from './GeneralLedgerListingPage.styles';
 
 const COMPONENT_NAME = 'GeneralLedgerListingPage';
+
+interface SummaryItemProps {
+  label: string;
+  value: number;
+  color?: 'error' | 'success' | 'primary' | 'text-primary' | 'text-secondary';
+}
+
+function SummaryItem({ label, value, color = 'text-primary' }: SummaryItemProps) {
+  return (
+    <SummaryItemContainer>
+      <SummaryItemLabel>{label}</SummaryItemLabel>
+      <SummaryItemValue $color={color}>${value.toFixed(2)}</SummaryItemValue>
+    </SummaryItemContainer>
+  );
+}
 
 interface GLEntry {
   id: string;
@@ -212,6 +231,7 @@ export function GeneralLedgerListingPageRender(props: GeneralLedgerListingPageRe
     netIncome,
   } = props;
 
+  const { l10n } = useI18n();
   const columns = createColumns();
   const tableContext: ListingRenderContext = {
     formatDate,
@@ -240,7 +260,7 @@ export function GeneralLedgerListingPageRender(props: GeneralLedgerListingPageRe
                 <AxHeading3 style={{ marginBottom: 'var(--spacing-xs)' }}>
                   General Ledger
                 </AxHeading3>
-                <AxParagraph style={{ color: 'var(--color-text-secondary)' }}>
+                <AxParagraph color="secondary">
                   Financial transactions based on shipping and payments
                 </AxParagraph>
               </div>
@@ -275,7 +295,7 @@ export function GeneralLedgerListingPageRender(props: GeneralLedgerListingPageRe
                 <AxHeading3 style={{ marginBottom: 'var(--spacing-xs)' }}>
                   General Ledger
                 </AxHeading3>
-                <AxParagraph style={{ color: 'var(--color-text-secondary)' }}>
+                <AxParagraph color="secondary">
                   Financial transactions based on shipping and payments
                 </AxParagraph>
               </div>
@@ -284,7 +304,7 @@ export function GeneralLedgerListingPageRender(props: GeneralLedgerListingPageRe
         </HeaderCard>
         <TableCard padding="large" {...debugProps(COMPONENT_NAME, 'TableCard')}>
           <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '200px', flexDirection: 'column', gap: 'var(--spacing-md)' }}>
-            <AxParagraph style={{ color: 'var(--color-error)' }}>Error: {error}</AxParagraph>
+            <AxParagraph color="error">Error: {error}</AxParagraph>
             <AxButton variant="secondary" onClick={() => window.location.reload()}>
               Retry
             </AxButton>
@@ -375,70 +395,15 @@ export function GeneralLedgerListingPageRender(props: GeneralLedgerListingPageRe
         {/* Summary - Always visible outside scrollable area */}
         {filteredEntries.length > 0 && (
           <SummarySection {...debugProps(COMPONENT_NAME, 'SummarySection')}>
-            <div>
-              <AxParagraph style={{ fontSize: 'var(--font-size-sm)', color: 'var(--color-text-secondary)', marginBottom: 'var(--spacing-xs)' }}>
-                Total Debit
-              </AxParagraph>
-              <AxParagraph style={{ fontSize: 'var(--font-size-lg)', fontWeight: 'var(--font-weight-bold)', color: 'var(--color-error)' }}>
-                ${totalDebit.toFixed(2)}
-              </AxParagraph>
-            </div>
-            <div>
-              <AxParagraph style={{ fontSize: 'var(--font-size-sm)', color: 'var(--color-text-secondary)', marginBottom: 'var(--spacing-xs)' }}>
-                Total Credit
-              </AxParagraph>
-              <AxParagraph style={{ fontSize: 'var(--font-size-lg)', fontWeight: 'var(--font-weight-bold)', color: 'var(--color-success)' }}>
-                ${totalCredit.toFixed(2)}
-              </AxParagraph>
-            </div>
-            <div>
-              <AxParagraph style={{ fontSize: 'var(--font-size-sm)', color: 'var(--color-text-secondary)', marginBottom: 'var(--spacing-xs)' }}>
-                Total Revenue
-              </AxParagraph>
-              <AxParagraph style={{ fontSize: 'var(--font-size-lg)', fontWeight: 'var(--font-weight-bold)', color: 'var(--color-success)' }}>
-                ${totalRevenue.toFixed(2)}
-              </AxParagraph>
-            </div>
-            <div>
-              <AxParagraph style={{ fontSize: 'var(--font-size-sm)', color: 'var(--color-text-secondary)', marginBottom: 'var(--spacing-xs)' }}>
-                Total Cost
-              </AxParagraph>
-              <AxParagraph style={{ fontSize: 'var(--font-size-lg)', fontWeight: 'var(--font-weight-bold)', color: 'var(--color-error)' }}>
-                ${totalCost.toFixed(2)}
-              </AxParagraph>
-            </div>
-            <div>
-              <AxParagraph style={{ fontSize: 'var(--font-size-sm)', color: 'var(--color-text-secondary)', marginBottom: 'var(--spacing-xs)' }}>
-                Total Expense
-              </AxParagraph>
-              <AxParagraph style={{ fontSize: 'var(--font-size-lg)', fontWeight: 'var(--font-weight-bold)', color: 'var(--color-error)' }}>
-                ${totalExpense.toFixed(2)}
-              </AxParagraph>
-            </div>
-            <div>
-              <AxParagraph style={{ fontSize: 'var(--font-size-sm)', color: 'var(--color-text-secondary)', marginBottom: 'var(--spacing-xs)' }}>
-                Total A/P
-              </AxParagraph>
-              <AxParagraph style={{ fontSize: 'var(--font-size-lg)', fontWeight: 'var(--font-weight-bold)', color: 'var(--color-error)' }}>
-                ${totalAccountsPayable.toFixed(2)}
-              </AxParagraph>
-            </div>
-            <div>
-              <AxParagraph style={{ fontSize: 'var(--font-size-sm)', color: 'var(--color-text-secondary)', marginBottom: 'var(--spacing-xs)' }}>
-                Total Payments
-              </AxParagraph>
-              <AxParagraph style={{ fontSize: 'var(--font-size-lg)', fontWeight: 'var(--font-weight-bold)', color: 'var(--color-primary)' }}>
-                ${totalPayment.toFixed(2)}
-              </AxParagraph>
-            </div>
-            <div>
-              <AxParagraph style={{ fontSize: 'var(--font-size-sm)', color: 'var(--color-text-secondary)', marginBottom: 'var(--spacing-xs)' }}>
-                Net Income
-              </AxParagraph>
-              <AxParagraph style={{ fontSize: 'var(--font-size-lg)', fontWeight: 'var(--font-weight-bold)', color: netIncome >= 0 ? 'var(--color-success)' : 'var(--color-error)' }}>
-                ${netIncome.toFixed(2)}
-              </AxParagraph>
-            </div>
+            <SummaryItem label={l10n('generalLedger.summary.totalDebit')} value={totalDebit} color="error" />
+            <SummaryItem label={l10n('generalLedger.summary.totalCredit')} value={totalCredit} color="success" />
+            <SummaryItem label={l10n('generalLedger.summary.totalRevenue')} value={totalRevenue} color="success" />
+            <SummaryItem label={l10n('generalLedger.summary.totalCost')} value={totalCost} color="error" />
+            <SummaryItem label={l10n('generalLedger.summary.totalExpense')} value={totalExpense} color="error" />
+            <SummaryItem label={l10n('generalLedger.summary.totalAccountsPayable')} value={totalAccountsPayable} color="error" />
+            <SummaryItem label={l10n('generalLedger.summary.totalPayments')} value={totalPayment} color="primary" />
+            <SummaryItem label={l10n('generalLedger.summary.netIncome')} value={netIncome} color={netIncome >= 0 ? 'success' : 'error'} 
+            />
           </SummarySection>
         )}
       </TableCard>

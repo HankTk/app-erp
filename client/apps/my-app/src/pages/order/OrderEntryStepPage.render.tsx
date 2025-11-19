@@ -77,7 +77,7 @@ export function OrderEntryStepPageRender(props: OrderEntryStepPageRenderProps) {
       <div>
         <AxHeading3 style={{ marginBottom: 'var(--spacing-md)' }}>Select Customer</AxHeading3>
         {!order?.id && (
-          <AxParagraph style={{ marginBottom: 'var(--spacing-md)', color: 'var(--color-warning)' }}>
+          <AxParagraph marginBottom="md" color="warning">
             Initializing order... Please wait.
           </AxParagraph>
         )}
@@ -100,7 +100,7 @@ export function OrderEntryStepPageRender(props: OrderEntryStepPageRenderProps) {
           />
         </AxFormGroup>
         {order?.customerId && (
-          <AxParagraph style={{ marginTop: 'var(--spacing-md)', color: 'var(--color-text-secondary)' }}>
+          <AxParagraph marginTop="md" color="secondary">
             Customer selected. You can proceed to the next step.
           </AxParagraph>
         )}
@@ -224,7 +224,7 @@ export function OrderEntryStepPageRender(props: OrderEntryStepPageRenderProps) {
               ) : (
                 <AxTableRow>
                   <AxTableCell colSpan={5} align="center">
-                    <AxParagraph style={{ color: 'var(--color-text-secondary)' }}>
+                    <AxParagraph color="secondary">
                       No products added yet
                     </AxParagraph>
                   </AxTableCell>
@@ -416,7 +416,7 @@ export function OrderEntryStepPageRender(props: OrderEntryStepPageRenderProps) {
         <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-lg)' }}>
 
           <div>
-            <AxParagraph style={{ fontWeight: 'var(--font-weight-bold)', marginBottom: 'var(--spacing-sm)' }}>
+            <AxParagraph weight="bold" marginBottom="sm">
               Order Items
             </AxParagraph>
             <ItemsTable {...debugProps(COMPONENT_NAME, 'ItemsTable')}>
@@ -470,8 +470,8 @@ export function OrderEntryStepPageRender(props: OrderEntryStepPageRenderProps) {
                 borderTop: '2px solid var(--color-border-default)',
               }}
             >
-              <AxParagraph style={{ fontWeight: 'var(--font-weight-bold)' }}>Total:</AxParagraph>
-              <AxParagraph style={{ fontWeight: 'var(--font-weight-bold)' }}>
+              <AxParagraph weight="bold">Total:</AxParagraph>
+              <AxParagraph weight="bold">
                 ${order?.total?.toFixed(2) || '0.00'}
               </AxParagraph>
             </div>

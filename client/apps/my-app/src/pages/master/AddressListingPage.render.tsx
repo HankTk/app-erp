@@ -173,7 +173,7 @@ export function AddressListingPageRender(props: AddressListingPageRenderProps) {
                 <AxHeading3 style={{ marginBottom: 'var(--spacing-xs)' }}>
                   Addresses
                 </AxHeading3>
-                <AxParagraph style={{ color: 'var(--color-text-secondary)' }}>
+                <AxParagraph color="secondary">
                   Manage shipping and billing addresses
                 </AxParagraph>
               </div>
@@ -211,7 +211,7 @@ export function AddressListingPageRender(props: AddressListingPageRenderProps) {
                 <AxHeading3 style={{ marginBottom: 'var(--spacing-xs)' }}>
                   Addresses
                 </AxHeading3>
-                <AxParagraph style={{ color: 'var(--color-text-secondary)' }}>
+                <AxParagraph color="secondary">
                   Manage shipping and billing addresses
                 </AxParagraph>
               </div>
@@ -223,7 +223,7 @@ export function AddressListingPageRender(props: AddressListingPageRenderProps) {
         </HeaderCard>
         <TableCard padding="large" {...debugProps(COMPONENT_NAME, 'TableCard')}>
           <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '200px', flexDirection: 'column', gap: 'var(--spacing-md)' }}>
-            <AxParagraph style={{ color: 'var(--color-error)' }}>Error: {error}</AxParagraph>
+            <AxParagraph color="error">Error: {error}</AxParagraph>
             <AxButton variant="secondary" onClick={onRetry}>
               Retry
             </AxButton>
@@ -326,7 +326,7 @@ export function AddressListingPageRender(props: AddressListingPageRenderProps) {
               fullWidth
               disabled={submitting}
             />
-            <AxParagraph style={{ marginTop: 'var(--spacing-xs)', color: 'var(--color-text-secondary)', fontSize: 'var(--font-size-sm)' }}>
+            <AxParagraph marginTop="xs" color="secondary" size="sm">
               Select "Both" to allow this address to be used for both shipping and billing. Leave as "Both" if not specified.
             </AxParagraph>
           </AxFormGroup>
@@ -430,10 +430,10 @@ export function AddressListingPageRender(props: AddressListingPageRenderProps) {
           </div>
         }
       >
-        <AxParagraph style={{ marginBottom: 'var(--spacing-md)' }}>
+        <AxParagraph marginBottom="md">
           Are you sure you want to delete this address?
         </AxParagraph>
-        <AxParagraph style={{ color: 'var(--color-text-secondary)', fontSize: 'var(--font-size-sm)' }}>
+        <AxParagraph color="secondary" size="sm">
           This action cannot be undone.
         </AxParagraph>
       </AxDialog>

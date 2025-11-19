@@ -208,7 +208,7 @@ export function VendorListingPageRender(props: VendorListingPageRenderProps) {
                 <AxHeading3 style={{ marginBottom: 'var(--spacing-xs)' }}>
                   {l10n('module.vendor')}
                 </AxHeading3>
-                <AxParagraph style={{ color: 'var(--color-text-secondary)' }}>
+                <AxParagraph color="secondary">
                   {l10n('vendor.subtitle')}
                 </AxParagraph>
               </div>
@@ -246,7 +246,7 @@ export function VendorListingPageRender(props: VendorListingPageRenderProps) {
                 <AxHeading3 style={{ marginBottom: 'var(--spacing-xs)' }}>
                   {l10n('module.vendor')}
                 </AxHeading3>
-                <AxParagraph style={{ color: 'var(--color-text-secondary)' }}>
+                <AxParagraph color="secondary">
                   {l10n('vendor.subtitle')}
                 </AxParagraph>
               </div>
@@ -258,7 +258,7 @@ export function VendorListingPageRender(props: VendorListingPageRenderProps) {
         </HeaderCard>
         <TableCard padding="large" {...debugProps(COMPONENT_NAME, 'TableCard')}>
           <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '200px', flexDirection: 'column', gap: 'var(--spacing-md)' }}>
-            <AxParagraph style={{ color: 'var(--color-error)' }}>Error: {error}</AxParagraph>
+            <AxParagraph color="error">Error: {error}</AxParagraph>
             <AxButton variant="secondary" onClick={onRetry}>
               Retry
             </AxButton>
@@ -428,7 +428,7 @@ export function VendorListingPageRender(props: VendorListingPageRenderProps) {
                   const vendorAddresses = getVendorAddresses(selectedVendor.id);
                   if (vendorAddresses.length === 0) {
                     return (
-                      <AxParagraph style={{ color: 'var(--color-text-secondary)', fontStyle: 'italic' }}>
+                      <AxParagraph color="secondary" italic>
                         {l10n('vendor.noAddresses')}
                       </AxParagraph>
                     );
@@ -485,10 +485,10 @@ export function VendorListingPageRender(props: VendorListingPageRenderProps) {
           </div>
         }
       >
-        <AxParagraph style={{ marginBottom: 'var(--spacing-md)' }}>
+        <AxParagraph marginBottom="md">
           {l10n('vendor.deleteMessage')}
         </AxParagraph>
-        <AxParagraph style={{ color: 'var(--color-text-secondary)', fontSize: 'var(--font-size-sm)' }}>
+        <AxParagraph color="secondary" size="sm">
           {l10n('vendor.deleteWarning')}
         </AxParagraph>
       </AxDialog>

@@ -115,7 +115,7 @@ export function OrderEntryPageRender(props: OrderEntryPageRenderProps) {
               <AxHeading3 style={{ marginBottom: 'var(--spacing-xs)' }}>
                 {title || l10n('orderEntry.title')}
               </AxHeading3>
-              <AxParagraph style={{ color: 'var(--color-text-secondary)' }}>
+              <AxParagraph color="secondary">
                 {subtitle || l10n('orderEntry.subtitle')}
               </AxParagraph>
             </div>
@@ -129,10 +129,10 @@ export function OrderEntryPageRender(props: OrderEntryPageRenderProps) {
                   borderRadius: 'var(--radius-md)',
                   minWidth: '150px'
                 }}>
-                  <AxParagraph style={{ fontWeight: 'var(--font-weight-bold)', marginBottom: 'var(--spacing-xs)', fontSize: 'var(--font-size-sm)' }}>
+                  <AxParagraph weight="bold" marginBottom="xs" size="sm">
                     {l10n('orderEntry.confirmation.orderNumber')}
                   </AxParagraph>
-                  <AxParagraph style={{ fontSize: 'var(--font-size-sm)' }}>
+                  <AxParagraph size="sm">
                     {order.orderNumber}
                   </AxParagraph>
                 </div>
@@ -144,14 +144,14 @@ export function OrderEntryPageRender(props: OrderEntryPageRenderProps) {
                   borderRadius: 'var(--radius-md)',
                   minWidth: '200px'
                 }}>
-                  <AxParagraph style={{ fontWeight: 'var(--font-weight-bold)', marginBottom: 'var(--spacing-xs)', fontSize: 'var(--font-size-sm)' }}>
+                  <AxParagraph weight="bold" marginBottom="xs" size="sm">
                     {l10n('orderEntry.customer')}
                   </AxParagraph>
-                  <AxParagraph style={{ fontSize: 'var(--font-size-sm)' }}>
+                  <AxParagraph size="sm">
                     {selectedCustomer.companyName || `${selectedCustomer.lastName} ${selectedCustomer.firstName}` || selectedCustomer.email}
                   </AxParagraph>
                   {selectedCustomer.email && (
-                    <AxParagraph style={{ fontSize: 'var(--font-size-sm)', color: 'var(--color-text-secondary)', marginTop: 'var(--spacing-xs)' }}>
+                    <AxParagraph size="sm" color="secondary" marginTop="xs">
                       {selectedCustomer.email}
                     </AxParagraph>
                   )}
@@ -171,10 +171,10 @@ export function OrderEntryPageRender(props: OrderEntryPageRenderProps) {
                           minWidth: '200px',
                           maxWidth: '250px'
                         }}>
-                          <AxParagraph style={{ fontWeight: 'var(--font-weight-bold)', marginBottom: 'var(--spacing-xs)', fontSize: 'var(--font-size-sm)' }}>
+                          <AxParagraph weight="bold" marginBottom="xs" size="sm">
                             {l10n('orderEntry.shippingAddress')}
                           </AxParagraph>
-                          <AxParagraph style={{ fontSize: 'var(--font-size-sm)', lineHeight: 'var(--line-height-tight)' }}>
+                          <AxParagraph size="sm" lineHeight="tight">
                             {shippingAddress.streetAddress1}
                             {shippingAddress.streetAddress2 && `, ${shippingAddress.streetAddress2}`}
                             <br />
@@ -196,10 +196,10 @@ export function OrderEntryPageRender(props: OrderEntryPageRenderProps) {
                           minWidth: '200px',
                           maxWidth: '250px'
                         }}>
-                          <AxParagraph style={{ fontWeight: 'var(--font-weight-bold)', marginBottom: 'var(--spacing-xs)', fontSize: 'var(--font-size-sm)' }}>
+                          <AxParagraph weight="bold" marginBottom="xs" size="sm">
                             {l10n('orderEntry.billingAddress')}
                           </AxParagraph>
-                          <AxParagraph style={{ fontSize: 'var(--font-size-sm)', lineHeight: 'var(--line-height-tight)' }}>
+                          <AxParagraph size="sm" lineHeight="tight">
                             {billingAddress.streetAddress1}
                             {billingAddress.streetAddress2 && `, ${billingAddress.streetAddress2}`}
                             <br />
@@ -226,7 +226,7 @@ export function OrderEntryPageRender(props: OrderEntryPageRenderProps) {
                     borderRadius: 'var(--radius-md)',
                     minWidth: '200px'
                   }}>
-                    <AxParagraph style={{ fontWeight: 'var(--font-weight-bold)', marginBottom: 'var(--spacing-xs)', fontSize: 'var(--font-size-sm)' }}>
+                    <AxParagraph weight="bold" marginBottom="xs" size="sm">
                       {l10n('orderEntry.orderStatus')}
                     </AxParagraph>
                     <AxListbox

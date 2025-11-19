@@ -1,3 +1,4 @@
+import React from 'react';
 import styled from '@emotion/styled';
 
 export const AxLabel = styled.label`
@@ -32,10 +33,104 @@ export const AxHeading3 = styled.h3`
   transition: color var(--transition-base);
 `;
 
-export const AxParagraph = styled.p`
-  color: var(--color-text-secondary);
+export interface AxParagraphProps extends React.HTMLAttributes<HTMLParagraphElement> {
+  color?: 'default' | 'secondary' | 'error' | 'danger' | 'warning' | 'success' | 'primary';
+  size?: 'sm' | 'md' | 'lg';
+  weight?: 'normal' | 'medium' | 'semibold' | 'bold';
+  italic?: boolean;
+  marginBottom?: 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl' | '3xl' | '4xl';
+  marginTop?: 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl' | '3xl' | '4xl';
+  textAlign?: 'left' | 'center' | 'right';
+  lineHeight?: 'normal' | 'tight';
+}
+
+interface StyledParagraphProps {
+  $color?: 'default' | 'secondary' | 'error' | 'danger' | 'warning' | 'success' | 'primary';
+  $size?: 'sm' | 'md' | 'lg';
+  $weight?: 'normal' | 'medium' | 'semibold' | 'bold';
+  $italic?: boolean;
+  $marginBottom?: 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl' | '3xl' | '4xl';
+  $marginTop?: 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl' | '3xl' | '4xl';
+  $textAlign?: 'left' | 'center' | 'right';
+  $lineHeight?: 'normal' | 'tight';
+}
+
+const StyledParagraph = styled.p<StyledParagraphProps>`
+  color: ${({ $color }) => {
+    switch ($color) {
+      case 'secondary':
+        return 'var(--color-text-secondary)';
+      case 'error':
+      case 'danger':
+        return 'var(--color-error)';
+      case 'warning':
+        return 'var(--color-warning)';
+      case 'success':
+        return 'var(--color-success)';
+      case 'primary':
+        return 'var(--color-primary)';
+      case 'default':
+      default:
+        return 'var(--color-text-secondary)';
+    }
+  }};
+  font-size: ${({ $size }) => {
+    switch ($size) {
+      case 'sm':
+        return 'var(--font-size-sm)';
+      case 'lg':
+        return 'var(--font-size-lg)';
+      case 'md':
+      default:
+        return 'inherit';
+    }
+  }};
+  font-weight: ${({ $weight }) => {
+    switch ($weight) {
+      case 'medium':
+        return 'var(--font-weight-medium)';
+      case 'semibold':
+        return 'var(--font-weight-semibold)';
+      case 'bold':
+        return 'var(--font-weight-bold)';
+      case 'normal':
+      default:
+        return 'normal';
+    }
+  }};
+  font-style: ${({ $italic }) => ($italic ? 'italic' : 'normal')};
+  margin-bottom: ${({ $marginBottom }) => ($marginBottom ? `var(--spacing-${$marginBottom})` : '0')};
+  margin-top: ${({ $marginTop }) => ($marginTop ? `var(--spacing-${$marginTop})` : '0')};
+  text-align: ${({ $textAlign }) => $textAlign || 'left'};
+  line-height: ${({ $lineHeight }) => ($lineHeight === 'tight' ? 'var(--line-height-tight)' : 'normal')};
   transition: color var(--transition-base);
 `;
+
+export const AxParagraph: React.FC<AxParagraphProps> = ({
+  color = 'default',
+  size,
+  weight,
+  italic,
+  marginBottom,
+  marginTop,
+  textAlign,
+  lineHeight,
+  ...props
+}) => {
+  return (
+    <StyledParagraph
+      $color={color}
+      $size={size}
+      $weight={weight}
+      $italic={italic}
+      $marginBottom={marginBottom}
+      $marginTop={marginTop}
+      $textAlign={textAlign}
+      $lineHeight={lineHeight}
+      {...props}
+    />
+  );
+};
 
 export const AxTypographyExample = styled.div`
   display: flex;

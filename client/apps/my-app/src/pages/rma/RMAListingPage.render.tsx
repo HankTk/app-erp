@@ -230,7 +230,7 @@ export function RMAListingPageRender(props: RMAListingPageRenderProps) {
                 <AxHeading3 style={{ marginBottom: 'var(--spacing-xs)' }}>
                   RMAs
                 </AxHeading3>
-                <AxParagraph style={{ color: 'var(--color-text-secondary)' }}>
+                <AxParagraph color="secondary">
                   View and manage all return merchandise authorizations
                 </AxParagraph>
               </div>
@@ -265,7 +265,7 @@ export function RMAListingPageRender(props: RMAListingPageRenderProps) {
                 <AxHeading3 style={{ marginBottom: 'var(--spacing-xs)' }}>
                   RMAs
                 </AxHeading3>
-                <AxParagraph style={{ color: 'var(--color-text-secondary)' }}>
+                <AxParagraph color="secondary">
                   View and manage all return merchandise authorizations
                 </AxParagraph>
               </div>
@@ -274,7 +274,7 @@ export function RMAListingPageRender(props: RMAListingPageRenderProps) {
         </HeaderCard>
         <TableCard padding="large" {...debugProps(COMPONENT_NAME, 'TableCard')}>
           <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '200px', flexDirection: 'column', gap: 'var(--spacing-md)' }}>
-            <AxParagraph style={{ color: 'var(--color-error)' }}>Error: {error}</AxParagraph>
+            <AxParagraph color="error">Error: {error}</AxParagraph>
             <AxButton variant="secondary" onClick={() => window.location.reload()}>
               Retry
             </AxButton>
@@ -377,10 +377,10 @@ export function RMAListingPageRender(props: RMAListingPageRenderProps) {
           </div>
         }
       >
-        <AxParagraph style={{ marginBottom: 'var(--spacing-md)' }}>
+        <AxParagraph marginBottom="md">
           Are you sure you want to delete this RMA?
         </AxParagraph>
-        <AxParagraph style={{ color: 'var(--color-text-secondary)', fontSize: 'var(--font-size-sm)' }}>
+        <AxParagraph color="secondary" size="sm">
           This action cannot be undone.
         </AxParagraph>
       </AxDialog>

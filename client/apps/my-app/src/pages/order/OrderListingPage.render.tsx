@@ -211,7 +211,7 @@ export function OrderListingPageRender(props: OrderListingPageRenderProps) {
                 <AxHeading3 style={{ marginBottom: 'var(--spacing-xs)' }}>
                   Orders
                 </AxHeading3>
-                <AxParagraph style={{ color: 'var(--color-text-secondary)' }}>
+                <AxParagraph color="secondary">
                   View and manage all orders
                 </AxParagraph>
               </div>
@@ -248,7 +248,7 @@ export function OrderListingPageRender(props: OrderListingPageRenderProps) {
                 <AxHeading3 style={{ marginBottom: 'var(--spacing-xs)' }}>
                   Orders
                 </AxHeading3>
-                <AxParagraph style={{ color: 'var(--color-text-secondary)' }}>
+                <AxParagraph color="secondary">
                   View and manage all orders
                 </AxParagraph>
               </div>
@@ -259,7 +259,7 @@ export function OrderListingPageRender(props: OrderListingPageRenderProps) {
         </HeaderCard>
         <TableCard padding="large" {...debugProps(COMPONENT_NAME, 'TableCard')}>
           <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '200px', flexDirection: 'column', gap: 'var(--spacing-md)' }}>
-            <AxParagraph style={{ color: 'var(--color-error)' }}>Error: {error}</AxParagraph>
+            <AxParagraph color="error">Error: {error}</AxParagraph>
             <AxButton variant="secondary" onClick={() => window.location.reload()}>
               Retry
             </AxButton>
@@ -364,10 +364,10 @@ export function OrderListingPageRender(props: OrderListingPageRenderProps) {
           </div>
         }
       >
-        <AxParagraph style={{ marginBottom: 'var(--spacing-md)' }}>
+        <AxParagraph marginBottom="md">
           Are you sure you want to delete this order?
         </AxParagraph>
-        <AxParagraph style={{ color: 'var(--color-text-secondary)', fontSize: 'var(--font-size-sm)' }}>
+        <AxParagraph color="secondary" size="sm">
           This action cannot be undone.
         </AxParagraph>
       </AxDialog>

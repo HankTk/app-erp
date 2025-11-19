@@ -179,7 +179,7 @@ export function AccountPayableDetailPageRender(props: AccountPayableDetailPageRe
                 <AxHeading3 style={{ marginBottom: 'var(--spacing-xs)' }}>
                   {l10n('module.accountsPayable')}
                 </AxHeading3>
-                <AxParagraph style={{ color: 'var(--color-text-secondary)' }}>
+                <AxParagraph color="secondary">
                   {l10n('accountsPayable.subtitle')}
                 </AxParagraph>
               </div>
@@ -214,7 +214,7 @@ export function AccountPayableDetailPageRender(props: AccountPayableDetailPageRe
                 <AxHeading3 style={{ marginBottom: 'var(--spacing-xs)' }}>
                   {l10n('module.accountsPayable')}
                 </AxHeading3>
-                <AxParagraph style={{ color: 'var(--color-text-secondary)' }}>
+                <AxParagraph color="secondary">
                   {l10n('accountsPayable.subtitle')}
                 </AxParagraph>
               </div>
@@ -359,7 +359,7 @@ export function AccountPayableDetailPageRender(props: AccountPayableDetailPageRe
                 </InfoRow>
                 <InfoRow>
                   <AxLabel style={{ fontWeight: 'var(--font-weight-bold)' }}>{l10n('accountsPayable.invoice.total')}</AxLabel>
-                  <AxParagraph style={{ fontWeight: 'var(--font-weight-bold)' }}>${po.total?.toFixed(2) || '0.00'}</AxParagraph>
+                  <AxParagraph weight="bold">${po.total?.toFixed(2) || '0.00'}</AxParagraph>
                 </InfoRow>
               </InfoSection>
             </>
@@ -371,7 +371,7 @@ export function AccountPayableDetailPageRender(props: AccountPayableDetailPageRe
                 <AxHeading3 style={{ marginBottom: 'var(--spacing-sm)' }}>
                   {l10n('accountsPayable.payment.title')}
                 </AxHeading3>
-                <AxParagraph style={{ marginBottom: 'var(--spacing-md)', color: 'var(--color-text-secondary)' }}>
+                <AxParagraph marginBottom="md" color="secondary">
                   {l10n('accountsPayable.payment.description')}
                 </AxParagraph>
               </div>
@@ -418,19 +418,19 @@ export function AccountPayableDetailPageRender(props: AccountPayableDetailPageRe
 
                 <InfoSection>
                   <InfoRow>
-                    <AxParagraph style={{ fontWeight: 'var(--font-weight-bold)' }}>
+                    <AxParagraph weight="bold">
                       {l10n('accountsPayable.payment.invoiceAmount')}
                     </AxParagraph>
-                    <AxParagraph style={{ fontSize: 'var(--font-size-lg)' }}>
+                    <AxParagraph size="lg">
                       ${po.total?.toFixed(2) || '0.00'}
                     </AxParagraph>
                   </InfoRow>
                   {paymentAmount > 0 && (
                     <InfoRow>
-                      <AxParagraph style={{ fontWeight: 'var(--font-weight-bold)' }}>
+                      <AxParagraph weight="bold">
                         {l10n('accountsPayable.payment.paidAmount')}
                       </AxParagraph>
-                      <AxParagraph style={{ fontSize: 'var(--font-size-lg)' }}>
+                      <AxParagraph size="lg">
                         ${paymentAmount.toFixed(2)}
                       </AxParagraph>
                     </InfoRow>

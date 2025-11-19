@@ -195,7 +195,7 @@ export function AccountReceivableListingPageRender(props: AccountReceivableListi
                 <AxHeading3 style={{ marginBottom: 'var(--spacing-xs)' }}>
                   Account Receivable
                 </AxHeading3>
-                <AxParagraph style={{ color: 'var(--color-text-secondary)' }}>
+                <AxParagraph color="secondary">
                   View and manage invoices
                 </AxParagraph>
               </div>
@@ -232,7 +232,7 @@ export function AccountReceivableListingPageRender(props: AccountReceivableListi
                 <AxHeading3 style={{ marginBottom: 'var(--spacing-xs)' }}>
                   Account Receivable
                 </AxHeading3>
-                <AxParagraph style={{ color: 'var(--color-text-secondary)' }}>
+                <AxParagraph color="secondary">
                   View and manage invoices
                 </AxParagraph>
               </div>
@@ -243,7 +243,7 @@ export function AccountReceivableListingPageRender(props: AccountReceivableListi
         </HeaderCard>
         <TableCard padding="large" {...debugProps(COMPONENT_NAME, 'TableCard')}>
           <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '200px', flexDirection: 'column', gap: 'var(--spacing-md)' }}>
-            <AxParagraph style={{ color: 'var(--color-error)' }}>Error: {error}</AxParagraph>
+            <AxParagraph color="error">Error: {error}</AxParagraph>
             <AxButton variant="secondary" onClick={() => window.location.reload()}>
               Retry
             </AxButton>

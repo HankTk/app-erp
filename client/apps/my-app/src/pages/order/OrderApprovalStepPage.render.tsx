@@ -20,7 +20,7 @@ export function OrderApprovalStepPageRender(props: OrderApprovalStepProps) {
   return (
     <StepContent>
       <AxHeading3 style={{ marginBottom: 'var(--spacing-md)' }}>{l10n('orderEntry.approval.title')}</AxHeading3>
-      <AxParagraph style={{ marginBottom: 'var(--spacing-lg)', color: 'var(--color-text-secondary)' }}>
+      <AxParagraph marginBottom="lg" color="secondary">
         {l10n('orderEntry.approval.description')}
       </AxParagraph>
 

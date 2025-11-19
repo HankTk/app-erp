@@ -189,7 +189,7 @@ export function PurchaseOrderListingPageRender(props: PurchaseOrderListingPageRe
                 <AxHeading3 style={{ marginBottom: 'var(--spacing-xs)' }}>
                   {l10n('module.purchaseOrder')}
                 </AxHeading3>
-                <AxParagraph style={{ color: 'var(--color-text-secondary)' }}>
+                <AxParagraph color="secondary">
                   {l10n('purchaseOrder.subtitle')}
                 </AxParagraph>
               </div>
@@ -226,7 +226,7 @@ export function PurchaseOrderListingPageRender(props: PurchaseOrderListingPageRe
                 <AxHeading3 style={{ marginBottom: 'var(--spacing-xs)' }}>
                   {l10n('module.purchaseOrder')}
                 </AxHeading3>
-                <AxParagraph style={{ color: 'var(--color-text-secondary)' }}>
+                <AxParagraph color="secondary">
                   {l10n('purchaseOrder.subtitle')}
                 </AxParagraph>
               </div>
@@ -237,9 +237,9 @@ export function PurchaseOrderListingPageRender(props: PurchaseOrderListingPageRe
         </HeaderCard>
         <TableCard padding="large" {...debugProps(COMPONENT_NAME, 'TableCard')}>
           <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '200px', flexDirection: 'column', gap: 'var(--spacing-md)' }}>
-            <AxParagraph style={{ color: 'var(--color-error)' }}>Error: {error}</AxParagraph>
+            <AxParagraph color="error">Error: {error}</AxParagraph>
             {error.includes('404') && (
-              <AxParagraph style={{ color: 'var(--color-text-secondary)', fontSize: 'var(--font-size-sm)', textAlign: 'center' }}>
+              <AxParagraph color="secondary" size="sm" textAlign="center">
                 {l10n('purchaseOrder.error.serverRestart')}
               </AxParagraph>
             )}
@@ -270,7 +270,7 @@ export function PurchaseOrderListingPageRender(props: PurchaseOrderListingPageRe
               <AxHeading3 style={{ marginBottom: 'var(--spacing-xs)' }}>
                 {l10n('module.purchaseOrder')}
               </AxHeading3>
-              <AxParagraph style={{ color: 'var(--color-text-secondary)' }}>
+              <AxParagraph color="secondary">
                 {l10n('purchaseOrder.subtitle')}
               </AxParagraph>
             </div>

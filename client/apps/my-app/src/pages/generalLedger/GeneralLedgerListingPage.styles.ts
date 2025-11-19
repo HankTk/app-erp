@@ -1,5 +1,5 @@
 import styled from '@emotion/styled';
-import { AxCard } from '@ui/components';
+import { AxCard, AxParagraph } from '@ui/components';
 
 export const PageContainer = styled.div`
   display: flex;
@@ -68,5 +68,41 @@ export const SummarySection = styled.div`
   justify-content: space-between;
   gap: var(--spacing-lg);
   flex-wrap: wrap;
+`;
+
+export const SummaryItemContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+`;
+
+export const SummaryItemLabel = styled(AxParagraph)`
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+  margin-bottom: var(--spacing-xs);
+`;
+
+interface SummaryItemValueProps {
+  $color?: 'error' | 'success' | 'primary' | 'text-primary' | 'text-secondary';
+}
+
+export const SummaryItemValue = styled(AxParagraph)<SummaryItemValueProps>`
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-bold);
+  color: ${({ $color = 'text-primary' }) => {
+    switch ($color) {
+      case 'error':
+        return 'var(--color-error)';
+      case 'success':
+        return 'var(--color-success)';
+      case 'primary':
+        return 'var(--color-primary)';
+      case 'text-primary':
+        return 'var(--color-text-primary)';
+      case 'text-secondary':
+        return 'var(--color-text-secondary)';
+      default:
+        return 'var(--color-text-primary)';
+    }
+  }};
 `;
 

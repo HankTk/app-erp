@@ -23,7 +23,7 @@ export function OrderConfirmationStepPageRender(props: OrderConfirmationStepProp
     <StepContent {...debugProps(COMPONENT_NAME, 'StepContent')}>
       <div>
         <AxHeading3 style={{ marginBottom: 'var(--spacing-md)' }}>{l10n('orderEntry.confirmation.title')}</AxHeading3>
-        <AxParagraph style={{ marginBottom: 'var(--spacing-lg)', color: 'var(--color-text-secondary)' }}>
+        <AxParagraph marginBottom="lg" color="secondary">
           {l10n('orderEntry.confirmation.description')}
         </AxParagraph>
       </div>
@@ -31,7 +31,7 @@ export function OrderConfirmationStepPageRender(props: OrderConfirmationStepProp
       <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-lg)' }}>
 
         <div>
-          <AxParagraph style={{ fontWeight: 'var(--font-weight-bold)', marginBottom: 'var(--spacing-sm)' }}>
+          <AxParagraph weight="bold" marginBottom="sm">
             Order Items
           </AxParagraph>
           <ItemsTable {...debugProps(COMPONENT_NAME, 'ItemsTable')}>
@@ -57,7 +57,7 @@ export function OrderConfirmationStepPageRender(props: OrderConfirmationStepProp
                 ) : (
                   <AxTableRow>
                     <AxTableCell colSpan={4} align="center">
-                      <AxParagraph style={{ color: 'var(--color-text-secondary)' }}>
+                      <AxParagraph color="secondary">
                         No items in this order
                       </AxParagraph>
                     </AxTableCell>
@@ -95,8 +95,8 @@ export function OrderConfirmationStepPageRender(props: OrderConfirmationStepProp
               borderTop: '2px solid var(--color-border-default)',
             }}
           >
-            <AxParagraph style={{ fontWeight: 'var(--font-weight-bold)' }}>Total:</AxParagraph>
-            <AxParagraph style={{ fontWeight: 'var(--font-weight-bold)' }}>
+            <AxParagraph weight="bold">Total:</AxParagraph>
+            <AxParagraph weight="bold">
               ${order?.total?.toFixed(2) || '0.00'}
             </AxParagraph>
           </div>

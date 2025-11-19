@@ -202,7 +202,7 @@ export function CustomerListingPageRender(props: CustomerListingPageRenderProps)
                 <AxHeading3 style={{ marginBottom: 'var(--spacing-xs)' }}>
                   Customers
                 </AxHeading3>
-                <AxParagraph style={{ color: 'var(--color-text-secondary)' }}>
+                <AxParagraph color="secondary">
                   Manage customer accounts
                 </AxParagraph>
               </div>
@@ -240,7 +240,7 @@ export function CustomerListingPageRender(props: CustomerListingPageRenderProps)
                 <AxHeading3 style={{ marginBottom: 'var(--spacing-xs)' }}>
                   Customers
                 </AxHeading3>
-                <AxParagraph style={{ color: 'var(--color-text-secondary)' }}>
+                <AxParagraph color="secondary">
                   Manage customer accounts
                 </AxParagraph>
               </div>
@@ -252,7 +252,7 @@ export function CustomerListingPageRender(props: CustomerListingPageRenderProps)
         </HeaderCard>
         <TableCard padding="large" {...debugProps(COMPONENT_NAME, 'TableCard')}>
           <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '200px', flexDirection: 'column', gap: 'var(--spacing-md)' }}>
-            <AxParagraph style={{ color: 'var(--color-error)' }}>Error: {error}</AxParagraph>
+            <AxParagraph color="error">Error: {error}</AxParagraph>
             <AxButton variant="secondary" onClick={onRetry}>
               Retry
             </AxButton>
@@ -422,7 +422,7 @@ export function CustomerListingPageRender(props: CustomerListingPageRenderProps)
                   const customerAddresses = getCustomerAddresses(selectedCustomer.id);
                   if (customerAddresses.length === 0) {
                     return (
-                      <AxParagraph style={{ color: 'var(--color-text-secondary)', fontStyle: 'italic' }}>
+                      <AxParagraph color="secondary" italic>
                         No addresses associated with this customer
                       </AxParagraph>
                     );
@@ -479,10 +479,10 @@ export function CustomerListingPageRender(props: CustomerListingPageRenderProps)
           </div>
         }
       >
-        <AxParagraph style={{ marginBottom: 'var(--spacing-md)' }}>
+        <AxParagraph marginBottom="md">
           Are you sure you want to delete this customer?
         </AxParagraph>
-        <AxParagraph style={{ color: 'var(--color-text-secondary)', fontSize: 'var(--font-size-sm)' }}>
+        <AxParagraph color="secondary" size="sm">
           This action cannot be undone.
         </AxParagraph>
       </AxDialog>

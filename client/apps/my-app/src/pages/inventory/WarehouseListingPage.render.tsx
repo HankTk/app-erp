@@ -158,7 +158,7 @@ export function WarehouseListingPageRender(props: WarehouseListingPageRenderProp
                 <AxHeading3 style={{ marginBottom: 'var(--spacing-xs)' }}>
                   {l10n('inventory.warehouses')}
                 </AxHeading3>
-                <AxParagraph style={{ color: 'var(--color-text-secondary)' }}>
+                <AxParagraph color="secondary">
                   {l10n('inventory.warehousesSubtitle')}
                 </AxParagraph>
               </div>
@@ -198,7 +198,7 @@ export function WarehouseListingPageRender(props: WarehouseListingPageRenderProp
                 <AxHeading3 style={{ marginBottom: 'var(--spacing-xs)' }}>
                   {l10n('inventory.warehouses')}
                 </AxHeading3>
-                <AxParagraph style={{ color: 'var(--color-text-secondary)' }}>
+                <AxParagraph color="secondary">
                   {l10n('inventory.warehousesSubtitle')}
                 </AxParagraph>
               </div>
@@ -212,7 +212,7 @@ export function WarehouseListingPageRender(props: WarehouseListingPageRenderProp
         </HeaderCard>
         <TableCard padding="large" {...debugProps(COMPONENT_NAME, 'TableCard')}>
           <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '200px', flexDirection: 'column', gap: 'var(--spacing-md)' }}>
-            <AxParagraph style={{ color: 'var(--color-error)' }}>Error: {error}</AxParagraph>
+            <AxParagraph color="error">Error: {error}</AxParagraph>
             <AxButton variant="secondary" onClick={onRetry}>
               {l10n('common.retry')}
             </AxButton>

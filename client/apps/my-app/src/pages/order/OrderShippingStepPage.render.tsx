@@ -10,7 +10,7 @@ export function OrderShippingStepPageRender(props: OrderShippingStepProps) {
   return (
     <StepContent>
       <AxHeading3 style={{ marginBottom: 'var(--spacing-md)' }}>{l10n('orderEntry.shipping.title')}</AxHeading3>
-      <AxParagraph style={{ marginBottom: 'var(--spacing-lg)', color: 'var(--color-text-secondary)' }}>
+      <AxParagraph marginBottom="lg" color="secondary">
         {l10n('orderEntry.shipping.description')}
       </AxParagraph>
 

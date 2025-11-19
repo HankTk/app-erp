@@ -80,7 +80,7 @@ export function PurchaseOrderEntryStepPageRender(props: PurchaseOrderEntryStepPa
       <div>
         <AxHeading3 style={{ marginBottom: 'var(--spacing-sm)' }}>{l10n('purchaseOrderEntry.selectSupplier')}</AxHeading3>
         {!po?.id && (
-          <AxParagraph style={{ marginBottom: 'var(--spacing-sm)', color: 'var(--color-warning)' }}>
+          <AxParagraph marginBottom="sm" color="warning">
             {l10n('purchaseOrderEntry.initializing')}
           </AxParagraph>
         )}
@@ -102,7 +102,7 @@ export function PurchaseOrderEntryStepPageRender(props: PurchaseOrderEntryStepPa
           />
         </AxFormGroup>
         {po?.supplierId && (
-          <AxParagraph style={{ marginTop: 'var(--spacing-sm)', color: 'var(--color-text-secondary)' }}>
+          <AxParagraph marginTop="sm" color="secondary">
             {l10n('purchaseOrderEntry.supplierSelected')}
           </AxParagraph>
         )}
@@ -223,7 +223,7 @@ export function PurchaseOrderEntryStepPageRender(props: PurchaseOrderEntryStepPa
               ) : (
                 <AxTableRow>
                   <AxTableCell colSpan={5} align="center">
-                    <AxParagraph style={{ color: 'var(--color-text-secondary)' }}>
+                    <AxParagraph color="secondary">
                       {l10n('purchaseOrderEntry.noProducts')}
                     </AxParagraph>
                   </AxTableCell>
@@ -421,13 +421,13 @@ export function PurchaseOrderEntryStepPageRender(props: PurchaseOrderEntryStepPa
               }}
               disabled={loading || !po?.id || readOnly}
             />
-            <AxParagraph style={{ marginTop: 'var(--spacing-xs)', color: 'var(--color-text-secondary)', fontSize: 'var(--font-size-sm)' }}>
+            <AxParagraph marginTop="xs" color="secondary" size="sm">
               {l10n('purchaseOrderEntry.expectedDeliveryDateDescription')}
             </AxParagraph>
           </AxFormGroup>
 
           <div>
-            <AxParagraph style={{ fontWeight: 'var(--font-weight-bold)', marginBottom: 'var(--spacing-xs)' }}>
+            <AxParagraph weight="bold" marginBottom="xs">
               {l10n('purchaseOrderEntry.orderItems')}
             </AxParagraph>
             <ItemsTable {...debugProps(COMPONENT_NAME, 'ItemsTable')}>
@@ -481,8 +481,8 @@ export function PurchaseOrderEntryStepPageRender(props: PurchaseOrderEntryStepPa
                 borderTop: '2px solid var(--color-border-default)',
               }}
             >
-              <AxParagraph style={{ fontWeight: 'var(--font-weight-bold)' }}>{l10n('purchaseOrderEntry.total')}:</AxParagraph>
-              <AxParagraph style={{ fontWeight: 'var(--font-weight-bold)' }}>
+              <AxParagraph weight="bold">{l10n('purchaseOrderEntry.total')}:</AxParagraph>
+              <AxParagraph weight="bold">
                 ${po?.total?.toFixed(2) || '0.00'}
               </AxParagraph>
             </div>

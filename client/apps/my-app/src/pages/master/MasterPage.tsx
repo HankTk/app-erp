@@ -131,7 +131,7 @@ export function MasterPage({ onPageChange, onNavigateBack }: MasterPageProps) {
               <AxHeading3 style={{ marginBottom: 'var(--spacing-xs)' }}>
                 {l10n('master.title')}
               </AxHeading3>
-              <AxParagraph style={{ color: 'var(--color-text-secondary)' }}>
+              <AxParagraph color="secondary">
                 {l10n('master.subtitle')}
               </AxParagraph>
             </div>

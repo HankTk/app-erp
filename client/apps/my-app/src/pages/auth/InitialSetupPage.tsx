@@ -146,7 +146,7 @@ export function InitialSetupPage({ onSetupComplete }: InitialSetupPageProps) {
         <SetupCardContent {...debugProps(COMPONENT_NAME, 'SetupCardContent')}>
           <TitleSection {...debugProps(COMPONENT_NAME, 'TitleSection')}>
             <AxHeading3 style={{ marginBottom: 'var(--spacing-xs)' }}>{l10n('setup.title')}</AxHeading3>
-            <AxParagraph style={{ fontSize: 'var(--font-size-sm)' }}>{l10n('setup.subtitle')}</AxParagraph>
+            <AxParagraph size="sm">{l10n('setup.subtitle')}</AxParagraph>
           </TitleSection>
           <SetupForm onSubmit={handleSubmit} {...debugProps(COMPONENT_NAME, 'SetupForm')}>
             {/* Account Information Section */}

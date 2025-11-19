@@ -1124,7 +1124,7 @@ export function OrderEntryPage(props: OrderEntryPageProps = {}) {
           <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', height: '100%', gap: 'var(--spacing-md)' }}>
             <AxParagraph>{loading ? 'Initializing order...' : 'Loading order...'}</AxParagraph>
             {process.env.NODE_ENV === 'development' && (
-              <AxParagraph style={{ fontSize: 'var(--font-size-sm)', color: 'var(--color-text-secondary)' }}>
+              <AxParagraph size="sm" color="secondary">
                 Order state: {order ? 'exists but no ID' : 'null'}, Loading: {loading ? 'true' : 'false'}
               </AxParagraph>
             )}

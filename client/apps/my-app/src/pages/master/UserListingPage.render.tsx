@@ -113,7 +113,7 @@ export function UserListingPageRender(props: UserListingPageRenderProps) {
                 <AxHeading3 style={{ marginBottom: 'var(--spacing-xs)' }}>
                   {l10n('user.title')}
                 </AxHeading3>
-                <AxParagraph style={{ color: 'var(--color-text-secondary)' }}>
+                <AxParagraph color="secondary">
                   {l10n('user.subtitle')}
                 </AxParagraph>
               </div>
@@ -151,7 +151,7 @@ export function UserListingPageRender(props: UserListingPageRenderProps) {
                 <AxHeading3 style={{ marginBottom: 'var(--spacing-xs)' }}>
                   {l10n('user.title')}
                 </AxHeading3>
-                <AxParagraph style={{ color: 'var(--color-text-secondary)' }}>
+                <AxParagraph color="secondary">
                   {l10n('user.subtitle')}
                 </AxParagraph>
               </div>
@@ -163,7 +163,7 @@ export function UserListingPageRender(props: UserListingPageRenderProps) {
         </HeaderCard>
         <TableCard padding="large" {...debugProps(COMPONENT_NAME, 'TableCard')}>
           <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '200px', flexDirection: 'column', gap: 'var(--spacing-md)' }}>
-            <AxParagraph style={{ color: 'var(--color-error)' }}>Error: {error}</AxParagraph>
+            <AxParagraph color="error">Error: {error}</AxParagraph>
             <AxButton variant="secondary" onClick={onRetry}>
               Retry
             </AxButton>
@@ -389,10 +389,10 @@ export function UserListingPageRender(props: UserListingPageRenderProps) {
           </div>
         }
       >
-        <AxParagraph style={{ marginBottom: 'var(--spacing-md)' }}>
+        <AxParagraph marginBottom="md">
           {l10n('user.dialog.deleteConfirm')}
         </AxParagraph>
-        <AxParagraph style={{ color: 'var(--color-text-secondary)', fontSize: 'var(--font-size-sm)' }}>
+        <AxParagraph color="secondary" size="sm">
           {l10n('user.dialog.deleteMessage')}
         </AxParagraph>
       </AxDialog>

@@ -246,7 +246,7 @@ export function VendorEditDialog({
               const vendorAddresses = getVendorAddresses(vendorId);
               if (vendorAddresses.length === 0) {
                 return (
-                  <AxParagraph style={{ color: 'var(--color-text-secondary)', fontStyle: 'italic' }}>
+                  <AxParagraph color="secondary" italic>
                     {l10n('vendor.noAddresses')}
                   </AxParagraph>
                 );

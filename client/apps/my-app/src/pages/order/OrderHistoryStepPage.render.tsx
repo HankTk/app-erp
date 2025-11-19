@@ -76,14 +76,14 @@ export function OrderHistoryStepPageRender(props: OrderHistoryStepPageRenderProp
         </AxButton>
       </div>
 
-      <AxParagraph style={{ marginBottom: 'var(--spacing-lg)', color: 'var(--color-text-secondary)' }}>
+      <AxParagraph marginBottom="lg" color="secondary">
         {l10n('orderEntry.history.description')}
       </AxParagraph>
 
       {historyRecords.length === 0 ? (
         <EmptyState {...debugProps(COMPONENT_NAME, 'EmptyState')}>
           <AxParagraph>{l10n('orderEntry.history.empty')}</AxParagraph>
-          <AxParagraph style={{ fontSize: 'var(--font-size-sm)', marginTop: 'var(--spacing-sm)' }}>
+          <AxParagraph size="sm" marginTop="sm">
             {l10n('orderEntry.history.emptyDescription')}
           </AxParagraph>
         </EmptyState>

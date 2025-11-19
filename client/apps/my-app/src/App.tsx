@@ -549,7 +549,7 @@ function AppContent() {
                 ) : (
                   <div style={{ padding: 'var(--spacing-lg)', display: 'flex', flexDirection: 'column', gap: 'var(--spacing-md)', alignItems: 'center', justifyContent: 'center', height: '100%' }}>
                     <AxHeading3>Shop Floor Control</AxHeading3>
-                    <AxParagraph style={{ color: 'var(--color-text-secondary)' }}>
+                    <AxParagraph color="secondary">
                       No RMA selected
                     </AxParagraph>
                     <AxButton 

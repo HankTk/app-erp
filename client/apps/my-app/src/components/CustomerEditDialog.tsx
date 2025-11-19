@@ -244,7 +244,7 @@ export function CustomerEditDialog({
               const customerAddresses = getCustomerAddresses(customerId);
               if (customerAddresses.length === 0) {
                 return (
-                  <AxParagraph style={{ color: 'var(--color-text-secondary)', fontStyle: 'italic' }}>
+                  <AxParagraph color="secondary" italic>
                     No addresses associated with this customer
                   </AxParagraph>
                 );

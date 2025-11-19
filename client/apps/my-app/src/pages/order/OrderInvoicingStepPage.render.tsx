@@ -10,7 +10,7 @@ export function OrderInvoicingStepPageRender(props: OrderInvoicingStepProps) {
   return (
     <StepContent>
       <AxHeading3 style={{ marginBottom: 'var(--spacing-md)' }}>{l10n('orderEntry.invoicing.title')}</AxHeading3>
-      <AxParagraph style={{ marginBottom: 'var(--spacing-lg)', color: 'var(--color-text-secondary)' }}>
+      <AxParagraph marginBottom="lg" color="secondary">
         {l10n('orderEntry.invoicing.description')}
       </AxParagraph>
 
@@ -38,10 +38,10 @@ export function OrderInvoicingStepPageRender(props: OrderInvoicingStepProps) {
         </AxFormGroup>
 
         <InvoiceAmountBox>
-          <AxParagraph style={{ fontWeight: 'var(--font-weight-bold)', marginBottom: 'var(--spacing-sm)' }}>
+          <AxParagraph weight="bold" marginBottom="sm">
             {l10n('orderEntry.invoicing.invoiceAmount')}
           </AxParagraph>
-          <AxParagraph style={{ fontSize: 'var(--font-size-lg)' }}>
+          <AxParagraph size="lg">
             ${order?.total?.toFixed(2) || '0.00'}
           </AxParagraph>
         </InvoiceAmountBox>

@@ -19,7 +19,7 @@ export function OrderPaymentStepPageRender(props: OrderPaymentStepProps) {
   return (
     <StepContent>
       <AxHeading3 style={{ marginBottom: 'var(--spacing-md)' }}>{l10n('orderEntry.payment.title')}</AxHeading3>
-      <AxParagraph style={{ marginBottom: 'var(--spacing-lg)', color: 'var(--color-text-secondary)' }}>
+      <AxParagraph marginBottom="lg" color="secondary">
         {l10n('orderEntry.payment.description')}
       </AxParagraph>
 
@@ -65,10 +65,10 @@ export function OrderPaymentStepPageRender(props: OrderPaymentStepProps) {
         </AxFormGroup>
 
         <PaymentSummaryBox>
-          <AxParagraph style={{ fontWeight: 'var(--font-weight-bold)', marginBottom: 'var(--spacing-sm)' }}>
+          <AxParagraph weight="bold" marginBottom="sm">
             {l10n('orderEntry.payment.invoiceAmount')}
           </AxParagraph>
-          <AxParagraph style={{ fontSize: 'var(--font-size-lg)', marginBottom: 'var(--spacing-md)' }}>
+          <AxParagraph size="lg" marginBottom="md">
             ${order?.total?.toFixed(2) || '0.00'}
           </AxParagraph>
           {paymentAmount > 0 && (

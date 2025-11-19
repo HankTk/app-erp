@@ -105,7 +105,7 @@ export function GeneralLedgerDetailPageRender(props: GeneralLedgerDetailPageRend
               <AxHeading3 style={{ marginBottom: 'var(--spacing-xs)' }}>
                 {l10n('module.generalLedger')}
               </AxHeading3>
-              <AxParagraph style={{ color: 'var(--color-text-secondary)' }}>
+              <AxParagraph color="secondary">
                 {l10n('generalLedger.subtitle')}
               </AxParagraph>
             </div>
@@ -120,7 +120,7 @@ export function GeneralLedgerDetailPageRender(props: GeneralLedgerDetailPageRend
 
         <InfoSection {...debugProps(COMPONENT_NAME, 'InfoSection')}>
           <InfoRow>
-            <AxParagraph style={{ fontWeight: 'var(--font-weight-bold)' }}>
+            <AxParagraph weight="bold">
               {l10n('generalLedger.detail.orderNumber')}
             </AxParagraph>
             <AxParagraph>{order.orderNumber || 'N/A'}</AxParagraph>
@@ -213,43 +213,43 @@ export function GeneralLedgerDetailPageRender(props: GeneralLedgerDetailPageRend
           </InfoRow>
           
           <InfoRow>
-            <AxParagraph style={{ fontWeight: 'var(--font-weight-bold)', color: 'var(--color-success)' }}>
+            <AxParagraph weight="bold" color="success">
               {l10n('generalLedger.detail.revenue')}
             </AxParagraph>
-            <AxParagraph style={{ fontSize: 'var(--font-size-lg)', fontWeight: 'var(--font-weight-bold)', color: 'var(--color-success)' }}>
+            <AxParagraph size="lg" weight="bold" color="success">
               ${revenue.toFixed(2)}
             </AxParagraph>
           </InfoRow>
           
           <InfoRow>
-            <AxParagraph style={{ fontWeight: 'var(--font-weight-bold)', color: 'var(--color-error)' }}>
+            <AxParagraph weight="bold" color="error">
               {l10n('generalLedger.detail.productCost')}
             </AxParagraph>
-            <AxParagraph style={{ color: 'var(--color-error)' }}>
+            <AxParagraph color="error">
               ${productCost.toFixed(2)}
             </AxParagraph>
           </InfoRow>
           
           <InfoRow>
-            <AxParagraph style={{ fontWeight: 'var(--font-weight-bold)', color: 'var(--color-error)' }}>
+            <AxParagraph weight="bold" color="error">
               {l10n('generalLedger.detail.shippingCost')}
             </AxParagraph>
-            <AxParagraph style={{ color: 'var(--color-error)' }}>
+            <AxParagraph color="error">
               ${shippingCost.toFixed(2)}
             </AxParagraph>
           </InfoRow>
           
           <InfoRow>
-            <AxParagraph style={{ fontWeight: 'var(--font-weight-bold)', color: 'var(--color-error)' }}>
+            <AxParagraph weight="bold" color="error">
               {l10n('generalLedger.detail.totalCost')}
             </AxParagraph>
-            <AxParagraph style={{ fontSize: 'var(--font-size-lg)', fontWeight: 'var(--font-weight-bold)', color: 'var(--color-error)' }}>
+            <AxParagraph size="lg" weight="bold" color="error">
               ${totalCost.toFixed(2)}
             </AxParagraph>
           </InfoRow>
           
           <InfoRow>
-            <AxParagraph style={{ fontWeight: 'var(--font-weight-bold)' }}>
+            <AxParagraph weight="bold">
               {l10n('generalLedger.detail.netIncome')}
             </AxParagraph>
             <AxParagraph style={{ 
@@ -263,10 +263,10 @@ export function GeneralLedgerDetailPageRender(props: GeneralLedgerDetailPageRend
           
           {paymentAmount > 0 && (
             <InfoRow>
-              <AxParagraph style={{ fontWeight: 'var(--font-weight-bold)', color: 'var(--color-primary)' }}>
+              <AxParagraph weight="bold" color="primary">
                 {l10n('generalLedger.detail.paymentReceived')}
               </AxParagraph>
-              <AxParagraph style={{ fontSize: 'var(--font-size-lg)', fontWeight: 'var(--font-weight-bold)', color: 'var(--color-primary)' }}>
+              <AxParagraph size="lg" weight="bold" color="primary">
                 ${paymentAmount.toFixed(2)}
               </AxParagraph>
             </InfoRow>
