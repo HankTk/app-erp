@@ -9,19 +9,19 @@ export function OrderEntryStepPage(props: OrderEntryStepProps) {
   } = props;
   const [customerDialogOpen, setCustomerDialogOpen] = useState(false);
 
-  const isSubStepCompleted = (subStep: EntrySubStep) => {
+  const isSubStepCompleted = (subStep: EntrySubStep): boolean => {
     if (!order) return false;
     switch (subStep) {
       case 'customer':
         return !!order.customerId;
       case 'products':
-        return order.items && order.items.length > 0;
+        return !!(order.items && order.items.length > 0);
       case 'shipping':
         return !!order.shippingAddressId && !!order.billingAddressId;
       case 'review':
         // Review is completed if customer, products, and shipping are all completed
         return !!order.customerId && 
-               order.items && order.items.length > 0 && 
+               !!(order.items && order.items.length > 0) && 
                !!order.shippingAddressId && 
                !!order.billingAddressId;
       default:

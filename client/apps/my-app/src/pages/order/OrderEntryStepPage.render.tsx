@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import {
   AxHeading3,
   AxParagraph,
@@ -58,7 +57,6 @@ export function OrderEntryStepPageRender(props: OrderEntryStepPageRenderProps) {
     onSetQuantity,
     onSetShippingId,
     onSetBillingId,
-    onAddressesRefresh,
     loading = false,
     readOnly = false,
     isSubStepCompleted,
@@ -87,11 +85,12 @@ export function OrderEntryStepPageRender(props: OrderEntryStepPageRenderProps) {
           <AxLabel>Customer</AxLabel>
           <AxListbox
             options={customerOptions}
-            value={order?.customerId || null}
-            onChange={async value => {
-              if (value && order?.id) {
-                await onCustomerSelect(value);
-              } else if (value && !order?.id) {
+            value={order?.customerId || undefined}
+            onChange={async (value: string | string[]) => {
+              const customerId = Array.isArray(value) ? value[0] : value;
+              if (customerId && order?.id) {
+                await onCustomerSelect(customerId);
+              } else if (customerId && !order?.id) {
                 alert('Order is not ready yet. Please wait a moment and try again.');
               }
             }}
@@ -132,8 +131,11 @@ export function OrderEntryStepPageRender(props: OrderEntryStepPageRenderProps) {
               <AxLabel>Product</AxLabel>
               <AxListbox
                 options={productOptions}
-                value={selectedProduct}
-                onChange={onSetSelectedProduct}
+                value={selectedProduct || undefined}
+                onChange={(value: string | string[]) => {
+                  const productId = Array.isArray(value) ? value[0] : value;
+                  onSetSelectedProduct(productId || null);
+                }}
                 placeholder="Select a product"
                 fullWidth
                 disabled={loading || readOnly}
@@ -272,13 +274,14 @@ export function OrderEntryStepPageRender(props: OrderEntryStepPageRenderProps) {
               <div style={{ flex: 1 }}>
                 <AxListbox
                   options={addressOptions}
-                  value={shippingId}
-                  onChange={async value => {
-                    onSetShippingId(value);
+                  value={shippingId || undefined}
+                  onChange={async (value: string | string[]) => {
+                    const addressId = Array.isArray(value) ? value[0] : value;
+                    onSetShippingId(addressId || null);
                     // Update shipping info if we have at least one address
                     // Use billingId if available, otherwise use shippingId for both
-                    if (value) {
-                      await onShippingInfoUpdate(value, billingId || value);
+                    if (addressId) {
+                      await onShippingInfoUpdate(addressId, billingId || addressId);
                     }
                   }}
                   placeholder="Select shipping address"
@@ -329,13 +332,14 @@ export function OrderEntryStepPageRender(props: OrderEntryStepPageRenderProps) {
               <div style={{ flex: 1 }}>
                 <AxListbox
                   options={addressOptions}
-                  value={billingId}
-                  onChange={async value => {
-                    onSetBillingId(value);
+                  value={billingId || undefined}
+                  onChange={async (value: string | string[]) => {
+                    const addressId = Array.isArray(value) ? value[0] : value;
+                    onSetBillingId(addressId || null);
                     // Update shipping info if we have at least one address
                     // Use shippingId if available, otherwise use billingId for both
-                    if (value) {
-                      await onShippingInfoUpdate(shippingId || value, value);
+                    if (addressId) {
+                      await onShippingInfoUpdate(shippingId || addressId, addressId);
                     }
                   }}
                   placeholder="Select billing address (can be same as shipping)"

@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react';
-import { fetchOrders, Order } from '../../api/orderApi';
-import { fetchPurchaseOrders, PurchaseOrder } from '../../api/purchaseOrderApi';
-import { fetchCustomers, Customer } from '../../api/customerApi';
-import { fetchVendors, Vendor } from '../../api/vendorApi';
-import { fetchProducts, Product } from '../../api/productApi';
+import { fetchOrders } from '../../api/orderApi';
+import { fetchPurchaseOrders } from '../../api/purchaseOrderApi';
+import { fetchCustomers } from '../../api/customerApi';
+import { fetchVendors } from '../../api/vendorApi';
+import { fetchProducts } from '../../api/productApi';
 import { GeneralLedgerListingPageRender } from './GeneralLedgerListingPage.render';
 
 interface GLEntry {
@@ -33,8 +33,6 @@ interface GeneralLedgerListingPageProps {
 
 export function GeneralLedgerListingPage({ onViewEntry, onNavigateBack }: GeneralLedgerListingPageProps = {} as GeneralLedgerListingPageProps) {
   const [glEntries, setGlEntries] = useState<GLEntry[]>([]);
-  const [customers, setCustomers] = useState<Customer[]>([]);
-  const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [typeFilter, setTypeFilter] = useState<string | null>(null);
@@ -52,9 +50,6 @@ export function GeneralLedgerListingPage({ onViewEntry, onNavigateBack }: Genera
         fetchVendors(),
         fetchProducts(),
       ]);
-      
-      setCustomers(customersData);
-      setProducts(productsData);
       
       // Generate GL entries from orders
       const entries: GLEntry[] = [];

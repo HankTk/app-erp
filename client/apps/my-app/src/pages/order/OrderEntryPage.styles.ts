@@ -119,3 +119,7 @@ export const ButtonGroup = styled.div`
   flex-shrink: 0;
 `;
 
+export const ItemsTable = styled.div`
+  overflow-x: auto;
+`;
+

@@ -91,7 +91,7 @@ export function GeneralLedgerDetailPage(props: GeneralLedgerDetailPageProps = {}
 
   const selectedCustomer = customers.find(c => c.id === order.customerId);
   const customerName = selectedCustomer 
-    ? (selectedCustomer.companyName || `${selectedCustomer.lastName} ${selectedCustomer.firstName}` || selectedCustomer.email)
+    ? (selectedCustomer.companyName || `${selectedCustomer.lastName || ''} ${selectedCustomer.firstName || ''}`.trim() || selectedCustomer.email || 'Unknown')
     : 'Unknown';
 
   const formatDate = (dateString?: string) => {

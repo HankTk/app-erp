@@ -1,5 +1,4 @@
 import {
-  AxCard,
   AxHeading3,
   AxParagraph,
   AxButton,

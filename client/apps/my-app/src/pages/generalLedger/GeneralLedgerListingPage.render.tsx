@@ -5,7 +5,6 @@ import {
   AxTableRow,
   AxTableHeader,
   AxTableCell,
-  AxCard,
   AxHeading3,
   AxParagraph,
   AxButton,
@@ -76,7 +75,6 @@ interface GeneralLedgerListingPageRenderProps {
 
 export function GeneralLedgerListingPageRender(props: GeneralLedgerListingPageRenderProps) {
   const {
-    glEntries,
     loading,
     error,
     typeFilter,
@@ -218,15 +216,15 @@ export function GeneralLedgerListingPageRender(props: GeneralLedgerListingPageRe
             <AxFormGroup style={{ margin: 0 }}>
               <AxListbox
                 options={[
-                  { value: null, label: 'All Types' },
+                  { value: '', label: 'All Types' },
                   { value: 'REVENUE', label: 'Revenue' },
                   { value: 'COST', label: 'Cost' },
                   { value: 'EXPENSE', label: 'Expense' },
                   { value: 'ACCOUNTS_PAYABLE', label: 'Accounts Payable' },
                   { value: 'PAYMENT', label: 'Payment' },
                 ]}
-                value={typeFilter}
-                onChange={(value) => onTypeFilterChange(value)}
+                value={typeFilter || ''}
+                onChange={(value: string | string[]) => onTypeFilterChange(Array.isArray(value) ? value[0] || null : value || null)}
                 placeholder="Filter by type"
                 style={{ width: '200px' }}
               />
@@ -262,8 +260,7 @@ export function GeneralLedgerListingPageRender(props: GeneralLedgerListingPageRe
                   const debitAmount = entry.type === 'COST' || entry.type === 'EXPENSE' || entry.type === 'ACCOUNTS_PAYABLE' ? entry.amount : 0;
                   const creditAmount = entry.type === 'REVENUE' || entry.type === 'PAYMENT' ? entry.amount : 0;
                   
-                  // Determine order/PO number and customer/supplier name
-                  const orderOrPONumber = entry.orderNumber || entry.poNumber || 'N/A';
+                  // Determine customer/supplier name
                   const customerOrSupplierName = entry.customerName || entry.supplierName || 'N/A';
                   
                   return (

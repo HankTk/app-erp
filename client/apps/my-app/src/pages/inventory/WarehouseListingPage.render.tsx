@@ -252,7 +252,7 @@ export function WarehouseListingPageRender(props: WarehouseListingPageRenderProp
       </HeaderCard>
 
       <TableCard padding="large" {...debugProps(COMPONENT_NAME, 'TableCard')}>
-        <AxTable fullWidth variant="bordered">
+        <AxTable fullWidth>
           <AxTableHead>
             <AxTableRow>
               {LISTING_TABLE_COLUMNS.map((column) => (

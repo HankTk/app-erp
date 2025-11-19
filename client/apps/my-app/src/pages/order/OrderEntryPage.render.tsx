@@ -1,5 +1,4 @@
 import {
-  AxCard,
   AxHeading3,
   AxParagraph,
   AxButton,
@@ -233,10 +232,11 @@ export function OrderEntryPageRender(props: OrderEntryPageRenderProps) {
                     <AxListbox
                       key={`status-${order.id}-${order.status || 'null'}`}
                       options={statusOptions}
-                      value={order?.status || null}
-                      onChange={(value) => {
-                        if (value) {
-                          onStatusChange(value);
+                      value={order?.status || undefined}
+                      onChange={(value: string | string[]) => {
+                        const statusValue = Array.isArray(value) ? value[0] : value;
+                        if (statusValue) {
+                          onStatusChange(statusValue);
                         }
                       }}
                       placeholder={l10n('orderEntry.selectStatus')}
@@ -263,7 +263,7 @@ export function OrderEntryPageRender(props: OrderEntryPageRenderProps) {
                 // In edit mode, show all steps except history
                 return step.key !== 'history';
               })
-              .map((step, index) => {
+              .map((step) => {
                 const isActive = currentStep === step.key;
                 const isCompleted = isStepCompleted(step.key);
                 // Calculate the original step number for display

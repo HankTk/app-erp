@@ -2,9 +2,8 @@ import { useState, useEffect, useRef } from 'react';
 import { useWebSocket } from '../../hooks/useWebSocket';
 import { useI18n } from '../../i18n/I18nProvider';
 import { fetchCustomers, Customer } from '../../api/customerApi';
-import { fetchAddressesByCustomerId } from '../../api/addressApi';
+import { fetchAddressesByCustomerId, Address } from '../../api/addressApi';
 import { fetchActiveProducts, Product } from '../../api/productApi';
-import { CustomerEditDialog } from '../../components/CustomerEditDialog';
 import {
   createOrder,
   updateOrder,
@@ -27,7 +26,9 @@ import { OrderInvoicingStepPage } from './OrderInvoicingStepPage';
 import { OrderHistoryStepPage } from './OrderHistoryStepPage';
 import { OrderEntryPageRender } from './OrderEntryPage.render';
 import { PageContainer, ContentCard } from './OrderEntryPage.styles';
-import { AxParagraph } from '@ui/components';
+import { 
+  AxParagraph, 
+} from '@ui/components';
 
 
 
@@ -64,7 +65,6 @@ export function OrderEntryPage(props: OrderEntryPageProps = {}) {
   // Shipping address state
   const [shippingId, setShippingId] = useState<string | null>(null);
   const [billingId, setBillingId] = useState<string | null>(null);
-  const [customerDialogOpen, setCustomerDialogOpen] = useState(false);
 
   // Approval state
   const [approvalNotes, setApprovalNotes] = useState<string>('');
@@ -686,11 +686,11 @@ export function OrderEntryPage(props: OrderEntryPageProps = {}) {
       jsonData.invoiceNumber = invoiceNumber;
       jsonData.invoiceDate = invoiceDate;
       // Set invoice date as LocalDateTime string format
-      const invoiceDateObj = invoiceDate ? new Date(invoiceDate + 'T00:00:00').toISOString() : null;
+      const invoiceDateObj = invoiceDate ? new Date(invoiceDate + 'T00:00:00').toISOString() : undefined;
       const updated = await updateOrder(order.id!, {
         ...order,
         status: 'INVOICED',
-        invoiceNumber: invoiceNumber, // Store in Order entity for A/R processing
+        invoiceNumber: invoiceNumber || undefined, // Store in Order entity for A/R processing
         invoiceDate: invoiceDateObj, // Store in Order entity
         jsonData,
       });
@@ -792,11 +792,11 @@ export function OrderEntryPage(props: OrderEntryPageProps = {}) {
     return steps.findIndex(s => s.key === step);
   };
 
-  const isStepCompleted = (step: OrderStep) => {
+  const isStepCompleted = (step: OrderStep): boolean => {
     if (!order) return false;
     switch (step) {
       case 'entry':
-        return order.status !== 'DRAFT' || (!!order.customerId && order.items && order.items.length > 0 && !!order.shippingAddressId && !!order.billingAddressId);
+        return order.status !== 'DRAFT' || !!(order.customerId && order.items && order.items.length > 0 && order.shippingAddressId && order.billingAddressId);
       case 'approval':
         return order.status === 'APPROVED' || order.status === 'SHIPPING_INSTRUCTED' || order.status === 'SHIPPED' || order.status === 'INVOICED' || order.status === 'PAID';
       case 'confirmation':
@@ -814,29 +814,13 @@ export function OrderEntryPage(props: OrderEntryPageProps = {}) {
     }
   };
 
-  const isEntrySubStepCompleted = (subStep: EntrySubStep) => {
-    if (!order) return false;
-    switch (subStep) {
-      case 'customer':
-        return !!order.customerId;
-      case 'products':
-        return order.items && order.items.length > 0;
-      case 'shipping':
-        return !!order.shippingAddressId && !!order.billingAddressId;
-      case 'review':
-        return false;
-      default:
-        return false;
-    }
-  };
-
-  const canProceedToNext = () => {
+  const canProceedToNext = (): boolean => {
     if (currentStep === 'entry') {
       switch (currentEntrySubStep) {
         case 'customer':
           return !!order?.customerId;
         case 'products':
-          return order?.items && order.items.length > 0;
+          return !!(order?.items && order.items.length > 0);
         case 'shipping':
           return !!order?.shippingAddressId && !!order?.billingAddressId;
         case 'review':
@@ -848,7 +832,7 @@ export function OrderEntryPage(props: OrderEntryPageProps = {}) {
     
     switch (currentStep) {
       case 'approval':
-        return creditCheckPassed && inventoryConfirmed && priceApproved;
+        return !!(creditCheckPassed && inventoryConfirmed && priceApproved);
       case 'confirmation':
         return true;
       case 'shipping_instruction':
@@ -884,6 +868,12 @@ export function OrderEntryPage(props: OrderEntryPageProps = {}) {
     }
   };
 
+  const handleSetCurrentEntrySubStep = (subStep: string) => {
+    if (subStep === 'customer' || subStep === 'products' || subStep === 'shipping' || subStep === 'review') {
+      setCurrentEntrySubStep(subStep);
+    }
+  };
+
   const handlePrevious = () => {
     if (currentStep === 'entry') {
       const currentSubIndex = entrySubSteps.findIndex(s => s.key === currentEntrySubStep);
@@ -907,628 +897,6 @@ export function OrderEntryPage(props: OrderEntryPageProps = {}) {
         }
       }
     }
-  };
-
-  const renderCustomerStep = () => {
-    const customerOptions = customers.map(c => ({
-      value: c.id!,
-      label: c.companyName || `${c.lastName} ${c.firstName}` || c.email || c.id!,
-    }));
-
-    return (
-      <div>
-        <AxHeading3 style={{ marginBottom: 'var(--spacing-md)' }}>Select Customer</AxHeading3>
-        {!order?.id && (
-          <AxParagraph style={{ marginBottom: 'var(--spacing-md)', color: 'var(--color-warning)' }}>
-            Initializing order... Please wait.
-          </AxParagraph>
-        )}
-        <AxFormGroup>
-          <AxLabel>Customer</AxLabel>
-          <AxListbox
-            options={customerOptions}
-            value={order?.customerId || null}
-            onChange={(value) => {
-              if (value && order?.id) {
-                handleCustomerSelect(value);
-              } else if (value && !order?.id) {
-                alert('Order is not ready yet. Please wait a moment and try again.');
-              }
-            }}
-            placeholder="Select a customer"
-            fullWidth
-            disabled={loading || !order?.id}
-          />
-        </AxFormGroup>
-        {order?.customerId && (
-          <AxParagraph style={{ marginTop: 'var(--spacing-md)', color: 'var(--color-text-secondary)' }}>
-            Customer selected. You can proceed to the next step.
-          </AxParagraph>
-        )}
-      </div>
-    );
-  };
-
-  const renderProductsStep = () => {
-    const productOptions = products.map(p => ({
-      value: p.id!,
-      label: `${p.productCode || ''} - ${p.productName || ''} ($${p.unitPrice || 0})`,
-    }));
-
-    return (
-      <div>
-        <AxHeading3 style={{ marginBottom: 'var(--spacing-md)' }}>Add Products</AxHeading3>
-        
-        <div style={{ display: 'flex', gap: 'var(--spacing-sm)', alignItems: 'flex-end', marginBottom: 'var(--spacing-lg)' }}>
-          <div style={{ flex: 1 }}>
-            <AxFormGroup style={{ marginBottom: 0 }}>
-              <AxLabel>Product</AxLabel>
-              <AxListbox
-                options={productOptions}
-                value={selectedProduct}
-                onChange={setSelectedProduct}
-                placeholder="Select a product"
-                fullWidth
-                disabled={loading}
-              />
-            </AxFormGroup>
-          </div>
-          <div style={{ width: '150px' }}>
-            <AxFormGroup style={{ marginBottom: 0 }}>
-              <AxLabel>Quantity</AxLabel>
-              <AxInput
-                type="number"
-                min="1"
-                value={quantity}
-                onChange={(e) => setQuantity(parseInt(e.target.value) || 1)}
-                disabled={loading}
-                fullWidth
-              />
-            </AxFormGroup>
-          </div>
-          <AxButton
-            variant="primary"
-            onClick={() => {
-              if (selectedProduct) {
-                handleAddProduct(selectedProduct, quantity);
-                setSelectedProduct(null);
-                setQuantity(1);
-              }
-            }}
-            disabled={!selectedProduct || loading}
-          >
-            Add
-          </AxButton>
-        </div>
-
-        <ItemsTable>
-          <AxTable fullWidth>
-            <AxTableHead>
-              <AxTableRow>
-                <AxTableHeader>Product</AxTableHeader>
-                <AxTableHeader>Quantity</AxTableHeader>
-                <AxTableHeader align="right">Unit Price</AxTableHeader>
-                <AxTableHeader align="right">Line Total</AxTableHeader>
-                <AxTableHeader align="center">Actions</AxTableHeader>
-              </AxTableRow>
-            </AxTableHead>
-            <AxTableBody>
-              {order?.items && order.items.length > 0 ? (
-                order.items.map((item) => (
-                  <AxTableRow key={item.id}>
-                    <AxTableCell>{item.productName || item.productCode}</AxTableCell>
-                    <AxTableCell>
-                      <div style={{ display: 'flex', gap: 'var(--spacing-xs)', alignItems: 'center' }}>
-                        <AxButton
-                          variant="secondary"
-                          size="small"
-                          onClick={() => handleUpdateQuantity(item.id!, (item.quantity || 1) - 1)}
-                          disabled={loading || (item.quantity || 1) <= 1}
-                        >
-                          -
-                        </AxButton>
-                        <span style={{ minWidth: '40px', textAlign: 'center' }}>{item.quantity || 0}</span>
-                        <AxButton
-                          variant="secondary"
-                          size="small"
-                          onClick={() => handleUpdateQuantity(item.id!, (item.quantity || 1) + 1)}
-                          disabled={loading}
-                        >
-                          +
-                        </AxButton>
-                      </div>
-                    </AxTableCell>
-                    <AxTableCell align="right">${item.unitPrice?.toFixed(2) || '0.00'}</AxTableCell>
-                    <AxTableCell align="right">${item.lineTotal?.toFixed(2) || '0.00'}</AxTableCell>
-                    <AxTableCell align="center">
-                      <AxButton
-                        variant="danger"
-                        size="small"
-                        onClick={() => handleRemoveItem(item.id!)}
-                        disabled={loading}
-                      >
-                        Delete
-                      </AxButton>
-                    </AxTableCell>
-                  </AxTableRow>
-                ))
-              ) : (
-                <AxTableRow>
-                  <AxTableCell colSpan={5} align="center">
-                    <AxParagraph style={{ color: 'var(--color-text-secondary)' }}>
-                      No products added yet
-                    </AxParagraph>
-                  </AxTableCell>
-                </AxTableRow>
-              )}
-            </AxTableBody>
-          </AxTable>
-        </ItemsTable>
-
-        {order && (
-          <div style={{ marginTop: 'var(--spacing-lg)', padding: 'var(--spacing-md)', backgroundColor: 'var(--color-background-secondary)', borderRadius: 'var(--radius-md)' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 'var(--spacing-sm)' }}>
-              <AxParagraph><strong>Subtotal:</strong></AxParagraph>
-              <AxParagraph><strong>${order.subtotal?.toFixed(2) || '0.00'}</strong></AxParagraph>
-            </div>
-          </div>
-        )}
-      </div>
-    );
-  };
-
-  const handleCustomerUpdated = async () => {
-    // Refresh addresses by reloading from API
-    if (order?.customerId) {
-      try {
-        const refreshedAddresses = await fetchAddressesByCustomerId(order.customerId);
-        setAddresses(refreshedAddresses);
-      } catch (err) {
-        console.error('Error refreshing addresses:', err);
-      }
-    }
-  };
-
-  const handleAddressesUpdated = async () => {
-    // Refresh addresses when addresses are updated in customer dialog
-    if (order?.customerId) {
-      try {
-        const refreshedAddresses = await fetchAddressesByCustomerId(order.customerId);
-        setAddresses(refreshedAddresses);
-      } catch (err) {
-        console.error('Error refreshing addresses:', err);
-      }
-    }
-  };
-
-  const renderShippingAddressStep = () => {
-    // Show all addresses for both shipping and billing (same address can be used for both)
-    const allAddresses = addresses;
-
-    const addressOptions = allAddresses.map(a => ({
-      value: a.id!,
-      label: `${a.streetAddress1 || ''}, ${a.city || ''}, ${a.state || ''} ${a.postalCode || ''}${a.addressType ? ` (${a.addressType})` : ''}`,
-    }));
-
-    return (
-      <div>
-        <AxHeading3 style={{ marginBottom: 'var(--spacing-md)' }}>Shipping Information</AxHeading3>
-        
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--spacing-md)' }}>
-          <AxFormGroup>
-            <AxLabel>Shipping Address</AxLabel>
-            <div style={{ display: 'flex', gap: 'var(--spacing-sm)', alignItems: 'flex-start' }}>
-              <div style={{ flex: 1 }}>
-                <AxListbox
-                  options={addressOptions}
-                  value={shippingId}
-                  onChange={(value) => {
-                    setShippingId(value);
-                    if (value && billingId) {
-                      handleShippingInfo(value, billingId);
-                    }
-                  }}
-                  placeholder="Select shipping address"
-                  fullWidth
-                  disabled={loading || addressOptions.length === 0}
-                />
-              </div>
-              <AxButton
-                onClick={() => {
-                  setCustomerDialogOpen(true);
-                }}
-                disabled={loading || !order?.customerId}
-                title="Edit customer and manage addresses"
-                style={{ 
-                  width: '44px',
-                  height: '44px',
-                  minWidth: '44px',
-                  padding: 0,
-                  whiteSpace: 'nowrap', 
-                  flexShrink: 0, 
-                  overflow: 'visible', 
-                  textOverflow: 'clip',
-                  backgroundColor: 'var(--color-background-secondary)',
-                  color: 'var(--color-text-primary)',
-                  border: '2px solid var(--color-border-default)',
-                  alignSelf: 'flex-start'
-                }}
-              >
-                ...
-              </AxButton>
-            </div>
-            {addressOptions.length === 0 && (
-              <AxParagraph style={{ marginTop: 'var(--spacing-xs)', color: 'var(--color-text-secondary)', fontSize: 'var(--font-size-sm)' }}>
-                No addresses found for this customer. Click ... to create a new address.
-              </AxParagraph>
-            )}
-          </AxFormGroup>
-
-          <AxFormGroup>
-            <AxLabel>Billing Address</AxLabel>
-            <div style={{ display: 'flex', gap: 'var(--spacing-sm)', alignItems: 'flex-start' }}>
-              <div style={{ flex: 1 }}>
-                <AxListbox
-                  options={addressOptions}
-                  value={billingId}
-                  onChange={(value) => {
-                    setBillingId(value);
-                    if (value && shippingId) {
-                      handleShippingInfo(shippingId, value);
-                    }
-                  }}
-                  placeholder="Select billing address (can be same as shipping)"
-                  fullWidth
-                  disabled={loading || addressOptions.length === 0}
-                />
-              </div>
-              <AxButton
-                onClick={() => {
-                  setCustomerDialogOpen(true);
-                }}
-                disabled={loading || !order?.customerId}
-                title="Edit customer and manage addresses"
-                style={{ 
-                  width: '44px',
-                  height: '44px',
-                  minWidth: '44px',
-                  padding: 0,
-                  whiteSpace: 'nowrap', 
-                  flexShrink: 0, 
-                  overflow: 'visible', 
-                  textOverflow: 'clip',
-                  backgroundColor: 'var(--color-background-secondary)',
-                  color: 'var(--color-text-primary)',
-                  border: '2px solid var(--color-border-default)',
-                  alignSelf: 'flex-start'
-                }}
-              >
-                ...
-              </AxButton>
-            </div>
-            {addressOptions.length === 0 && (
-              <AxParagraph style={{ marginTop: 'var(--spacing-xs)', color: 'var(--color-text-secondary)', fontSize: 'var(--font-size-sm)' }}>
-                No addresses found for this customer. Click ... to create a new address.
-              </AxParagraph>
-            )}
-          </AxFormGroup>
-        </div>
-        <AxParagraph style={{ marginTop: 'var(--spacing-xs)', color: 'var(--color-text-secondary)', fontSize: 'var(--font-size-sm)' }}>
-          You can select the same address for both shipping and billing.
-        </AxParagraph>
-        {order?.customerId && (
-          <CustomerEditDialog
-            open={customerDialogOpen}
-            onClose={() => {
-              setCustomerDialogOpen(false);
-            }}
-            customerId={order.customerId}
-            onCustomerUpdated={handleCustomerUpdated}
-            onAddressesUpdated={handleAddressesUpdated}
-          />
-        )}
-      </div>
-    );
-  };
-
-  const renderReviewStep = () => {
-    const shippingAddress = addresses.find(a => a.id === order?.shippingAddressId);
-    const billingAddress = addresses.find(a => a.id === order?.billingAddressId);
-
-    return (
-      <div>
-        <AxHeading3 style={{ marginBottom: 'var(--spacing-md)' }}>Review Order</AxHeading3>
-        
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-lg)' }}>
-          <div style={{ display: 'flex', gap: 'var(--spacing-xl)', flexWrap: 'wrap' }}>
-            <div style={{ flex: 1, minWidth: '250px' }}>
-              <AxParagraph style={{ fontWeight: 'var(--font-weight-bold)', marginBottom: 'var(--spacing-sm)' }}>
-                Shipping Address
-              </AxParagraph>
-              {shippingAddress ? (
-                <AxParagraph>
-                  {shippingAddress.streetAddress1}<br />
-                  {shippingAddress.streetAddress2 && <>{shippingAddress.streetAddress2}<br /></>}
-                  {shippingAddress.city}, {shippingAddress.state} {shippingAddress.postalCode}<br />
-                  {shippingAddress.country}
-                </AxParagraph>
-              ) : (
-                <AxParagraph style={{ color: 'var(--color-text-secondary)' }}>Not selected</AxParagraph>
-              )}
-            </div>
-
-            <div style={{ flex: 1, minWidth: '250px' }}>
-              <AxParagraph style={{ fontWeight: 'var(--font-weight-bold)', marginBottom: 'var(--spacing-sm)' }}>
-                Billing Address
-              </AxParagraph>
-              {billingAddress ? (
-                <AxParagraph>
-                  {billingAddress.streetAddress1}<br />
-                  {billingAddress.streetAddress2 && <>{billingAddress.streetAddress2}<br /></>}
-                  {billingAddress.city}, {billingAddress.state} {billingAddress.postalCode}<br />
-                  {billingAddress.country}
-                </AxParagraph>
-              ) : (
-                <AxParagraph style={{ color: 'var(--color-text-secondary)' }}>Not selected</AxParagraph>
-              )}
-            </div>
-          </div>
-
-          <div>
-            <AxParagraph style={{ fontWeight: 'var(--font-weight-bold)', marginBottom: 'var(--spacing-sm)' }}>
-              Order Items
-            </AxParagraph>
-            <ItemsTable>
-              <AxTable fullWidth>
-                <AxTableHead>
-                  <AxTableRow>
-                    <AxTableHeader>Product</AxTableHeader>
-                    <AxTableHeader>Quantity</AxTableHeader>
-                    <AxTableHeader align="right">Unit Price</AxTableHeader>
-                    <AxTableHeader align="right">Line Total</AxTableHeader>
-                  </AxTableRow>
-                </AxTableHead>
-                <AxTableBody>
-                  {order?.items?.map((item) => (
-                    <AxTableRow key={item.id}>
-                      <AxTableCell>{item.productName || item.productCode}</AxTableCell>
-                      <AxTableCell>{item.quantity || 0}</AxTableCell>
-                      <AxTableCell align="right">${item.unitPrice?.toFixed(2) || '0.00'}</AxTableCell>
-                      <AxTableCell align="right">${item.lineTotal?.toFixed(2) || '0.00'}</AxTableCell>
-                    </AxTableRow>
-                  ))}
-                </AxTableBody>
-              </AxTable>
-            </ItemsTable>
-          </div>
-
-          <div style={{ padding: 'var(--spacing-md)', backgroundColor: 'var(--color-background-secondary)', borderRadius: 'var(--radius-md)' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 'var(--spacing-sm)' }}>
-              <AxParagraph>Subtotal:</AxParagraph>
-              <AxParagraph>${order?.subtotal?.toFixed(2) || '0.00'}</AxParagraph>
-            </div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 'var(--spacing-sm)' }}>
-              <AxParagraph>Tax:</AxParagraph>
-              <AxParagraph>${order?.tax?.toFixed(2) || '0.00'}</AxParagraph>
-            </div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 'var(--spacing-sm)' }}>
-              <AxParagraph>Shipping:</AxParagraph>
-              <AxParagraph>${order?.shippingCost?.toFixed(2) || '0.00'}</AxParagraph>
-            </div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', paddingTop: 'var(--spacing-sm)', borderTop: '2px solid var(--color-border-default)' }}>
-              <AxParagraph style={{ fontWeight: 'var(--font-weight-bold)' }}>Total:</AxParagraph>
-              <AxParagraph style={{ fontWeight: 'var(--font-weight-bold)' }}>${order?.total?.toFixed(2) || '0.00'}</AxParagraph>
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  };
-
-  const renderApprovalStep = () => {
-    return (
-      <div>
-        <AxHeading3 style={{ marginBottom: 'var(--spacing-md)' }}>{l10n('orderEntry.approval.title')}</AxHeading3>
-        <AxParagraph style={{ marginBottom: 'var(--spacing-lg)', color: 'var(--color-text-secondary)' }}>
-          {l10n('orderEntry.approval.description')}
-        </AxParagraph>
-        
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-md)' }}>
-          <AxFormGroup>
-            <AxLabel>
-              <input
-                type="checkbox"
-                checked={creditCheckPassed}
-                onChange={(e) => setCreditCheckPassed(e.target.checked)}
-                style={{ marginRight: 'var(--spacing-xs)' }}
-              />
-              {l10n('orderEntry.approval.creditCheck')}
-            </AxLabel>
-          </AxFormGroup>
-
-          <AxFormGroup>
-            <AxLabel>
-              <input
-                type="checkbox"
-                checked={inventoryConfirmed}
-                onChange={(e) => setInventoryConfirmed(e.target.checked)}
-                style={{ marginRight: 'var(--spacing-xs)' }}
-              />
-              {l10n('orderEntry.approval.inventoryConfirmed')}
-            </AxLabel>
-          </AxFormGroup>
-
-          <AxFormGroup>
-            <AxLabel>
-              <input
-                type="checkbox"
-                checked={priceApproved}
-                onChange={(e) => setPriceApproved(e.target.checked)}
-                style={{ marginRight: 'var(--spacing-xs)' }}
-              />
-              {l10n('orderEntry.approval.priceApproved')}
-            </AxLabel>
-          </AxFormGroup>
-
-          <AxFormGroup>
-            <AxLabel>{l10n('orderEntry.approval.notes')}</AxLabel>
-            <textarea
-              value={approvalNotes}
-              onChange={(e) => setApprovalNotes(e.target.value)}
-              style={{
-                width: '100%',
-                minHeight: '100px',
-                padding: 'var(--spacing-sm)',
-                borderRadius: 'var(--radius-md)',
-                border: '1px solid var(--color-border-default)',
-                fontFamily: 'inherit',
-              }}
-              placeholder={l10n('orderEntry.approval.notesPlaceholder')}
-            />
-          </AxFormGroup>
-        </div>
-      </div>
-    );
-  };
-
-  const renderConfirmationStep = () => {
-    return (
-      <div>
-        <AxHeading3 style={{ marginBottom: 'var(--spacing-md)' }}>{l10n('orderEntry.confirmation.title')}</AxHeading3>
-        <AxParagraph style={{ marginBottom: 'var(--spacing-lg)', color: 'var(--color-text-secondary)' }}>
-          {l10n('orderEntry.confirmation.description')}
-        </AxParagraph>
-        
-        <div style={{ padding: 'var(--spacing-lg)', backgroundColor: 'var(--color-background-secondary)', borderRadius: 'var(--radius-md)' }}>
-          <AxParagraph style={{ marginBottom: 'var(--spacing-md)' }}>
-            <strong>{l10n('orderEntry.confirmation.orderNumber')}</strong> {order?.orderNumber || 'N/A'}
-          </AxParagraph>
-          <AxParagraph style={{ marginBottom: 'var(--spacing-md)' }}>
-            <strong>{l10n('orderEntry.confirmation.customer')}</strong> {selectedCustomer?.companyName || selectedCustomer?.email || 'N/A'}
-          </AxParagraph>
-          <AxParagraph style={{ marginBottom: 'var(--spacing-md)' }}>
-            <strong>{l10n('orderEntry.confirmation.totalAmount')}</strong> ${order?.total?.toFixed(2) || '0.00'}
-          </AxParagraph>
-          <AxParagraph>
-            {l10n('orderEntry.confirmation.confirmMessage')}
-          </AxParagraph>
-        </div>
-      </div>
-    );
-  };
-
-  const renderShippingInstructionStep = () => {
-    return (
-      <div>
-        <AxHeading3 style={{ marginBottom: 'var(--spacing-md)' }}>{l10n('orderEntry.shippingInstruction.title')}</AxHeading3>
-        <AxParagraph style={{ marginBottom: 'var(--spacing-lg)', color: 'var(--color-text-secondary)' }}>
-          {l10n('orderEntry.shippingInstruction.description')}
-        </AxParagraph>
-        
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-md)' }}>
-          <AxFormGroup>
-            <AxLabel>{l10n('orderEntry.shippingInstruction.requestedShipDate')}</AxLabel>
-            <AxInput
-              type="date"
-              value={requestedShipDate}
-              onChange={(e) => setRequestedShipDate(e.target.value)}
-            />
-          </AxFormGroup>
-
-          <AxFormGroup>
-            <AxLabel>{l10n('orderEntry.shippingInstruction.notes')}</AxLabel>
-            <textarea
-              value={shippingInstructions}
-              onChange={(e) => setShippingInstructions(e.target.value)}
-              style={{
-                width: '100%',
-                minHeight: '100px',
-                padding: 'var(--spacing-sm)',
-                borderRadius: 'var(--radius-md)',
-                border: '1px solid var(--color-border-default)',
-                fontFamily: 'inherit',
-              }}
-              placeholder={l10n('orderEntry.shippingInstruction.notesPlaceholder')}
-            />
-          </AxFormGroup>
-        </div>
-      </div>
-    );
-  };
-
-  const renderShippingFulfillmentStep = () => {
-    return (
-      <div>
-        <AxHeading3 style={{ marginBottom: 'var(--spacing-md)' }}>{l10n('orderEntry.shipping.title')}</AxHeading3>
-        <AxParagraph style={{ marginBottom: 'var(--spacing-lg)', color: 'var(--color-text-secondary)' }}>
-          {l10n('orderEntry.shipping.description')}
-        </AxParagraph>
-        
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-md)' }}>
-          <AxFormGroup>
-            <AxLabel>{l10n('orderEntry.shipping.actualShipDate')}</AxLabel>
-            <AxInput
-              type="date"
-              value={actualShipDate}
-              onChange={(e) => setActualShipDate(e.target.value)}
-            />
-          </AxFormGroup>
-
-          <AxFormGroup>
-            <AxLabel>{l10n('orderEntry.shipping.trackingNumber')}</AxLabel>
-            <AxInput
-              type="text"
-              value={trackingNumber}
-              onChange={(e) => setTrackingNumber(e.target.value)}
-              placeholder={l10n('orderEntry.shipping.trackingNumberPlaceholder')}
-              fullWidth
-            />
-          </AxFormGroup>
-        </div>
-      </div>
-    );
-  };
-
-  const renderInvoicingStep = () => {
-    return (
-      <div>
-        <AxHeading3 style={{ marginBottom: 'var(--spacing-md)' }}>{l10n('orderEntry.invoicing.title')}</AxHeading3>
-        <AxParagraph style={{ marginBottom: 'var(--spacing-lg)', color: 'var(--color-text-secondary)' }}>
-          {l10n('orderEntry.invoicing.description')}
-        </AxParagraph>
-        
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-md)' }}>
-          <AxFormGroup>
-            <AxLabel>{l10n('orderEntry.invoicing.invoiceNumber')}</AxLabel>
-            <AxInput
-              type="text"
-              value={invoiceNumber}
-              onChange={(e) => setInvoiceNumber(e.target.value)}
-              placeholder={l10n('orderEntry.invoicing.invoiceNumberPlaceholder')}
-              style={{ width: '220px' }}
-            />
-          </AxFormGroup>
-
-          <AxFormGroup>
-            <AxLabel>{l10n('orderEntry.invoicing.invoiceDate')}</AxLabel>
-            <AxInput
-              type="date"
-              value={invoiceDate}
-              onChange={(e) => setInvoiceDate(e.target.value)}
-            />
-          </AxFormGroup>
-
-          <div style={{ padding: 'var(--spacing-md)', backgroundColor: 'var(--color-background-secondary)', borderRadius: 'var(--radius-md)' }}>
-            <AxParagraph style={{ fontWeight: 'var(--font-weight-bold)', marginBottom: 'var(--spacing-sm)' }}>
-              {l10n('orderEntry.invoicing.invoiceAmount')}
-            </AxParagraph>
-            <AxParagraph style={{ fontSize: 'var(--font-size-lg)' }}>
-              ${order?.total?.toFixed(2) || '0.00'}
-            </AxParagraph>
-          </div>
-        </div>
-      </div>
-    );
   };
 
   const handleOrderUpdate = (updatedOrder: Order) => {
@@ -1724,8 +1092,6 @@ export function OrderEntryPage(props: OrderEntryPageProps = {}) {
     }
   };
 
-  const selectedCustomer = customers.find(c => c.id === order?.customerId);
-
   const statusOptions = [
     { value: 'DRAFT', label: l10n('orderEntry.status.draft') },
     { value: 'PENDING_APPROVAL', label: l10n('orderEntry.status.pendingApproval') },
@@ -1795,22 +1161,6 @@ export function OrderEntryPage(props: OrderEntryPageProps = {}) {
     }
   };
 
-  const handleNotesChange = async (notes: string) => {
-    if (!order || !order.id) {
-      return;
-    }
-    try {
-      const updated = await updateOrder(order.id, {
-        ...order,
-        notes: notes,
-      });
-      setOrder(updated);
-    } catch (err) {
-      console.error('Error updating order notes:', err);
-      alert('Failed to update order notes');
-    }
-  };
-
   return (
     <OrderEntryPageRender
       order={order}
@@ -1840,7 +1190,7 @@ export function OrderEntryPage(props: OrderEntryPageProps = {}) {
       handleShipOrder={handleShipOrder}
       handleInvoiceOrder={handleInvoiceOrder}
       setCurrentStep={setCurrentStep}
-      setCurrentEntrySubStep={setCurrentEntrySubStep}
+      setCurrentEntrySubStep={handleSetCurrentEntrySubStep}
       onStatusChange={handleStatusChange}
       orderIdToEdit={orderIdToEdit}
       l10n={l10n}
