@@ -69,8 +69,10 @@ app-erp/
 
 For detailed documentation, please refer to:
 
+- **[Documentation Index](docs/README.md)** - Comprehensive system documentation including module diagrams, process reviews, and screenshots
 - **[Backend Documentation](server/README.md)** - Spring Boot API, endpoints, data models, and configuration
 - **[Frontend Documentation](client/README.md)** - React applications, UI components, and development guide
+- **[Screenshots](docs/SCREENSHOTS.md)** - Visual documentation of the ERP system interface
 
 ## ✨ Features
 
